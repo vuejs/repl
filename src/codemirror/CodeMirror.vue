@@ -69,7 +69,8 @@ onMounted(() => {
 }
 
 .CodeMirror {
-  font-family: 'Source Code Pro', monospace;
+  font-family: var(--font-code);
+  line-height: 1.5;
   height: 100%;
 }
 </style>

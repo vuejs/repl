@@ -93,7 +93,6 @@ function doneAddFile() {
   cursor: pointer;
   color: #999;
   box-sizing: border-box;
-  height: 34px;
 }
 .file.active {
   color: var(--color-branding);
@@ -120,13 +119,13 @@ function doneAddFile() {
   padding-left: 0;
 }
 .add {
-  font-size: 20px;
+  font-size: 18px;
   font-family: var(--font-code);
   color: #999;
   vertical-align: middle;
   margin-left: 6px;
   position: relative;
-  top: -2px;
+  top: -1px;
 }
 .add:hover {
   color: var(--color-branding);

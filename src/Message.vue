@@ -55,6 +55,12 @@ function formatMessage(err: string | Error): string {
   overflow-y: scroll;
 }
 
+@media (max-width: 720px) {
+  .msg {
+    bottom: 50px;
+  }
+}
+
 .msg.err {
   color: red;
   border-color: red;

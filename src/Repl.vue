@@ -39,9 +39,10 @@ provide('store', props.store)
     Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
   color: var(--base);
   margin: 0;
+  overflow: hidden;
   background-color: #f8f8f8;
   --base: #444;
-  --font-code: 'Source Code Pro', monospace;
+  --font-code: Menlo, Monaco, Consolas, "Courier New", monospace;
   --color-branding: #3ca877;
   --color-branding-dark: #416f9c;
 }

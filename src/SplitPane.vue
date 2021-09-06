@@ -3,6 +3,9 @@ import { ref, reactive } from 'vue'
 
 const container = ref()
 
+// mobile only
+const showOutput = ref(false)
+
 const state = reactive({
   dragging: false,
   split: 50
@@ -40,7 +43,7 @@ function dragEnd() {
   <div
     ref="container"
     class="split-pane"
-    :class="{ dragging: state.dragging }"
+    :class="{ dragging: state.dragging, 'show-output': showOutput }"
     @mousemove="dragMove"
     @mouseup="dragEnd"
     @mouseleave="dragEnd"
@@ -52,6 +55,10 @@ function dragEnd() {
     <div class="right" :style="{ width: 100 - boundSplit() + '%' }">
       <slot name="right" />
     </div>
+
+    <button class="toggler" @click="showOutput = !showOutput">
+      {{ showOutput ? '< Code' : 'Output >' }}
+    </button>
   </div>
 </template>
 
@@ -59,6 +66,7 @@ function dragEnd() {
 .split-pane {
   display: flex;
   height: 100%;
+  position: relative;
 }
 .split-pane.dragging {
   cursor: ew-resize;
@@ -83,5 +91,37 @@ function dragEnd() {
   right: -5px;
   width: 10px;
   cursor: ew-resize;
+}
+.toggler {
+  display: none;
+  z-index: 999;
+  font-family: var(--font-code);
+  color: #444;
+  position: absolute;
+  left: 50%;
+  bottom: 20px;
+  background-color: #fff;
+  padding: 8px 12px;
+  border-radius: 8px;
+  transform: translateX(-50%);
+  box-shadow: 0 3px 8px rgba(0,0,0,0.25);
+}
+@media (max-width: 720px) {
+  .toggler {
+    display: block;
+  }
+  .left,
+  .right {
+    width: 100% !important;
+  }
+  .right {
+    display: none;
+  }
+  .split-pane.show-output .right {
+    display: block;
+  }
+  .split-pane.show-output .left {
+    display: none;
+  }
 }
 </style>
