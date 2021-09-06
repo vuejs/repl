@@ -6,7 +6,10 @@ import { Repl, ReplStore } from '../src'
 const App = {
   setup() {
     const store = new ReplStore({
-      serializedState: location.hash.slice(1)
+      serializedState: location.hash.slice(1),
+      defaultVueRuntimeURL: import.meta.env.PROD
+        ? undefined
+        : `${location.origin}/src/vue-dev-proxy`
     })
 
     watchEffect(() => history.replaceState({}, '', store.serialize()))

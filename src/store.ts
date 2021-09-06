@@ -64,9 +64,7 @@ export class ReplStore {
       }
     }
 
-    this.defaultVueRuntimeURL = import.meta.env.PROD
-      ? defaultVueRuntimeURL
-      : `${location.origin}/src/vue-dev-proxy`
+    this.defaultVueRuntimeURL = defaultVueRuntimeURL
 
     this.state = reactive({
       files,
