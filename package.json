@@ -1,6 +1,6 @@
 {
   "name": "@vue/repl",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Vue component for editing Vue components",
   "main": "dist/vue-repl.js",
   "files": [
@@ -29,13 +29,13 @@
     "@types/codemirror": "^5.60.2",
     "@vitejs/plugin-vue": "^1.6.0",
     "@vue/compiler-sfc": "^3.2.9",
-    "vite": "^2.5.3",
-    "vue": "^3.2.9",
     "codemirror": "^5.62.3",
-    "sucrase": "^3.20.1"
+    "sucrase": "^3.20.1",
+    "vite": "^2.5.3",
+    "vue": "^3.2.9"
   },
   "peerDependencies": {
-    "vue": "^3.2.9",
-    "@vue/compiler-sfc": "^3.2.9"
+    "@vue/compiler-sfc": "^3.2.9",
+    "vue": "^3.2.9"
   }
 }
