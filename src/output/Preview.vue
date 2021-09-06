@@ -29,26 +29,13 @@ onMounted(createSandbox)
 
 // reset sandbox when import map changes
 watch(
-  () => store.importMap,
-  (importMap, prev) => {
-    if (!importMap) {
-      if (prev) {
-        // import-map.json deleted
-        createSandbox()
-      }
-      return
-    }
+  () => store.state.files['import-map.json'].code,
+  (raw) => {
     try {
-      const map = JSON.parse(importMap)
+      const map = JSON.parse(raw)
       if (!map.imports) {
         store.state.errors = [`import-map.json is missing "imports" field.`]
         return
-      }
-      if (map.imports.vue) {
-        store.state.errors = [
-          'Select Vue versions using the top-right dropdown.\n' +
-            'Specifying it in the import map has no effect.'
-        ]
       }
       createSandbox()
     } catch (e: any) {
@@ -88,20 +75,13 @@ function createSandbox() {
     ].join(' ')
   )
 
-  let importMap: Record<string, any>
-  try {
-    importMap = JSON.parse(store.importMap || `{}`)
-  } catch (e: any) {
-    store.state.errors = [
-      `Syntax error in import-map.json: ${(e as Error).message}`
-    ]
-    return
-  }
-
+  const importMap = store.getImportMap()
   if (!importMap.imports) {
     importMap.imports = {}
   }
-  importMap.imports.vue = store.state.vueRuntimeURL
+  if (!importMap.imports.vue) {
+    importMap.imports.vue = store.state.vueRuntimeURL
+  }
   const sandboxSrc = srcdoc.replace(
     /<!--IMPORT_MAP-->/,
     JSON.stringify(importMap)

@@ -1,11 +1,15 @@
 <script setup lang="ts">
 import { ReplStore } from '../store'
-import { inject, ref, VNode } from 'vue'
+import { computed, inject, ref, VNode } from 'vue'
 
 const store = inject('store') as ReplStore
 
 const pending = ref(false)
 const pendingFilename = ref('Comp.vue')
+const importMapFile = 'import-map.json'
+const files = computed(() =>
+  Object.keys(store.state.files).filter((f) => f !== importMapFile)
+)
 
 function startAddFile() {
   pending.value = true
@@ -22,10 +26,8 @@ function focus({ el }: VNode) {
 function doneAddFile() {
   const filename = pendingFilename.value
 
-  if (!/\.(vue|js|ts)$/.test(filename) && filename !== 'import-map.json') {
-    store.state.errors = [
-      `Playground only supports *.vue, *.js, *.ts files or import-map.json.`
-    ]
+  if (!/\.(vue|js|ts)$/.test(filename)) {
+    store.state.errors = [`Playground only supports *.vue, *.js, *.ts files.`]
     return
   }
 
@@ -44,14 +46,14 @@ function doneAddFile() {
 <template>
   <div class="file-selector">
     <div
-      v-for="(file, i) in Object.keys(store.state.files)"
+      v-for="(file, i) in files"
       class="file"
       :class="{ active: store.state.activeFilename === file }"
       @click="store.setActive(file)"
     >
       <span class="label">{{ file }}</span>
       <span v-if="i > 0" class="remove" @click.stop="store.deleteFile(file)">
-        <svg width="12" height="12" viewBox="0 0 24 24" class="svelte-cghqrp">
+        <svg class="icon" width="12" height="12" viewBox="0 0 24 24">
           <line stroke="#999" x1="18" y1="6" x2="6" y2="18"></line>
           <line stroke="#999" x1="6" y1="6" x2="18" y2="18"></line>
         </svg>
@@ -67,6 +69,13 @@ function doneAddFile() {
       />
     </div>
     <button class="add" @click="startAddFile">+</button>
+    <div
+      class="file import-map"
+      :class="{ active: store.state.activeFilename === importMapFile }"
+      @click="store.setActive(importMapFile)"
+    >
+      <span class="label">Import Map</span>
+    </div>
   </div>
 </template>
 
@@ -75,6 +84,7 @@ function doneAddFile() {
   box-sizing: border-box;
   border-bottom: 1px solid #ddd;
   background-color: white;
+  overflow-x: scroll;
 }
 .file {
   display: inline-block;
@@ -83,6 +93,7 @@ function doneAddFile() {
   cursor: pointer;
   color: #999;
   box-sizing: border-box;
+  height: 34px;
 }
 .file.active {
   color: var(--color-branding);
@@ -114,8 +125,16 @@ function doneAddFile() {
   color: #999;
   vertical-align: middle;
   margin-left: 6px;
+  position: relative;
+  top: -2px;
 }
 .add:hover {
   color: var(--color-branding);
+}
+.icon {
+  margin-top: -1px;
+}
+.import-map {
+  float: right;
 }
 </style>

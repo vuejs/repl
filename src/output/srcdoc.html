@@ -12,6 +12,7 @@
 			(() => {
 				let scriptEls = []
 
+				window.process = { env: {} }
 				window.__modules__ = {}
 
 				window.__export__ = (mod, key, get) => {

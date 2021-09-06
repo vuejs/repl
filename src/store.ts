@@ -75,6 +75,8 @@ export class ReplStore {
       vueRuntimeURL: this.defaultVueRuntimeURL
     })
 
+    this.initImportMap()
+
     watchEffect(() => compileFile(this, this.activeFile))
 
     for (const file in this.state.files) {
@@ -88,26 +90,12 @@ export class ReplStore {
     return this.state.files[this.state.activeFilename]
   }
 
-  get importMap() {
-    const file = this.state.files['import-map.json']
-    return file && file.code
-  }
-
   setActive(filename: string) {
     this.state.activeFilename = filename
   }
 
   addFile(filename: string) {
-    const file = (this.state.files[filename] = new File(filename))
-
-    if (filename === 'import-map.json') {
-      file.code = `
-{
-  "imports": {
-
-  }
-}`.trim()
-    }
+    this.state.files[filename] = new File(filename)
     this.setActive(filename)
   }
 
@@ -138,6 +126,34 @@ export class ReplStore {
       files[filename] = new File(filename, newFiles[filename])
     }
     this.state.files = files
+    this.initImportMap()
+  }
+
+  private initImportMap() {
+    if (!this.state.files['import-map.json']) {
+      this.state.files['import-map.json'] = new File(
+        'import-map.json',
+        JSON.stringify({ imports: {} }, null, 2)
+      )
+    }
+  }
+
+  getImportMap() {
+    try {
+      return JSON.parse(this.state.files['import-map.json'].code)
+    } catch (e) {
+      this.state.errors = [
+        `Syntax error in import-map.json: ${(e as Error).message}`
+      ]
+      return {}
+    }
+  }
+
+  setImportMap(map: {
+    imports: Record<string, string>
+    scopes?: Record<string, Record<string, string>>
+  }) {
+    this.state.files['import-map.json']!.code = JSON.stringify(map, null, 2)
   }
 
   async setVueVersion(version: string) {
