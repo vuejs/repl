@@ -17,5 +17,5 @@
     "lib": ["esnext", "dom"],
     "rootDir": "."
   },
-  "include": ["src"]
+  "include": ["src", "demo", "vite.config.ts"]
 }

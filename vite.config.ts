@@ -3,12 +3,15 @@ import vue from '@vitejs/plugin-vue'
 
 export default defineConfig({
   plugins: [vue()],
-  resolve: {
-    alias: {
-      '@vue/compiler-sfc': '@vue/compiler-sfc/dist/compiler-sfc.esm-browser.js'
+  build: {
+    minify: false,
+    sourcemap: true,
+    lib: {
+      entry: './src/index.ts',
+      formats: ['es']
+    },
+    rollupOptions: {
+      external: ['vue', '@vue/compiler-sfc']
     }
-  },
-  optimizeDeps: {
-    exclude: ['@vue/compiler-sfc']
   }
 })

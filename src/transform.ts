@@ -7,6 +7,7 @@ import {
 } from '@vue/compiler-sfc'
 import * as defaultCompiler from '@vue/compiler-sfc'
 import { ref } from 'vue'
+import { transform } from 'sucrase'
 
 export const MAIN_FILE = 'App.vue'
 export const COMP_IDENTIFIER = `__sfc__`
@@ -17,9 +18,9 @@ export const COMP_IDENTIFIER = `__sfc__`
  */
 let SFCCompiler: typeof defaultCompiler = defaultCompiler
 
-// @ts-ignore
 const defaultVueUrl = import.meta.env.PROD
-  ? `${location.origin}/vue.runtime.esm-browser.js` // to be copied on build
+  ? // TODO make this configurable
+    `https://unpkg.com/@vue/runtime-dom/dist/runtime-dom.esm-browser.js`
   : `${location.origin}/src/vue-dev-proxy`
 
 export const vueRuntimeUrl = ref(defaultVueUrl)
@@ -42,7 +43,7 @@ export function resetVersion() {
 }
 
 async function transformTS(src: string) {
-  return (await import('sucrase')).transform(src, {
+  return transform(src, {
     transforms: ['typescript']
   }).code
 }
@@ -78,7 +79,7 @@ export async function compileFile({ filename, code, compiled }: File) {
   }
 
   if (
-    descriptor.styles.some(s => s.lang) ||
+    descriptor.styles.some((s) => s.lang) ||
     (descriptor.template && descriptor.template.lang)
   ) {
     store.errors = [
@@ -96,7 +97,7 @@ export async function compileFile({ filename, code, compiled }: File) {
     return
   }
 
-  const hasScoped = descriptor.styles.some(s => s.scoped)
+  const hasScoped = descriptor.styles.some((s) => s.scoped)
   let clientCode = ''
   let ssrCode = ''
 
@@ -252,7 +253,7 @@ function doCompileTemplate(
     source: descriptor.template!.content,
     filename: descriptor.filename,
     id,
-    scoped: descriptor.styles.some(s => s.scoped),
+    scoped: descriptor.styles.some((s) => s.scoped),
     slotted: descriptor.slotted,
     ssr,
     ssrCssVars: descriptor.cssVars,
@@ -280,6 +281,6 @@ async function hashId(filename: string) {
   const msgUint8 = new TextEncoder().encode(filename) // encode as (utf-8) Uint8Array
   const hashBuffer = await crypto.subtle.digest('SHA-256', msgUint8) // hash the message
   const hashArray = Array.from(new Uint8Array(hashBuffer)) // convert buffer to byte array
-  const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('') // convert bytes to hex string
+  const hashHex = hashArray.map((b) => b.toString(16).padStart(2, '0')).join('') // convert bytes to hex string
   return hashHex.slice(0, 8)
 }
