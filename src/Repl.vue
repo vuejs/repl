@@ -2,6 +2,21 @@
 import SplitPane from './SplitPane.vue'
 import Editor from './editor/Editor.vue'
 import Output from './output/Output.vue'
+import { ReplStore } from './store'
+import { provide } from 'vue'
+
+const props = withDefaults(
+  defineProps<{
+    store?: ReplStore
+    showCompileOutput?: boolean
+  }>(),
+  {
+    store: () => new ReplStore(),
+    showCompileOutput: false
+  }
+)
+
+provide('store', props.store)
 </script>
 
 <template>
@@ -11,7 +26,7 @@ import Output from './output/Output.vue'
         <Editor />
       </template>
       <template #right>
-        <Output />
+        <Output :showCompileOutput="props.showCompileOutput" />
       </template>
     </SplitPane>
   </div>

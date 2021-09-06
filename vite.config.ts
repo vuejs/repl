@@ -8,7 +8,8 @@ export default defineConfig({
     sourcemap: true,
     lib: {
       entry: './src/index.ts',
-      formats: ['es']
+      formats: ['es'],
+      fileName: () => 'vue-repl.js'
     },
     rollupOptions: {
       external: ['vue', '@vue/compiler-sfc']

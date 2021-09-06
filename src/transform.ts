@@ -1,46 +1,14 @@
-import { store, File } from './store'
+import { ReplStore, File } from './store'
 import {
   SFCDescriptor,
   BindingMetadata,
   shouldTransformRef,
   transformRef
 } from '@vue/compiler-sfc'
-import * as defaultCompiler from '@vue/compiler-sfc'
-import { ref } from 'vue'
 import { transform } from 'sucrase'
 
 export const MAIN_FILE = 'App.vue'
 export const COMP_IDENTIFIER = `__sfc__`
-
-/**
- * The default SFC compiler we are using is built from each commit
- * but we may swap it out with a version fetched from CDNs
- */
-let SFCCompiler: typeof defaultCompiler = defaultCompiler
-
-const defaultVueUrl = import.meta.env.PROD
-  ? // TODO make this configurable
-    `https://unpkg.com/@vue/runtime-dom/dist/runtime-dom.esm-browser.js`
-  : `${location.origin}/src/vue-dev-proxy`
-
-export const vueRuntimeUrl = ref(defaultVueUrl)
-
-export async function setVersion(version: string) {
-  const compilerUrl = `https://unpkg.com/@vue/compiler-sfc@${version}/dist/compiler-sfc.esm-browser.js`
-  const runtimeUrl = `https://unpkg.com/@vue/runtime-dom@${version}/dist/runtime-dom.esm-browser.js`
-  const [compiler] = await Promise.all([
-    import(/* @vite-ignore */ compilerUrl),
-    import(/* @vite-ignore */ runtimeUrl)
-  ])
-  SFCCompiler = compiler
-  vueRuntimeUrl.value = runtimeUrl
-  console.info(`Now using Vue version: ${version}`)
-}
-
-export function resetVersion() {
-  SFCCompiler = defaultCompiler
-  vueRuntimeUrl.value = defaultVueUrl
-}
 
 async function transformTS(src: string) {
   return transform(src, {
@@ -48,9 +16,12 @@ async function transformTS(src: string) {
   }).code
 }
 
-export async function compileFile({ filename, code, compiled }: File) {
+export async function compileFile(
+  store: ReplStore,
+  { filename, code, compiled }: File
+) {
   if (!code.trim()) {
-    store.errors = []
+    store.state.errors = []
     return
   }
 
@@ -64,17 +35,17 @@ export async function compileFile({ filename, code, compiled }: File) {
     }
 
     compiled.js = compiled.ssr = code
-    store.errors = []
+    store.state.errors = []
     return
   }
 
   const id = await hashId(filename)
-  const { errors, descriptor } = SFCCompiler.parse(code, {
+  const { errors, descriptor } = store.compiler.parse(code, {
     filename,
     sourceMap: true
   })
   if (errors.length) {
-    store.errors = errors
+    store.state.errors = errors
     return
   }
 
@@ -82,7 +53,7 @@ export async function compileFile({ filename, code, compiled }: File) {
     descriptor.styles.some((s) => s.lang) ||
     (descriptor.template && descriptor.template.lang)
   ) {
-    store.errors = [
+    store.state.errors = [
       `lang="x" pre-processors for <template> or <style> are currently not ` +
         `supported.`
     ]
@@ -93,7 +64,7 @@ export async function compileFile({ filename, code, compiled }: File) {
     (descriptor.script && descriptor.script.lang) ||
     (descriptor.scriptSetup && descriptor.scriptSetup.lang)
   if (scriptLang && scriptLang !== 'ts') {
-    store.errors = [`Only lang="ts" is supported for <script> blocks.`]
+    store.state.errors = [`Only lang="ts" is supported for <script> blocks.`]
     return
   }
 
@@ -106,7 +77,7 @@ export async function compileFile({ filename, code, compiled }: File) {
     ssrCode += code
   }
 
-  const clientScriptResult = await doCompileScript(descriptor, id, false)
+  const clientScriptResult = await doCompileScript(store, descriptor, id, false)
   if (!clientScriptResult) {
     return
   }
@@ -116,11 +87,11 @@ export async function compileFile({ filename, code, compiled }: File) {
   // script ssr only needs to be performed if using <script setup> where
   // the render fn is inlined.
   if (descriptor.scriptSetup) {
-    const ssrScriptResult = await doCompileScript(descriptor, id, true)
+    const ssrScriptResult = await doCompileScript(store, descriptor, id, true)
     if (ssrScriptResult) {
       ssrCode += ssrScriptResult[0]
     } else {
-      ssrCode = `/* SSR compile error: ${store.errors[0]} */`
+      ssrCode = `/* SSR compile error: ${store.state.errors[0]} */`
     }
   } else {
     // when no <script setup> is used, the script result will be identical.
@@ -131,6 +102,7 @@ export async function compileFile({ filename, code, compiled }: File) {
   // only need dedicated compilation if not using <script setup>
   if (descriptor.template && !descriptor.scriptSetup) {
     const clientTemplateResult = doCompileTemplate(
+      store,
       descriptor,
       id,
       bindings,
@@ -141,12 +113,18 @@ export async function compileFile({ filename, code, compiled }: File) {
     }
     clientCode += clientTemplateResult
 
-    const ssrTemplateResult = doCompileTemplate(descriptor, id, bindings, true)
+    const ssrTemplateResult = doCompileTemplate(
+      store,
+      descriptor,
+      id,
+      bindings,
+      true
+    )
     if (ssrTemplateResult) {
       // ssr compile failure is fine
       ssrCode += ssrTemplateResult
     } else {
-      ssrCode = `/* SSR compile error: ${store.errors[0]} */`
+      ssrCode = `/* SSR compile error: ${store.state.errors[0]} */`
     }
   }
 
@@ -169,11 +147,13 @@ export async function compileFile({ filename, code, compiled }: File) {
   let css = ''
   for (const style of descriptor.styles) {
     if (style.module) {
-      store.errors = [`<style module> is not supported in the playground.`]
+      store.state.errors = [
+        `<style module> is not supported in the playground.`
+      ]
       return
     }
 
-    const styleResult = await SFCCompiler.compileStyleAsync({
+    const styleResult = await store.compiler.compileStyleAsync({
       source: style.content,
       filename,
       id,
@@ -184,7 +164,7 @@ export async function compileFile({ filename, code, compiled }: File) {
       // postcss uses pathToFileURL which isn't polyfilled in the browser
       // ignore these errors for now
       if (!styleResult.errors[0].message.includes('pathToFileURL')) {
-        store.errors = styleResult.errors
+        store.state.errors = styleResult.errors
       }
       // proceed even if css compile errors
     } else {
@@ -198,17 +178,18 @@ export async function compileFile({ filename, code, compiled }: File) {
   }
 
   // clear errors
-  store.errors = []
+  store.state.errors = []
 }
 
 async function doCompileScript(
+  store: ReplStore,
   descriptor: SFCDescriptor,
   id: string,
   ssr: boolean
 ): Promise<[string, BindingMetadata | undefined] | undefined> {
   if (descriptor.script || descriptor.scriptSetup) {
     try {
-      const compiledScript = SFCCompiler.compileScript(descriptor, {
+      const compiledScript = store.compiler.compileScript(descriptor, {
         id,
         refTransform: true,
         inlineTemplate: true,
@@ -227,7 +208,7 @@ async function doCompileScript(
       }
       code +=
         `\n` +
-        SFCCompiler.rewriteDefault(compiledScript.content, COMP_IDENTIFIER)
+        store.compiler.rewriteDefault(compiledScript.content, COMP_IDENTIFIER)
 
       if ((descriptor.script || descriptor.scriptSetup)!.lang === 'ts') {
         code = await transformTS(code)
@@ -235,7 +216,7 @@ async function doCompileScript(
 
       return [code, compiledScript.bindings]
     } catch (e: any) {
-      store.errors = [e.stack.split('\n').slice(0, 12).join('\n')]
+      store.state.errors = [e.stack.split('\n').slice(0, 12).join('\n')]
       return
     }
   } else {
@@ -244,12 +225,13 @@ async function doCompileScript(
 }
 
 function doCompileTemplate(
+  store: ReplStore,
   descriptor: SFCDescriptor,
   id: string,
   bindingMetadata: BindingMetadata | undefined,
   ssr: boolean
 ) {
-  const templateResult = SFCCompiler.compileTemplate({
+  const templateResult = store.compiler.compileTemplate({
     source: descriptor.template!.content,
     filename: descriptor.filename,
     id,
@@ -263,7 +245,7 @@ function doCompileTemplate(
     }
   })
   if (templateResult.errors.length) {
-    store.errors = templateResult.errors
+    store.state.errors = templateResult.errors
     return
   }
 

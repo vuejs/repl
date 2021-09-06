@@ -1,13 +1,13 @@
 {
-  "name": "vue-repl",
+  "name": "@vue/repl",
   "version": "1.0.0",
   "description": "Vue component for editing Vue components",
-  "main": "dist/vue-repl.es.js",
+  "main": "dist/vue-repl.js",
   "files": [
     "dist"
   ],
   "exports": {
-    ".": "./dist/vue-repl.es.js",
+    ".": "./dist/vue-repl.js",
     "./style.css": "./dist/style.css",
     "./dist/style.css": "./dist/style.css"
   },

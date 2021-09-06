@@ -4,7 +4,6 @@
 
 <script setup lang="ts">
 import { ref, onMounted, watchEffect } from 'vue'
-import { debounce } from '../utils'
 import CodeMirror from './codemirror'
 
 const el = ref()
@@ -54,13 +53,6 @@ onMounted(() => {
   watchEffect(() => {
     editor.setOption('mode', props.mode)
   })
-
-  window.addEventListener(
-    'resize',
-    debounce(() => {
-      editor.refresh()
-    })
-  )
 
   setTimeout(() => {
     editor.refresh()

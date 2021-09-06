@@ -1,4 +1,4 @@
-import { store, File } from '../store'
+import { File, ReplStore } from '../store'
 import { MAIN_FILE } from '../transform'
 import {
   babelParse,
@@ -12,8 +12,8 @@ import {
 import { babelParserDefaultPlugins } from '@vue/shared'
 import { ExportSpecifier, Identifier, Node } from '@babel/types'
 
-export function compileModulesForPreview() {
-  return processFile(store.files[MAIN_FILE]).reverse()
+export function compileModulesForPreview(store: ReplStore) {
+  return processFile(store, store.state.files[MAIN_FILE]).reverse()
 }
 
 const modulesKey = `__modules__`
@@ -22,7 +22,7 @@ const dynamicImportKey = `__dynamic_import__`
 const moduleKey = `__module__`
 
 // similar logic with Vite's SSR transform, except this is targeting the browser
-function processFile(file: File, seen = new Set<File>()) {
+function processFile(store: ReplStore, file: File, seen = new Set<File>()) {
   if (seen.has(file)) {
     return []
   }
@@ -45,7 +45,7 @@ function processFile(file: File, seen = new Set<File>()) {
 
   function defineImport(node: Node, source: string) {
     const filename = source.replace(/^\.\/+/, '')
-    if (!(filename in store.files)) {
+    if (!(filename in store.state.files)) {
       throw new Error(`File "${filename}" does not exist.`)
     }
     if (importedFiles.has(filename)) {
@@ -226,7 +226,7 @@ function processFile(file: File, seen = new Set<File>()) {
   const processed = [s.toString()]
   if (importedFiles.size) {
     for (const imported of importedFiles) {
-      processed.push(...processFile(store.files[imported], seen))
+      processed.push(...processFile(store, store.state.files[imported], seen))
     }
   }
 

@@ -2,9 +2,11 @@
 import FileSelector from './FileSelector.vue'
 import CodeMirror from '../codemirror/CodeMirror.vue'
 import Message from '../Message.vue'
-import { store } from '../store'
 import { debounce } from '../utils'
-import { ref, watch, computed } from 'vue'
+import { ref, watch, computed, inject } from 'vue'
+import { ReplStore } from '../store'
+
+const store = inject('store') as ReplStore
 
 const onChange = debounce((code: string) => {
   store.activeFile.code = code
@@ -12,11 +14,11 @@ const onChange = debounce((code: string) => {
 
 const activeCode = ref(store.activeFile.code)
 const activeMode = computed(() =>
-  store.activeFilename.endsWith('.vue') ? 'htmlmixed' : 'javascript'
+  store.state.activeFilename.endsWith('.vue') ? 'htmlmixed' : 'javascript'
 )
 
 watch(
-  () => store.activeFilename,
+  () => store.state.activeFilename,
   () => {
     activeCode.value = store.activeFile.code
   }
@@ -27,7 +29,7 @@ watch(
   <FileSelector />
   <div class="editor-container">
     <CodeMirror @change="onChange" :value="activeCode" :mode="activeMode" />
-    <Message :err="store.errors[0]" />
+    <Message :err="store.state.errors[0]" />
   </div>
 </template>
 

@@ -6,21 +6,23 @@ import {
   onUnmounted,
   watchEffect,
   watch,
-  WatchStopHandle
+  WatchStopHandle,
+  inject
 } from 'vue'
 import srcdoc from './srcdoc.html?raw'
 import { PreviewProxy } from './PreviewProxy'
-import { MAIN_FILE, vueRuntimeUrl } from '../transform'
+import { MAIN_FILE } from '../transform'
 import { compileModulesForPreview } from './moduleCompiler'
-import { store } from '../store'
+import { ReplStore } from '../store'
 
+const store = inject('store') as ReplStore
 const container = ref()
 const runtimeError = ref()
 const runtimeWarning = ref()
 
 let sandbox: HTMLIFrameElement
 let proxy: PreviewProxy
-let stopUpdateWatcher: WatchStopHandle
+let stopUpdateWatcher: WatchStopHandle | undefined
 
 // create sandbox on mount
 onMounted(createSandbox)
@@ -39,25 +41,25 @@ watch(
     try {
       const map = JSON.parse(importMap)
       if (!map.imports) {
-        store.errors = [`import-map.json is missing "imports" field.`]
+        store.state.errors = [`import-map.json is missing "imports" field.`]
         return
       }
       if (map.imports.vue) {
-        store.errors = [
+        store.state.errors = [
           'Select Vue versions using the top-right dropdown.\n' +
             'Specifying it in the import map has no effect.'
         ]
       }
       createSandbox()
     } catch (e: any) {
-      store.errors = [e as Error]
+      store.state.errors = [e as Error]
       return
     }
   }
 )
 
 // reset sandbox when version changes
-watch(vueRuntimeUrl, createSandbox)
+watch(() => store.state.vueRuntimeURL, createSandbox)
 
 onUnmounted(() => {
   proxy.destroy()
@@ -68,7 +70,7 @@ function createSandbox() {
   if (sandbox) {
     // clear prev sandbox
     proxy.destroy()
-    stopUpdateWatcher()
+    stopUpdateWatcher && stopUpdateWatcher()
     container.value.removeChild(sandbox)
   }
 
@@ -90,14 +92,16 @@ function createSandbox() {
   try {
     importMap = JSON.parse(store.importMap || `{}`)
   } catch (e: any) {
-    store.errors = [`Syntax error in import-map.json: ${(e as Error).message}`]
+    store.state.errors = [
+      `Syntax error in import-map.json: ${(e as Error).message}`
+    ]
     return
   }
 
   if (!importMap.imports) {
     importMap.imports = {}
   }
-  importMap.imports.vue = vueRuntimeUrl.value
+  importMap.imports.vue = store.state.vueRuntimeURL
   const sandboxSrc = srcdoc.replace(
     /<!--IMPORT_MAP-->/,
     JSON.stringify(importMap)
@@ -174,8 +178,8 @@ async function updatePreview() {
   runtimeError.value = null
   runtimeWarning.value = null
   try {
-    const modules = compileModulesForPreview()
-    console.log(`successfully compiled ${modules.length} modules.`)
+    const modules = compileModulesForPreview(store)
+    console.log(`[@vue/repl] successfully compiled ${modules.length} modules.`)
     // reset modules
     await proxy.eval([
       `window.__modules__ = {};window.__css__ = ''`,
