@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, reactive } from 'vue'
+import { ref, reactive, computed } from 'vue'
 
 const container = ref()
 
@@ -11,10 +11,10 @@ const state = reactive({
   split: 50
 })
 
-function boundSplit() {
+const boundSplit = computed(()=>{
   const { split } = state
   return split < 20 ? 20 : split > 80 ? 80 : split
-}
+}) 
 
 let startPosition = 0
 let startSplit = 0
@@ -22,7 +22,7 @@ let startSplit = 0
 function dragStart(e: MouseEvent) {
   state.dragging = true
   startPosition = e.pageX
-  startSplit = boundSplit()
+  startSplit = boundSplit.value
 }
 
 function dragMove(e: MouseEvent) {
@@ -48,11 +48,11 @@ function dragEnd() {
     @mouseup="dragEnd"
     @mouseleave="dragEnd"
   >
-    <div class="left" :style="{ width: boundSplit() + '%' }">
+    <div class="left">
       <slot name="left" />
       <div class="dragger" @mousedown.prevent="dragStart" />
     </div>
-    <div class="right" :style="{ width: 100 - boundSplit() + '%' }">
+    <div class="right">
       <slot name="right" />
     </div>
 
@@ -82,6 +82,10 @@ function dragEnd() {
 }
 .left {
   border-right: 1px solid #ccc;
+  width: v-bind(boundSplit + "%");
+}
+.right {
+  width: v-bind(100 - boundSplit + "%");
 }
 .dragger {
   position: absolute;
