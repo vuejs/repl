@@ -63,6 +63,7 @@ function doneAddFile() {
       <input
         v-model="pendingFilename"
         spellcheck="false"
+        @blur="doneAddFile"
         @keyup.enter="doneAddFile"
         @keyup.esc="cancelAddFile"
         @vnodeMounted="focus"
