@@ -34,17 +34,30 @@ provide('store', props.store)
 
 <style scoped>
 .vue-repl {
+  --bg: #fff;
+  --bg-soft: #f8f8f8;
+  --border: #ddd;
+  --text-light: #999;
+  --font-code: Menlo, Monaco, Consolas, 'Courier New', monospace;
+  --color-branding: #42b883;
+  --color-branding-dark: #416f9c;
+
   font-size: 13px;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
     Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
   color: var(--base);
   margin: 0;
   overflow: hidden;
-  background-color: #f8f8f8;
-  --base: #444;
-  --font-code: Menlo, Monaco, Consolas, "Courier New", monospace;
-  --color-branding: #3ca877;
-  --color-branding-dark: #416f9c;
+  background-color: var(--bg-soft);
+}
+
+.dark .vue-repl {
+  --bg: #1a1a1a;
+  --bg-soft: #242424;
+  --border: #383838;
+  --text-light: #aaa;
+  --color-branding: #42d392;
+  --color-branding-dark: #89ddff;
 }
 
 :deep(button) {

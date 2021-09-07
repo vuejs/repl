@@ -82,8 +82,8 @@ function doneAddFile() {
 <style scoped>
 .file-selector {
   box-sizing: border-box;
-  border-bottom: 1px solid #ddd;
-  background-color: white;
+  border-bottom: 1px solid var(--border);
+  background-color: var(--bg);
   overflow-x: scroll;
 }
 .file {
@@ -91,7 +91,7 @@ function doneAddFile() {
   font-size: 13px;
   font-family: var(--font-code);
   cursor: pointer;
-  color: #999;
+  color: var(--text-light);
   box-sizing: border-box;
 }
 .file.active {
@@ -106,7 +106,7 @@ function doneAddFile() {
 .file input {
   width: 80px;
   outline: none;
-  border: 1px solid #ccc;
+  border: 1px solid var(--border);
   border-radius: 3px;
   padding: 4px 6px;
   margin-left: 6px;

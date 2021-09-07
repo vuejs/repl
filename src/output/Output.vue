@@ -47,15 +47,15 @@ const mode = ref<Modes>('preview')
 }
 .tab-buttons {
   box-sizing: border-box;
-  border-bottom: 1px solid #ddd;
-  background-color: white;
+  border-bottom: 1px solid var(--border);
+  background-color: var(--bg);
 }
 .tab-buttons button {
   font-size: 13px;
   font-family: var(--font-code);
   padding: 8px 16px 6px;
   text-transform: uppercase;
-  color: #999;
+  color: var(--text-light);
   box-sizing: border-box;
 }
 

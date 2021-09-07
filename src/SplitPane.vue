@@ -81,7 +81,7 @@ function dragEnd() {
   height: 100%;
 }
 .left {
-  border-right: 1px solid #ccc;
+  border-right: 1px solid var(--border);
 }
 .dragger {
   position: absolute;
