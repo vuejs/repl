@@ -37,7 +37,7 @@ function doneAddFile() {
   }
 
   store.state.errors = []
-  pending.value = false
+  cancelAddFile()
   store.addFile(filename)
   pendingFilename.value = 'Comp.vue'
 }
