@@ -13,7 +13,8 @@
   },
   "scripts": {
     "dev": "vite",
-    "build": "vite build"
+    "build": "vite build",
+    "prepublishOnly": "vite build"
   },
   "repository": {
     "type": "git",
