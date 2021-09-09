@@ -5,18 +5,23 @@ import Output from './output/Output.vue'
 import { ReplStore } from './store'
 import { provide } from 'vue'
 
-const props = withDefaults(
-  defineProps<{
-    store?: ReplStore
-    showCompileOutput?: boolean
-  }>(),
-  {
-    store: () => new ReplStore(),
-    showCompileOutput: false
-  }
-)
+interface Props {
+  store?: ReplStore
+  autoResize?: boolean
+  showCompileOutput?: boolean
+  showImportMap?: boolean
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  store: () => new ReplStore(),
+  autoResize: true,
+  showCompileOutput: true,
+  showImportMap: true
+})
 
 provide('store', props.store)
+provide('autoresize', props.autoResize)
+provide('import-map', props.showImportMap)
 </script>
 
 <template>

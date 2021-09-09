@@ -1,6 +1,5 @@
 import { createApp, h, watchEffect } from 'vue'
 import { Repl, ReplStore } from '../src'
-
 ;(window as any).process = { env: {} }
 
 const App = {
@@ -19,7 +18,8 @@ const App = {
     return () =>
       h(Repl, {
         store,
-        showCompileOutput: true
+        // showCompileOutput: false,
+        // showImportMap: false
       })
   }
 }

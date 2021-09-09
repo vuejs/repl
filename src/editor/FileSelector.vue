@@ -7,6 +7,7 @@ const store = inject('store') as ReplStore
 const pending = ref(false)
 const pendingFilename = ref('Comp.vue')
 const importMapFile = 'import-map.json'
+const showImportMap = inject<boolean>('import-map')
 const files = computed(() =>
   Object.keys(store.state.files).filter((f) => f !== importMapFile)
 )
@@ -70,6 +71,7 @@ function doneAddFile() {
     </div>
     <button class="add" @click="startAddFile">+</button>
     <div
+      v-if="showImportMap"
       class="file import-map"
       :class="{ active: store.state.activeFilename === importMapFile }"
       @click="store.setActive(importMapFile)"
