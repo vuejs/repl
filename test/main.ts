@@ -13,6 +13,12 @@ const App = {
 
     watchEffect(() => history.replaceState({}, '', store.serialize()))
 
+    setTimeout(() => {
+      store.setFiles({
+        'App.vue': '<template>Force update files</template>'
+      })
+    }, 1000);
+
     // store.setVueVersion('3.2.8')
 
     return () =>

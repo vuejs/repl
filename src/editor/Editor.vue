@@ -3,7 +3,7 @@ import FileSelector from './FileSelector.vue'
 import CodeMirror from '../codemirror/CodeMirror.vue'
 import Message from '../Message.vue'
 import { debounce } from '../utils'
-import { ref, watch, computed, inject } from 'vue'
+import { computed, inject } from 'vue'
 import { ReplStore } from '../store'
 
 const store = inject('store') as ReplStore
@@ -12,16 +12,9 @@ const onChange = debounce((code: string) => {
   store.activeFile.code = code
 }, 250)
 
-const activeCode = ref(store.activeFile.code)
+const activeCode = computed(() => store.activeFile.code)
 const activeMode = computed(() =>
   store.state.activeFilename.endsWith('.vue') ? 'htmlmixed' : 'javascript'
-)
-
-watch(
-  () => store.state.activeFilename,
-  () => {
-    activeCode.value = store.activeFile.code
-  }
 )
 </script>
 

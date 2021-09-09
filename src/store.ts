@@ -123,6 +123,9 @@ export class ReplStore {
     for (const filename in newFiles) {
       files[filename] = new File(filename, newFiles[filename])
     }
+    if (!files['App.vue']) {
+      files['App.vue'] = new File('App.vue', welcomeCode)
+    }
     this.state.files = files
     this.initImportMap()
   }
