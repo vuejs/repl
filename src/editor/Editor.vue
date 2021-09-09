@@ -12,7 +12,6 @@ const onChange = debounce((code: string) => {
   store.activeFile.code = code
 }, 250)
 
-const activeCode = computed(() => store.activeFile.code)
 const activeMode = computed(() =>
   store.state.activeFilename.endsWith('.vue') ? 'htmlmixed' : 'javascript'
 )
@@ -21,7 +20,11 @@ const activeMode = computed(() =>
 <template>
   <FileSelector />
   <div class="editor-container">
-    <CodeMirror @change="onChange" :value="activeCode" :mode="activeMode" />
+    <CodeMirror
+      @change="onChange"
+      :value="store.state.activeCode"
+      :mode="activeMode"
+    />
     <Message :err="store.state.errors[0]" />
   </div>
 </template>

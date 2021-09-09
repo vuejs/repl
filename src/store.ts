@@ -34,6 +34,7 @@ export class File {
 export interface StoreState {
   files: Record<string, File>
   activeFilename: string
+  activeCode: string
   errors: (string | Error)[]
   vueRuntimeURL: string
 }
@@ -60,7 +61,7 @@ export class ReplStore {
       }
     } else {
       files = {
-        'App.vue': new File(MAIN_FILE, welcomeCode)
+        [MAIN_FILE]: new File(MAIN_FILE, welcomeCode)
       }
     }
 
@@ -69,6 +70,7 @@ export class ReplStore {
     this.state = reactive({
       files,
       activeFilename: MAIN_FILE,
+      activeCode: files[MAIN_FILE].code,
       errors: [],
       vueRuntimeURL: this.defaultVueRuntimeURL
     })
@@ -90,6 +92,7 @@ export class ReplStore {
 
   setActive(filename: string) {
     this.state.activeFilename = filename
+    this.state.activeCode = this.activeFile.code
   }
 
   addFile(filename: string) {
@@ -123,11 +126,12 @@ export class ReplStore {
     for (const filename in newFiles) {
       files[filename] = new File(filename, newFiles[filename])
     }
-    if (!files['App.vue']) {
-      files['App.vue'] = new File('App.vue', welcomeCode)
+    if (!files[MAIN_FILE]) {
+      files[MAIN_FILE] = new File('App.vue', welcomeCode)
     }
     this.state.files = files
     this.initImportMap()
+    this.setActive(MAIN_FILE)
   }
 
   private initImportMap() {
