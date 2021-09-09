@@ -49,7 +49,7 @@ function doneAddFile() {
     <div
       v-for="(file, i) in files"
       class="file"
-      :class="{ active: store.state.activeFilename === file }"
+      :class="{ active: store.state.activeFile.filename === file }"
       @click="store.setActive(file)"
     >
       <span class="label">{{ file }}</span>
@@ -73,7 +73,7 @@ function doneAddFile() {
     <div
       v-if="showImportMap"
       class="file import-map"
-      :class="{ active: store.state.activeFilename === importMapFile }"
+      :class="{ active: store.state.activeFile.filename === importMapFile }"
       @click="store.setActive(importMapFile)"
     >
       <span class="label">Import Map</span>

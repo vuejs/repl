@@ -47,8 +47,12 @@ onMounted(() => {
   })
 
   watchEffect(() => {
-    editor.setValue(props.value)
+    const cur = editor.getValue()
+    if (props.value !== cur) {
+      editor.setValue(props.value)
+    }
   })
+
   watchEffect(() => {
     editor.setOption('mode', props.mode)
   })
@@ -58,9 +62,12 @@ onMounted(() => {
   }, 50)
 
   if (needAutoResize) {
-    window.addEventListener('resize', debounce(() => {
-      editor.refresh()
-    }))
+    window.addEventListener(
+      'resize',
+      debounce(() => {
+        editor.refresh()
+      })
+    )
   }
 })
 </script>

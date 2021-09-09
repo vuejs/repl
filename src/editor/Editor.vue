@@ -9,11 +9,11 @@ import { ReplStore } from '../store'
 const store = inject('store') as ReplStore
 
 const onChange = debounce((code: string) => {
-  store.activeFile.code = code
+  store.state.activeFile.code = code
 }, 250)
 
 const activeMode = computed(() =>
-  store.state.activeFilename.endsWith('.vue') ? 'htmlmixed' : 'javascript'
+  store.state.activeFile.filename.endsWith('.vue') ? 'htmlmixed' : 'javascript'
 )
 </script>
 
@@ -22,7 +22,7 @@ const activeMode = computed(() =>
   <div class="editor-container">
     <CodeMirror
       @change="onChange"
-      :value="store.state.activeCode"
+      :value="store.state.activeFile.code"
       :mode="activeMode"
     />
     <Message :err="store.state.errors[0]" />

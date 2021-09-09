@@ -33,8 +33,7 @@ export class File {
 
 export interface StoreState {
   files: Record<string, File>
-  activeFilename: string
-  activeCode: string
+  activeFile: File
   errors: (string | Error)[]
   vueRuntimeURL: string
 }
@@ -69,15 +68,14 @@ export class ReplStore {
 
     this.state = reactive({
       files,
-      activeFilename: MAIN_FILE,
-      activeCode: files[MAIN_FILE].code,
+      activeFile: files[MAIN_FILE],
       errors: [],
       vueRuntimeURL: this.defaultVueRuntimeURL
     })
 
     this.initImportMap()
 
-    watchEffect(() => compileFile(this, this.activeFile))
+    watchEffect(() => compileFile(this, this.state.activeFile))
 
     for (const file in this.state.files) {
       if (file !== MAIN_FILE) {
@@ -86,13 +84,8 @@ export class ReplStore {
     }
   }
 
-  get activeFile() {
-    return this.state.files[this.state.activeFilename]
-  }
-
   setActive(filename: string) {
-    this.state.activeFilename = filename
-    this.state.activeCode = this.activeFile.code
+    this.state.activeFile = this.state.files[filename]
   }
 
   addFile(filename: string) {
@@ -102,8 +95,8 @@ export class ReplStore {
 
   deleteFile(filename: string) {
     if (confirm(`Are you sure you want to delete ${filename}?`)) {
-      if (this.state.activeFilename === filename) {
-        this.state.activeFilename = MAIN_FILE
+      if (this.state.activeFile.filename === filename) {
+        this.state.activeFile = this.state.files[MAIN_FILE]
       }
       delete this.state.files[filename]
     }

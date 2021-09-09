@@ -34,7 +34,7 @@ const mode = ref<Modes>('preview')
       v-else
       readonly
       :mode="mode === 'css' ? 'css' : 'javascript'"
-      :value="store.activeFile.compiled[mode]"
+      :value="store.state.activeFile.compiled[mode]"
     />
   </div>
 </template>
