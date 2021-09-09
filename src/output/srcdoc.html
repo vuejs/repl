@@ -60,7 +60,6 @@
 								scriptEls.push(scriptEl)
 								await done
 							}
-							window.__next__ = undefined
 							send_ok()
 						} catch (e) {
 							send_error(e.message, e.stack);
