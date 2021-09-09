@@ -10,18 +10,21 @@ interface Props {
   autoResize?: boolean
   showCompileOutput?: boolean
   showImportMap?: boolean
+  clearConsole?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
   store: () => new ReplStore(),
   autoResize: true,
   showCompileOutput: true,
-  showImportMap: true
+  showImportMap: true,
+  clearConsole: true
 })
 
 provide('store', props.store)
 provide('autoresize', props.autoResize)
 provide('import-map', props.showImportMap)
+provide('clear-console', props.clearConsole)
 </script>
 
 <template>

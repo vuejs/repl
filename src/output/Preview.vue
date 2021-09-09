@@ -16,6 +16,7 @@ import { compileModulesForPreview } from './moduleCompiler'
 import { ReplStore } from '../store'
 
 const store = inject('store') as ReplStore
+const clearConsole = inject<boolean>('clear-console')
 const container = ref()
 const runtimeError = ref()
 const runtimeWarning = ref()
@@ -151,8 +152,7 @@ function createSandbox() {
 }
 
 async function updatePreview() {
-  // @ts-ignore
-  if (import.meta.env.PROD) {
+  if (import.meta.env.PROD && clearConsole) {
     console.clear()
   }
   runtimeError.value = null
