@@ -114,13 +114,16 @@ export class ReplStore {
     return exported
   }
 
-  setFiles(newFiles: Record<string, string>) {
+  async setFiles(newFiles: Record<string, string>) {
     const files: Record<string, File> = {}
     for (const filename in newFiles) {
       files[filename] = new File(filename, newFiles[filename])
     }
     if (!files[MAIN_FILE]) {
       files[MAIN_FILE] = new File('App.vue', welcomeCode)
+    }
+    for (const file in files) {
+      await compileFile(this, files[file])
     }
     this.state.files = files
     this.initImportMap()
