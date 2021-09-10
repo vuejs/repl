@@ -85,7 +85,7 @@ function dragEnd() {
 }
 .dragger {
   position: absolute;
-  z-index: 99;
+  z-index: 3;
   top: 0;
   bottom: 0;
   right: -5px;
@@ -94,10 +94,10 @@ function dragEnd() {
 }
 .toggler {
   display: none;
-  z-index: 999;
+  z-index: 3;
   font-family: var(--font-code);
   color: #444;
-  position: absolute;
+  position: fixed;
   left: 50%;
   bottom: 20px;
   background-color: #fff;
