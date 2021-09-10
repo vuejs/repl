@@ -97,7 +97,7 @@ function dragEnd() {
   z-index: 3;
   font-family: var(--font-code);
   color: #444;
-  position: fixed;
+  position: absolute;
   left: 50%;
   bottom: 20px;
   background-color: #fff;
