@@ -120,7 +120,7 @@ export class ReplStore {
       files[filename] = new File(filename, newFiles[filename])
     }
     if (!files[MAIN_FILE]) {
-      files[MAIN_FILE] = new File('App.vue', welcomeCode)
+      files[MAIN_FILE] = new File(MAIN_FILE, welcomeCode)
     }
     for (const file in files) {
       await compileFile(this, files[file])

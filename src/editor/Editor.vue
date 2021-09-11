@@ -12,9 +12,14 @@ const onChange = debounce((code: string) => {
   store.state.activeFile.code = code
 }, 250)
 
-const activeMode = computed(() =>
-  store.state.activeFile.filename.endsWith('.vue') ? 'htmlmixed' : 'javascript'
-)
+const activeMode = computed(() => {
+  const { filename } = store.state.activeFile
+  return filename.endsWith('.vue')
+    ? 'htmlmixed'
+    : filename.endsWith('.css')
+    ? 'css'
+    : 'javascript'
+})
 </script>
 
 <template>

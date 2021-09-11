@@ -13,11 +13,19 @@ const App = {
 
     watchEffect(() => history.replaceState({}, '', store.serialize()))
 
-    setInterval(() => {
-      store.setFiles({
-        'App.vue': '<template>Force update files</template>'
-      })
-    }, 5000);
+//     setTimeout(() => {
+//       store.setFiles({
+//         'App.vue': `
+// <script>console.log('evaluating App.vue')</script>
+// <script setup>
+// import Foo from './Foo.vue'
+// </script>
+// <template><Foo/></template>`,
+//         'Foo.vue': `
+// <script>console.log('evaluating Foo.vue')</script>
+// <template>foo</template>`
+//       })
+//     }, 1000);
 
     // store.setVueVersion('3.2.8')
 

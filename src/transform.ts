@@ -26,15 +26,17 @@ export async function compileFile(
   }
 
   if (!filename.endsWith('.vue')) {
-    if (shouldTransformRef(code)) {
-      code = transformRef(code, { filename }).code
+    if (filename.endsWith('.css')) {
+      compiled.css = code
+    } else {
+      if (shouldTransformRef(code)) {
+        code = transformRef(code, { filename }).code
+      }
+      if (filename.endsWith('.ts')) {
+        code = await transformTS(code)
+      }
+      compiled.js = compiled.ssr = code
     }
-
-    if (filename.endsWith('.ts')) {
-      code = await transformTS(code)
-    }
-
-    compiled.js = compiled.ssr = code
     store.state.errors = []
     return
   }

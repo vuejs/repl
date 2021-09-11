@@ -12,8 +12,30 @@ import {
 import { babelParserDefaultPlugins } from '@vue/shared'
 import { ExportSpecifier, Identifier, Node } from '@babel/types'
 
-export function compileModulesForPreview(store: ReplStore) {
-  return processFile(store, store.state.files[MAIN_FILE]).reverse()
+export function compileModulesForPreview(
+  store: ReplStore,
+  mainFile = MAIN_FILE
+) {
+  const seen = new Set<File>()
+  const processed = processFile(
+    store,
+    store.state.files[mainFile],
+    seen
+  ).reverse()
+
+  // also add css files that are not imported
+  for (const filename in store.state.files) {
+    if (filename.endsWith('.css')) {
+      const file = store.state.files[filename]
+      if (!seen.has(file)) {
+        processed.push(
+          `\nwindow.__css__ += ${JSON.stringify(file.compiled.css)}`
+        )
+      }
+    }
+  }
+
+  return processed
 }
 
 const modulesKey = `__modules__`
@@ -22,7 +44,7 @@ const dynamicImportKey = `__dynamic_import__`
 const moduleKey = `__module__`
 
 // similar logic with Vite's SSR transform, except this is targeting the browser
-function processFile(store: ReplStore, file: File, seen = new Set<File>()) {
+function processFile(store: ReplStore, file: File, seen: Set<File>) {
   if (seen.has(file)) {
     return []
   }
