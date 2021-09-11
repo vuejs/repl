@@ -1,7 +1,9 @@
 import { version, reactive, watchEffect } from 'vue'
 import * as defaultCompiler from '@vue/compiler-sfc'
-import { compileFile, MAIN_FILE } from './transform'
+import { compileFile } from './transform'
 import { utoa, atou } from './utils'
+
+const defaultMainFile = 'App.vue'
 
 const welcomeCode = `
 <script setup>
@@ -32,6 +34,7 @@ export class File {
 }
 
 export interface StoreState {
+  mainFile: string
   files: Record<string, File>
   activeFile: File
   errors: (string | Error)[]
@@ -60,15 +63,20 @@ export class ReplStore {
       }
     } else {
       files = {
-        [MAIN_FILE]: new File(MAIN_FILE, welcomeCode)
+        [defaultMainFile]: new File(defaultMainFile, welcomeCode)
       }
     }
 
     this.defaultVueRuntimeURL = defaultVueRuntimeURL
 
+    let mainFile = defaultMainFile
+    if (!files[mainFile]) {
+      mainFile = Object.keys(files)[0]
+    }
     this.state = reactive({
+      mainFile,
       files,
-      activeFile: files[MAIN_FILE],
+      activeFile: files[mainFile],
       errors: [],
       vueRuntimeURL: this.defaultVueRuntimeURL
     })
@@ -78,7 +86,7 @@ export class ReplStore {
     watchEffect(() => compileFile(this, this.state.activeFile))
 
     for (const file in this.state.files) {
-      if (file !== MAIN_FILE) {
+      if (file !== defaultMainFile) {
         compileFile(this, this.state.files[file])
       }
     }
@@ -96,7 +104,7 @@ export class ReplStore {
   deleteFile(filename: string) {
     if (confirm(`Are you sure you want to delete ${filename}?`)) {
       if (this.state.activeFile.filename === filename) {
-        this.state.activeFile = this.state.files[MAIN_FILE]
+        this.state.activeFile = this.state.files[this.state.mainFile]
       }
       delete this.state.files[filename]
     }
@@ -114,20 +122,21 @@ export class ReplStore {
     return exported
   }
 
-  async setFiles(newFiles: Record<string, string>) {
+  async setFiles(newFiles: Record<string, string>, mainFile = defaultMainFile) {
     const files: Record<string, File> = {}
+    if (mainFile === defaultMainFile && !newFiles[mainFile]) {
+      files[mainFile] = new File(mainFile, welcomeCode)
+    }
     for (const filename in newFiles) {
       files[filename] = new File(filename, newFiles[filename])
-    }
-    if (!files[MAIN_FILE]) {
-      files[MAIN_FILE] = new File(MAIN_FILE, welcomeCode)
     }
     for (const file in files) {
       await compileFile(this, files[file])
     }
+    this.state.mainFile = mainFile
     this.state.files = files
     this.initImportMap()
-    this.setActive(MAIN_FILE)
+    this.setActive(mainFile)
   }
 
   private initImportMap() {

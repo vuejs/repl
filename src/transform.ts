@@ -7,7 +7,6 @@ import {
 } from '@vue/compiler-sfc'
 import { transform } from 'sucrase'
 
-export const MAIN_FILE = 'App.vue'
 export const COMP_IDENTIFIER = `__sfc__`
 
 async function transformTS(src: string) {

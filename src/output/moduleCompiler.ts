@@ -1,5 +1,4 @@
 import { File, ReplStore } from '../store'
-import { MAIN_FILE } from '../transform'
 import {
   babelParse,
   MagicString,
@@ -12,14 +11,11 @@ import {
 import { babelParserDefaultPlugins } from '@vue/shared'
 import { ExportSpecifier, Identifier, Node } from '@babel/types'
 
-export function compileModulesForPreview(
-  store: ReplStore,
-  mainFile = MAIN_FILE
-) {
+export function compileModulesForPreview(store: ReplStore) {
   const seen = new Set<File>()
   const processed = processFile(
     store,
-    store.state.files[mainFile],
+    store.state.files[store.state.mainFile],
     seen
   ).reverse()
 

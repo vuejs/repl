@@ -11,7 +11,6 @@ import {
 } from 'vue'
 import srcdoc from './srcdoc.html?raw'
 import { PreviewProxy } from './PreviewProxy'
-import { MAIN_FILE } from '../transform'
 import { compileModulesForPreview } from './moduleCompiler'
 import { ReplStore } from '../store'
 
@@ -157,26 +156,41 @@ async function updatePreview() {
   }
   runtimeError.value = null
   runtimeWarning.value = null
+
   try {
+    // compile code to simulated module system
     const modules = compileModulesForPreview(store)
     console.log(`[@vue/repl] successfully compiled ${modules.length} modules.`)
-    // reset modules
-    await proxy.eval([
-      `window.__modules__ = {};window.__css__ = ''`,
-      ...modules,
-      `
-  import { createApp as _createApp } from "vue"
-  
-  if (window.__app__) {
-    window.__app__.unmount()
-    document.getElementById('app').innerHTML = ''
-  }
-  
-  document.getElementById('__sfc-styles').innerHTML = window.__css__
-  const app = window.__app__ = _createApp(__modules__["${MAIN_FILE}"].default)
-  app.config.errorHandler = e => console.error(e)
-  app.mount('#app')`.trim()
-    ])
+
+    const codeToEval = [
+      `window.__modules__ = {};window.__css__ = '';document.body.innerHTML = ''`,
+      ...modules
+    ]
+
+    // determine app bootstrapping code - if main file is a vue file, mount it.
+    const mainFile = store.state.mainFile
+    if (mainFile.endsWith('.vue')) {
+      codeToEval.push(
+        `import { createApp as _createApp } from "vue"
+        
+        if (window.__app__) {
+          window.__app__.unmount()
+        }
+        
+        document.body.innerHTML = '<div id="app"></div>'
+        document.getElementById('__sfc-styles').innerHTML = window.__css__
+        const app = window.__app__ = _createApp(__modules__["${mainFile}"].default)
+        app.config.errorHandler = e => console.error(e)
+        app.mount('#app')`.trim()
+      )
+    } else {
+      codeToEval.push(
+        `\ndocument.getElementById('__sfc-styles').innerHTML = window.__css__`
+      )
+    }
+
+    // eval code in sandbox
+    await proxy.eval(codeToEval)
   } catch (e: any) {
     runtimeError.value = (e as Error).message
   }
