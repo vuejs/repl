@@ -1,6 +1,6 @@
 {
   "name": "@vue/repl",
-  "version": "0.2.5",
+  "version": "0.3.0",
   "description": "Vue component for editing Vue components",
   "main": "dist/ssr-stub.js",
   "module": "dist/vue-repl.js",
