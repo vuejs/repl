@@ -46,12 +46,39 @@ function processFile(store: ReplStore, file: File, seen: Set<File>) {
   }
   seen.add(file)
 
-  const { js, css } = file.compiled
+  if (file.filename.endsWith('.html')) {
+    return processHtmlFile(store, file.code, file.filename, seen)
+  }
 
-  const s = new MagicString(js)
+  let [js, importedFiles] = processModule(
+    store,
+    file.compiled.js,
+    file.filename
+  )
+  // append css
+  if (file.compiled.css) {
+    js += `\nwindow.__css__ += ${JSON.stringify(file.compiled.css)}`
+  }
+  // crawl imports
+  const processed = [js]
+  if (importedFiles.size) {
+    for (const imported of importedFiles) {
+      processed.push(...processFile(store, store.state.files[imported], seen))
+    }
+  }
+  // return a list of files to further process
+  return processed
+}
 
-  const ast = babelParse(js, {
-    sourceFilename: file.filename,
+function processModule(
+  store: ReplStore,
+  src: string,
+  filename: string
+): [string, Set<string>] {
+  const s = new MagicString(src)
+
+  const ast = babelParse(src, {
+    sourceFilename: filename,
     sourceType: 'module',
     plugins: [...babelParserDefaultPlugins]
   }).program.body
@@ -86,7 +113,7 @@ function processFile(store: ReplStore, file: File, seen: Set<File>) {
   // 0. instantiate module
   s.prepend(
     `const ${moduleKey} = __modules__[${JSON.stringify(
-      file.filename
+      filename
     )}] = { [Symbol.toStringTag]: "Module" }\n\n`
   )
 
@@ -236,18 +263,35 @@ function processFile(store: ReplStore, file: File, seen: Set<File>) {
     }
   })
 
-  // append CSS injection code
-  if (css) {
-    s.append(`\nwindow.__css__ += ${JSON.stringify(css)}`)
-  }
+  return [s.toString(), importedFiles]
+}
 
-  const processed = [s.toString()]
-  if (importedFiles.size) {
-    for (const imported of importedFiles) {
-      processed.push(...processFile(store, store.state.files[imported], seen))
-    }
-  }
+const scriptRE = /<script\b(?:\s[^>]*>|>)([^]*?)<\/script>/gi
+const scriptModuleRE =
+  /<script\b[^>]*type\s*=\s*(?:"module"|'module')[^>]*>([^]*?)<\/script>/gi
 
-  // return a list of files to further process
-  return processed
+function processHtmlFile(
+  store: ReplStore,
+  src: string,
+  filename: string,
+  seen: Set<File>
+): string[] {
+  const deps: string[] = []
+  let jsCode = ''
+  const html = src
+    .replace(scriptModuleRE, (_, content) => {
+      const [code, importedFiles] = processModule(store, content, filename)
+      if (importedFiles.size) {
+        for (const imported of importedFiles) {
+          deps.push(...processFile(store, store.state.files[imported], seen))
+        }
+      }
+      jsCode += '\n' + code
+      return ''
+    })
+    .replace(scriptRE, (_, content) => {
+      jsCode += '\n' + content
+      return ''
+    })
+  return [jsCode, ...deps, `document.body.innerHTML = ${JSON.stringify(html)}`]
 }

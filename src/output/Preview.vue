@@ -163,29 +163,21 @@ async function updatePreview() {
     console.log(`[@vue/repl] successfully compiled ${modules.length} modules.`)
 
     const codeToEval = [
-      `window.__modules__ = {};window.__css__ = '';document.body.innerHTML = ''`,
-      ...modules
+      `window.__modules__ = {};window.__css__ = '';` +
+        `if (window.__app__) window.__app__.unmount();` +
+        `document.body.innerHTML = '<div id="app"></div>'`,
+      ...modules,
+      `document.getElementById('__sfc-styles').innerHTML = window.__css__`
     ]
 
-    // determine app bootstrapping code - if main file is a vue file, mount it.
+    // if main file is a vue file, mount it.
     const mainFile = store.state.mainFile
     if (mainFile.endsWith('.vue')) {
       codeToEval.push(
         `import { createApp as _createApp } from "vue"
-        
-        if (window.__app__) {
-          window.__app__.unmount()
-        }
-        
-        document.body.innerHTML = '<div id="app"></div>'
-        document.getElementById('__sfc-styles').innerHTML = window.__css__
         const app = window.__app__ = _createApp(__modules__["${mainFile}"].default)
         app.config.errorHandler = e => console.error(e)
         app.mount('#app')`.trim()
-      )
-    } else {
-      codeToEval.push(
-        `\ndocument.getElementById('__sfc-styles').innerHTML = window.__css__`
       )
     }
 

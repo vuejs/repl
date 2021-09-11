@@ -15,8 +15,9 @@ const App = {
 
     setTimeout(() => {
       store.setFiles({
+        'index.html': '<h1>yo</h1>',
         'main.js': 'document.body.innerHTML = "<h1>hello</h1>"'
-      }, 'main.js')
+      }, 'index.html')
     }, 1000);
 
     // store.setVueVersion('3.2.8')
