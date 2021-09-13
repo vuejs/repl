@@ -140,11 +140,28 @@ export class ReplStore {
   }
 
   private initImportMap() {
-    if (!this.state.files['import-map.json']) {
+    const map = this.state.files['import-map.json']
+    if (!map) {
       this.state.files['import-map.json'] = new File(
         'import-map.json',
-        JSON.stringify({ imports: {} }, null, 2)
+        JSON.stringify(
+          {
+            imports: {
+              vue: this.defaultVueRuntimeURL
+            }
+          },
+          null,
+          2
+        )
       )
+    } else {
+      try {
+        const json = JSON.parse(map.code)
+        if (!json.imports.vue) {
+          json.imports.vue = this.defaultVueRuntimeURL
+          map.code = JSON.stringify(json, null, 2)
+        }
+      } catch (e) {}
     }
   }
 
