@@ -9,7 +9,9 @@ const pendingFilename = ref('Comp.vue')
 const importMapFile = 'import-map.json'
 const showImportMap = inject<boolean>('import-map')
 const files = computed(() =>
-  Object.keys(store.state.files).filter((f) => f !== importMapFile)
+  Object.keys(store.state.files).filter((f) => {
+    return showImportMap || f !== importMapFile
+  })
 )
 
 function startAddFile() {
@@ -55,7 +57,11 @@ function doneAddFile() {
       @click="store.setActive(file)"
     >
       <span class="label">{{ file }}</span>
-      <span v-if="i > 0" class="remove" @click.stop="store.deleteFile(file)">
+      <span
+        v-if="i > 0 && file !== importMapFile"
+        class="remove"
+        @click.stop="store.deleteFile(file)"
+      >
         <svg class="icon" width="12" height="12" viewBox="0 0 24 24">
           <line stroke="#999" x1="18" y1="6" x2="6" y2="18"></line>
           <line stroke="#999" x1="6" y1="6" x2="18" y2="18"></line>
@@ -72,14 +78,6 @@ function doneAddFile() {
       />
     </div>
     <button class="add" @click="startAddFile">+</button>
-    <div
-      v-if="showImportMap"
-      class="file import-map"
-      :class="{ active: store.state.activeFile.filename === importMapFile }"
-      @click="store.setActive(importMapFile)"
-    >
-      <span class="label">Import Map</span>
-    </div>
   </div>
 </template>
 
@@ -88,8 +86,25 @@ function doneAddFile() {
   box-sizing: border-box;
   border-bottom: 1px solid var(--border);
   background-color: var(--bg);
-  overflow-x: scroll;
+  overflow-y: hidden;
+  overflow-x: auto;
+  white-space: nowrap;
+  position: relative;
+  height: var(--header-height);
 }
+
+.file-selector::-webkit-scrollbar {
+  height: 1px;
+}
+
+.file-selector::-webkit-scrollbar-track {
+  background-color: var(--bg-soft);
+}
+
+.file-selector::-webkit-scrollbar-thumb {
+  background-color: var(--color-branding);
+}
+
 .file {
   display: inline-block;
   font-size: 13px;
@@ -106,6 +121,7 @@ function doneAddFile() {
 .file span {
   display: inline-block;
   padding: 8px 10px 6px;
+  line-height: 20px;
 }
 .file input {
   width: 80px;
@@ -138,6 +154,9 @@ function doneAddFile() {
   margin-top: -1px;
 }
 .import-map {
-  float: right;
+  position: absolute;
+  top: 0;
+  right: 0;
+  background-color: var(--bg);
 }
 </style>

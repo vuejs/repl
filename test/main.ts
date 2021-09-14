@@ -13,18 +13,24 @@ const App = {
 
     watchEffect(() => history.replaceState({}, '', store.serialize()))
 
-    setTimeout(() => {
-      store.setFiles({
+    // setTimeout(() => {
+    store.setFiles(
+      {
         'index.html': '<h1>yo</h1>',
-        'main.js': 'document.body.innerHTML = "<h1>hello</h1>"'
-      }, 'index.html')
-    }, 1000);
+        'main.js': 'document.body.innerHTML = "<h1>hello</h1>"',
+        'foo.js': 'document.body.innerHTML = "<h1>hello</h1>"',
+        'bar.js': 'document.body.innerHTML = "<h1>hello</h1>"',
+        'baz.js': 'document.body.innerHTML = "<h1>hello</h1>"'
+      },
+      'index.html'
+    )
+    // }, 1000);
 
     // store.setVueVersion('3.2.8')
 
     return () =>
       h(Repl, {
-        store,
+        store
         // showCompileOutput: false,
         // showImportMap: false
       })

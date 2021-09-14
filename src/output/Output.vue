@@ -24,7 +24,7 @@ const mode = ref<Modes>('preview')
       :class="{ active: mode === m }"
       @click="mode = m"
     >
-      {{ m }}
+      <span>{{ m }}</span>
     </button>
   </div>
 
@@ -41,7 +41,7 @@ const mode = ref<Modes>('preview')
 
 <style scoped>
 .output-container {
-  height: calc(100% - 35px);
+  height: calc(100% - var(--header-height));
   overflow: hidden;
   position: relative;
 }
@@ -49,16 +49,22 @@ const mode = ref<Modes>('preview')
   box-sizing: border-box;
   border-bottom: 1px solid var(--border);
   background-color: var(--bg);
+  height: var(--header-height);
+  overflow: hidden;
 }
 .tab-buttons button {
-  font-size: 13px;
-  font-family: var(--font-code);
-  padding: 8px 16px 6px;
-  text-transform: uppercase;
-  color: var(--text-light);
+  padding: 0;
   box-sizing: border-box;
 }
-
+.tab-buttons span {
+  font-size: 13px;
+  font-family: var(--font-code);
+  text-transform: uppercase;
+  color: var(--text-light);
+  display: inline-block;
+  padding: 8px 16px 6px;
+  line-height: 20px;
+}
 button.active {
   color: var(--color-branding-dark);
   border-bottom: 3px solid var(--color-branding-dark);
