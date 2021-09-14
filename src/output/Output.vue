@@ -2,18 +2,20 @@
 import Preview from './Preview.vue'
 import CodeMirror from '../codemirror/CodeMirror.vue'
 import { ReplStore } from '../store'
-import { inject, ref } from 'vue'
+import { inject, ref, computed } from 'vue'
 
 const props = defineProps<{
   showCompileOutput?: boolean
 }>()
 
 const store = inject('store') as ReplStore
-const modes = props.showCompileOutput
-  ? (['preview', 'js', 'css', 'ssr'] as const)
-  : (['preview'] as const)
+const modes = computed(() =>
+  props.showCompileOutput
+    ? (['preview', 'js', 'css', 'ssr'] as const)
+    : (['preview'] as const)
+)
 
-type Modes = typeof modes[number]
+type Modes = typeof modes.value[number]
 const mode = ref<Modes>('preview')
 </script>
 

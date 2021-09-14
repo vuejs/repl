@@ -7,7 +7,8 @@ import {
   watchEffect,
   watch,
   WatchStopHandle,
-  inject
+  inject,
+  Ref
 } from 'vue'
 import srcdoc from './srcdoc.html?raw'
 import { PreviewProxy } from './PreviewProxy'
@@ -15,7 +16,7 @@ import { compileModulesForPreview } from './moduleCompiler'
 import { ReplStore } from '../store'
 
 const store = inject('store') as ReplStore
-const clearConsole = inject<boolean>('clear-console')
+const clearConsole = inject('clear-console') as Ref<boolean>
 const container = ref()
 const runtimeError = ref()
 const runtimeWarning = ref()
@@ -151,7 +152,7 @@ function createSandbox() {
 }
 
 async function updatePreview() {
-  if (import.meta.env.PROD && clearConsole) {
+  if (import.meta.env.PROD && clearConsole.value) {
     console.clear()
   }
   runtimeError.value = null

@@ -1,16 +1,16 @@
 <script setup lang="ts">
 import { ReplStore } from '../store'
-import { computed, inject, ref, VNode } from 'vue'
+import { computed, inject, ref, VNode, Ref } from 'vue'
 
 const store = inject('store') as ReplStore
 
 const pending = ref(false)
 const pendingFilename = ref('Comp.vue')
 const importMapFile = 'import-map.json'
-const showImportMap = inject<boolean>('import-map')
+const showImportMap = inject('import-map') as Ref<boolean>
 const files = computed(() =>
   Object.keys(store.state.files).filter((f) => {
-    return showImportMap || f !== importMapFile
+    return showImportMap.value || f !== importMapFile
   })
 )
 

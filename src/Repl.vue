@@ -3,7 +3,7 @@ import SplitPane from './SplitPane.vue'
 import Editor from './editor/Editor.vue'
 import Output from './output/Output.vue'
 import { ReplStore } from './store'
-import { provide } from 'vue'
+import { provide, toRef } from 'vue'
 
 interface Props {
   store?: ReplStore
@@ -23,8 +23,8 @@ const props = withDefaults(defineProps<Props>(), {
 
 provide('store', props.store)
 provide('autoresize', props.autoResize)
-provide('import-map', props.showImportMap)
-provide('clear-console', props.clearConsole)
+provide('import-map', toRef(props, 'showImportMap'))
+provide('clear-console', toRef(props, 'clearConsole'))
 </script>
 
 <template>
