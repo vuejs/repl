@@ -9,9 +9,7 @@ const pendingFilename = ref('Comp.vue')
 const importMapFile = 'import-map.json'
 const showImportMap = inject('import-map') as Ref<boolean>
 const files = computed(() =>
-  Object.keys(store.state.files).filter((f) => {
-    return showImportMap.value || f !== importMapFile
-  })
+  Object.keys(store.state.files).filter((f) => f !== importMapFile)
 )
 
 function startAddFile() {
@@ -49,19 +47,17 @@ function doneAddFile() {
 </script>
 
 <template>
-  <div class="file-selector">
+  <div class="file-selector" :class="{ 'has-import-map': showImportMap }">
     <div
       v-for="(file, i) in files"
       class="file"
       :class="{ active: store.state.activeFile.filename === file }"
       @click="store.setActive(file)"
     >
-      <span class="label">{{ file }}</span>
-      <span
-        v-if="i > 0 && file !== importMapFile"
-        class="remove"
-        @click.stop="store.deleteFile(file)"
-      >
+      <span class="label">{{
+        file === importMapFile ? 'Import Map' : file
+      }}</span>
+      <span v-if="i > 0" class="remove" @click.stop="store.deleteFile(file)">
         <svg class="icon" width="12" height="12" viewBox="0 0 24 24">
           <line stroke="#999" x1="18" y1="6" x2="6" y2="18"></line>
           <line stroke="#999" x1="6" y1="6" x2="18" y2="18"></line>
@@ -78,11 +74,22 @@ function doneAddFile() {
       />
     </div>
     <button class="add" @click="startAddFile">+</button>
+
+    <div v-if="showImportMap" class="import-map-wrapper">
+      <div
+        class="file import-map"
+        :class="{ active: store.state.activeFile.filename === importMapFile }"
+        @click="store.setActive(importMapFile)"
+      >
+        <span class="label">Import Map</span>
+      </div>
+    </div>
   </div>
 </template>
 
 <style scoped>
 .file-selector {
+  display: flex;
   box-sizing: border-box;
   border-bottom: 1px solid var(--border);
   background-color: var(--bg);
@@ -98,11 +105,15 @@ function doneAddFile() {
 }
 
 .file-selector::-webkit-scrollbar-track {
-  background-color: var(--bg-soft);
+  background-color: var(--border);
 }
 
 .file-selector::-webkit-scrollbar-thumb {
   background-color: var(--color-branding);
+}
+
+.file-selector.has-import-map .add {
+  margin-right: 10px;
 }
 
 .file {
@@ -153,10 +164,24 @@ function doneAddFile() {
 .icon {
   margin-top: -1px;
 }
-.import-map {
-  position: absolute;
+.import-map-wrapper {
+  position: sticky;
+  margin-left: auto;
   top: 0;
   right: 0;
+  padding-left: 30px;
   background-color: var(--bg);
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 1) 25%
+  );
+}
+.dark .import-map-wrapper {
+  background: linear-gradient(
+    90deg,
+    rgba(26, 26, 26, 0) 0%,
+    rgba(26, 26, 26, 1) 25%
+  );
 }
 </style>
