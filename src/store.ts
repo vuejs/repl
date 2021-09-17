@@ -190,6 +190,9 @@ export class ReplStore {
     this.compiler = await this.pendingCompiler
     this.pendingCompiler = null
     this.state.vueRuntimeURL = runtimeUrl
+    const importMap = this.getImportMap()
+    ;(importMap.imports || (importMap.imports = {})).vue = runtimeUrl
+    this.setImportMap(importMap)
     console.info(`[@vue/repl] Now using Vue version: ${version}`)
   }
 
