@@ -64,7 +64,7 @@ function doneAddFile() {
         </svg>
       </span>
     </div>
-    <div v-if="pending" class="file">
+    <div v-if="pending" class="file pending">
       <input
         v-model="pendingFilename"
         spellcheck="false"
@@ -134,13 +134,18 @@ function doneAddFile() {
   padding: 8px 10px 6px;
   line-height: 20px;
 }
-.file input {
-  width: 80px;
+.file.pending input {
+  width: 90px;
+  height: 30px;
+  line-height: 30px;
   outline: none;
   border: 1px solid var(--border);
-  border-radius: 3px;
-  padding: 4px 6px;
+  border-radius: 4px;
+  padding: 0 0 0 10px;
+  margin-top: 2px;
   margin-left: 6px;
+  font-family: var(--font-code);
+  font-size: 12px;
 }
 .file .remove {
   display: inline-block;
