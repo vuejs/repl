@@ -45,7 +45,7 @@ provide('clear-console', toRef(props, 'clearConsole'))
   --bg: #fff;
   --bg-soft: #f8f8f8;
   --border: #ddd;
-  --text-light: #999;
+  --text-light: #888;
   --font-code: Menlo, Monaco, Consolas, 'Courier New', monospace;
   --color-branding: #42b883;
   --color-branding-dark: #416f9c;
@@ -54,7 +54,6 @@ provide('clear-console', toRef(props, 'clearConsole'))
   font-size: 13px;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
     Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-  color: var(--base);
   margin: 0;
   overflow: hidden;
   background-color: var(--bg-soft);
