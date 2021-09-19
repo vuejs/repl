@@ -29,13 +29,14 @@ function formatMessage(err: string | Error): string {
 
 <template>
   <Transition name="fade">
-    <pre
+    <div
       v-if="!dismissed && (err || warn)"
       class="msg"
       :class="err ? 'err' : 'warn'"
-      @click="dismissed = true"
-      >{{ formatMessage(err || warn) }}</pre
     >
+      <pre>{{ formatMessage(err || warn) }}</pre>
+      <button class="dismiss" @click="dismissed = true">✕</button>
+    </div>
   </Transition>
 </template>
 
@@ -51,14 +52,28 @@ function formatMessage(err: string | Error): string {
   border-radius: 6px;
   font-family: var(--font-code);
   white-space: pre-wrap;
-  max-height: calc(100% - 50px);
+  max-height: calc(100% - 400px);
+  min-height: 16px;
   overflow-y: scroll;
+  margin-bottom: 8px;
 }
 
-@media (max-width: 720px) {
-  .msg {
-    bottom: 50px;
-  }
+pre {
+  margin: 0;
+}
+
+.dismiss {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 18px;
+  height: 18px;
+  text-align: center;
+  border-radius: 18px;
+  background-color: red;
+  display: block;
+  color: #fff;
+  font-size: 9px;
 }
 
 .msg.err {
@@ -72,6 +87,10 @@ function formatMessage(err: string | Error): string {
   color: var(--color);
   border-color: var(--color);
   background-color: rgb(247, 240, 205);
+}
+
+.msg.warn .dismiss {
+  background-color: var(--color);
 }
 
 .fade-enter-active,
