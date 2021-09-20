@@ -51,37 +51,47 @@ function formatMessage(err: string | Error): string {
   border-radius: 6px;
   font-family: var(--font-code);
   white-space: pre-wrap;
-  max-height: calc(100% - 400px);
-  min-height: 16px;
-  overflow-y: scroll;
+  max-height: calc(100% - 300px);
+  min-height: 42px;
   margin-bottom: 8px;
 }
 
 pre {
   margin: 0;
-  padding: 14px 20px;
-  overflow-x: scroll;
+  padding: 12px 20px;
+  overflow: scroll;
 }
 
 .dismiss {
   position: absolute;
-  top: 0;
-  right: 0;
-  width: 24px;
-  height: 24px;
-  border-radius: 12px;
+  top: 2px;
+  right: 2px;
+  width: 18px;
+  height: 18px;
+  line-height: 18px;
+  border-radius: 9px;
   text-align: center;
   display: block;
-  font-size: 12px;
+  font-size: 9px;
+  padding: 0;
+  background-color: red;
+  color: #fff;
 }
 
-.msg.err, .msg.err .dismiss {
+@media (max-width: 760px) {
+  .dismiss {
+    top: -9px;
+    right: -9px;
+  }
+}
+
+.msg.err {
   color: red;
   border-color: red;
   background-color: #ffd7d7;
 }
 
-.msg.warn, .msg.warn .dismiss {
+.msg.warn {
   --color: rgb(105, 95, 27);
   color: var(--color);
   border-color: var(--color);
@@ -89,7 +99,7 @@ pre {
 }
 
 .msg.warn .dismiss {
-  color: var(--color);
+  background-color: var(--color);
 }
 
 .fade-enter-active,
