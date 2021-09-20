@@ -52,15 +52,16 @@ function formatMessage(err: string | Error): string {
   font-family: var(--font-code);
   white-space: pre-wrap;
   margin-bottom: 8px;
+  max-height: calc(100% - 300px);
+  min-height: 40px;
+  display: flex;
+  align-items: stretch;
 }
 
 pre {
   margin: 0;
   padding: 12px 20px;
-  max-height: calc(100vh - 300px);
-  min-height: 40px;
   overflow: scroll;
-  box-sizing: border-box;
 }
 
 .dismiss {
