@@ -51,15 +51,16 @@ function formatMessage(err: string | Error): string {
   border-radius: 6px;
   font-family: var(--font-code);
   white-space: pre-wrap;
-  max-height: calc(100% - 300px);
-  min-height: 42px;
   margin-bottom: 8px;
 }
 
 pre {
   margin: 0;
   padding: 12px 20px;
+  max-height: calc(100vh - 300px);
+  min-height: 40px;
   overflow: scroll;
+  box-sizing: border-box;
 }
 
 .dismiss {
