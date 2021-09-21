@@ -4,7 +4,7 @@ import {
   BindingMetadata,
   shouldTransformRef,
   transformRef
-} from '@vue/compiler-sfc'
+} from 'vue/compiler-sfc'
 import { transform } from 'sucrase'
 
 export const COMP_IDENTIFIER = `__sfc__`

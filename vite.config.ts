@@ -23,7 +23,7 @@ export default defineConfig({
       fileName: () => 'vue-repl.js'
     },
     rollupOptions: {
-      external: ['vue', '@vue/compiler-sfc']
+      external: ['vue', 'vue/compiler-sfc']
     }
   }
 })

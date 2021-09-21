@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
-import { CompilerError } from '@vue/compiler-sfc'
+import { CompilerError } from 'vue/compiler-sfc'
 
 const props = defineProps(['err', 'warn'])
 

@@ -31,16 +31,15 @@
   },
   "homepage": "https://github.com/vuejs/repl#readme",
   "devDependencies": {
+    "@babel/types": "^7.15.6",
     "@types/codemirror": "^5.60.2",
-    "@vitejs/plugin-vue": "^1.6.0",
-    "@vue/compiler-sfc": "^3.2.9",
+    "@vitejs/plugin-vue": "^1.9.0",
     "codemirror": "^5.62.3",
     "sucrase": "^3.20.1",
-    "vite": "^2.5.3",
-    "vue": "^3.2.9"
+    "vite": "^2.6.0-0",
+    "vue": "^3.2.13"
   },
   "peerDependencies": {
-    "@vue/compiler-sfc": "^3.2.9",
-    "vue": "^3.2.9"
+    "vue": "^3.2.13"
   }
 }

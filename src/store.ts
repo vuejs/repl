@@ -1,5 +1,5 @@
 import { version, reactive, watchEffect } from 'vue'
-import * as defaultCompiler from '@vue/compiler-sfc'
+import * as defaultCompiler from 'vue/compiler-sfc'
 import { compileFile } from './transform'
 import { utoa, atou } from './utils'
 
