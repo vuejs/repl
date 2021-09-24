@@ -3,7 +3,8 @@ import {
   SFCDescriptor,
   BindingMetadata,
   shouldTransformRef,
-  transformRef
+  transformRef,
+  CompilerOptions
 } from 'vue/compiler-sfc'
 import { transform } from 'sucrase'
 
@@ -213,6 +214,9 @@ async function doCompileScript(
 ): Promise<[string, BindingMetadata | undefined] | undefined> {
   if (descriptor.script || descriptor.scriptSetup) {
     try {
+      const expressionPlugins: CompilerOptions['expressionPlugins'] = isTS
+        ? ['typescript']
+        : undefined
       const compiledScript = store.compiler.compileScript(descriptor, {
         id,
         refTransform: true,
@@ -221,7 +225,7 @@ async function doCompileScript(
           ssr,
           ssrCssVars: descriptor.cssVars,
           compilerOptions: {
-            expressionPlugins: isTS ? ['typescript'] : undefined
+            expressionPlugins
           }
         }
       })
@@ -235,7 +239,11 @@ async function doCompileScript(
       }
       code +=
         `\n` +
-        store.compiler.rewriteDefault(compiledScript.content, COMP_IDENTIFIER)
+        store.compiler.rewriteDefault(
+          compiledScript.content,
+          COMP_IDENTIFIER,
+          expressionPlugins
+        )
 
       if ((descriptor.script || descriptor.scriptSetup)!.lang === 'ts') {
         code = await transformTS(code)
