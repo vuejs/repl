@@ -2,6 +2,11 @@ import { version, reactive, watchEffect } from 'vue'
 import * as defaultCompiler from 'vue/compiler-sfc'
 import { compileFile } from './transform'
 import { utoa, atou } from './utils'
+import {
+  SFCScriptCompileOptions,
+  SFCAsyncStyleCompileOptions,
+  SFCTemplateCompileOptions
+} from 'vue/compiler-sfc'
 
 const defaultMainFile = 'App.vue'
 
@@ -41,9 +46,16 @@ export interface StoreState {
   vueRuntimeURL: string
 }
 
+export interface SFCOptions {
+  script?: SFCScriptCompileOptions
+  style?: SFCAsyncStyleCompileOptions
+  template?: SFCTemplateCompileOptions
+}
+
 export class ReplStore {
   state: StoreState
   compiler = defaultCompiler
+  options?: SFCOptions
   defaultVueRuntimeURL: string
   pendingCompiler: Promise<any> | null = null
 

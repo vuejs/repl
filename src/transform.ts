@@ -178,6 +178,7 @@ export async function compileFile(
     }
 
     const styleResult = await store.compiler.compileStyleAsync({
+      ...store.options?.style,
       source: style.content,
       filename,
       id,
@@ -218,13 +219,15 @@ async function doCompileScript(
         ? ['typescript']
         : undefined
       const compiledScript = store.compiler.compileScript(descriptor, {
-        id,
-        refTransform: true,
         inlineTemplate: true,
+        ...store.options?.script,
+        id,
         templateOptions: {
+          ...store.options?.template,
           ssr,
           ssrCssVars: descriptor.cssVars,
           compilerOptions: {
+            ...store.options?.template?.compilerOptions,
             expressionPlugins
           }
         }
@@ -268,6 +271,7 @@ function doCompileTemplate(
   isTS: boolean
 ) {
   const templateResult = store.compiler.compileTemplate({
+    ...store.options?.template,
     source: descriptor.template!.content,
     filename: descriptor.filename,
     id,
@@ -277,6 +281,7 @@ function doCompileTemplate(
     ssrCssVars: descriptor.cssVars,
     isProd: false,
     compilerOptions: {
+      ...store.options?.template?.compilerOptions,
       bindingMetadata,
       expressionPlugins: isTS ? ['typescript'] : undefined
     }

@@ -2,7 +2,7 @@
 import SplitPane from './SplitPane.vue'
 import Editor from './editor/Editor.vue'
 import Output from './output/Output.vue'
-import { ReplStore } from './store'
+import { ReplStore, SFCOptions } from './store'
 import { provide, toRef } from 'vue'
 
 interface Props {
@@ -11,6 +11,7 @@ interface Props {
   showCompileOutput?: boolean
   showImportMap?: boolean
   clearConsole?: boolean
+  sfcOptions?: SFCOptions
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -20,6 +21,8 @@ const props = withDefaults(defineProps<Props>(), {
   showImportMap: true,
   clearConsole: true
 })
+
+props.store.options = props.sfcOptions
 
 provide('store', props.store)
 provide('autoresize', props.autoResize)
