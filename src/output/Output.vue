@@ -31,9 +31,11 @@ const mode = ref<Modes>('preview')
   </div>
 
   <div class="output-container">
-    <Preview v-if="mode === 'preview'" />
+    <div class="iframe-container" v-show="mode === 'preview'">
+      <Preview />
+    </div>
     <CodeMirror
-      v-else
+      v-if="mode !== 'preview'"
       readonly
       :mode="mode === 'css' ? 'css' : 'javascript'"
       :value="store.state.activeFile.compiled[mode]"
@@ -47,6 +49,14 @@ const mode = ref<Modes>('preview')
   overflow: hidden;
   position: relative;
 }
+.iframe-container,
+.iframe-container :deep(iframe) {
+  width: 100%;
+  height: 100%;
+  border: none;
+  background-color: #fff;
+}
+
 .tab-buttons {
   box-sizing: border-box;
   border-bottom: 1px solid var(--border);

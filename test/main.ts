@@ -26,7 +26,7 @@ const App = {
     // )
     // }, 1000);
 
-    store.setVueVersion('3.2.8')
+    // store.setVueVersion('3.2.8')
 
     return () =>
       h(Repl, {

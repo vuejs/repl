@@ -8,7 +8,6 @@ import {
   isInDestructureAssignment,
   isStaticProperty
 } from 'vue/compiler-sfc'
-import { babelParserDefaultPlugins } from '@vue/shared'
 import { ExportSpecifier, Identifier, Node } from '@babel/types'
 
 export function compileModulesForPreview(store: ReplStore) {
@@ -79,8 +78,7 @@ function processModule(
 
   const ast = babelParse(src, {
     sourceFilename: filename,
-    sourceType: 'module',
-    plugins: [...babelParserDefaultPlugins]
+    sourceType: 'module'
   }).program.body
 
   const idToImportMap = new Map<string, string>()

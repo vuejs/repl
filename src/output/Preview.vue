@@ -193,17 +193,7 @@ async function updatePreview() {
 </script>
 
 <template>
-  <div class="vue-repl-preview-container" ref="container"></div>
+  <div ref="container"></div>
   <Message :err="runtimeError" />
   <Message v-if="!runtimeError" :warn="runtimeWarning" />
 </template>
-
-<style>
-.vue-repl-preview-container,
-.vue-repl-preview-container iframe {
-  width: 100%;
-  height: 100%;
-  border: none;
-  background-color: #fff;
-}
-</style>
