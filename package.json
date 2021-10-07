@@ -36,8 +36,8 @@
     "@vitejs/plugin-vue": "^1.9.0",
     "codemirror": "^5.62.3",
     "sucrase": "^3.20.1",
-    "vite": "^2.6.0-0",
-    "vue": "^3.2.13"
+    "vite": "^2.6.5",
+    "vue": "^3.2.19"
   },
   "peerDependencies": {
     "vue": "^3.2.13"
