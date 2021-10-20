@@ -1,22 +1,22 @@
 <script setup lang="ts">
-import Preview from "./Preview.vue";
-import CodeMirror from "../codemirror/CodeMirror.vue";
-import { ReplStore } from "../store";
-import { inject, ref, computed } from "vue";
+import Preview from './Preview.vue'
+import CodeMirror from '../codemirror/CodeMirror.vue'
+import { ReplStore } from '../store'
+import { inject, ref, computed } from 'vue'
 
 const props = defineProps<{
-  showCompileOutput?: boolean;
-}>();
+  showCompileOutput?: boolean
+}>()
 
-const store = inject("store") as ReplStore;
+const store = inject('store') as ReplStore
 const modes = computed(() =>
   props.showCompileOutput
-    ? (["preview", "js", "css", "ssr"] as const)
-    : (["preview"] as const)
-);
+    ? (['preview', 'js', 'css', 'ssr'] as const)
+    : (['preview'] as const)
+)
 
-type Modes = typeof modes.value[number];
-const mode = ref<Modes>("preview");
+type Modes = typeof modes.value[number]
+const mode = ref<Modes>('preview')
 </script>
 
 <template>
