@@ -27,9 +27,9 @@ function focus({ el }: VNode) {
 function doneAddFile() {
   const filename = pendingFilename.value
 
-  if (!/\.(vue|js|ts|css)$/.test(filename)) {
+  if (!/\.(vue|js|ts|css|html)$/.test(filename)) {
     store.state.errors = [
-      `Playground only supports *.vue, *.js, *.ts, *.css files.`
+      `Playground only supports *.vue, *.js, *.ts, *.css, *.html files.`
     ]
     return
   }
