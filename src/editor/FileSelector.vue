@@ -70,6 +70,13 @@ function doneAddFile() {
         spellcheck="false"
         @keyup.enter="doneAddFile"
         @keyup.esc="cancelAddFile"
+        @blur="()=>{
+            if(pendingFilename === ''){
+                cancelAddFile()
+            }else{
+                doneAddFile()
+            }   
+        }"
         @vnodeMounted="focus"
       />
     </div>
