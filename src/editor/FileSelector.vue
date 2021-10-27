@@ -18,6 +18,7 @@ function startAddFile() {
 
 function cancelAddFile() {
   pending.value = false
+  store.state.errors = []
 }
 
 function focus({ el }: VNode) {
