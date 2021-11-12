@@ -31,9 +31,7 @@ const mode = ref<Modes>('preview')
   </div>
 
   <div class="output-container">
-    <div class="iframe-container" v-show="mode === 'preview'">
-      <Preview />
-    </div>
+    <Preview :show="mode === 'preview'" />
     <CodeMirror
       v-if="mode !== 'preview'"
       readonly
@@ -48,13 +46,6 @@ const mode = ref<Modes>('preview')
   height: calc(100% - var(--header-height));
   overflow: hidden;
   position: relative;
-}
-.iframe-container,
-.iframe-container :deep(iframe) {
-  width: 100%;
-  height: 100%;
-  border: none;
-  background-color: #fff;
 }
 
 .tab-buttons {

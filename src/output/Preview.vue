@@ -15,6 +15,8 @@ import { PreviewProxy } from './PreviewProxy'
 import { compileModulesForPreview } from './moduleCompiler'
 import { ReplStore } from '../store'
 
+defineProps<{ show: boolean }>()
+
 const store = inject('store') as ReplStore
 const clearConsole = inject('clear-console') as Ref<boolean>
 const container = ref()
@@ -193,7 +195,17 @@ async function updatePreview() {
 </script>
 
 <template>
-  <div ref="container"></div>
+  <div class="iframe-container" v-show="show" ref="container"></div>
   <Message :err="runtimeError" />
   <Message v-if="!runtimeError" :warn="runtimeWarning" />
 </template>
+
+<style scoped>
+.iframe-container,
+.iframe-container :deep(iframe) {
+  width: 100%;
+  height: 100%;
+  border: none;
+  background-color: #fff;
+}
+</style>
