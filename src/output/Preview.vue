@@ -181,6 +181,7 @@ async function updatePreview() {
         const AppComponent = __modules__["${mainFile}"].default
         AppComponent.name = 'Repl'
         const app = window.__app__ = _createApp(AppComponent)
+        app.config.unwrapInjectedRef = true
         app.config.errorHandler = e => console.error(e)
         app.mount('#app')`.trim()
       )
