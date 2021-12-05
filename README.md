@@ -20,7 +20,7 @@ import '@vue/repl/style.css'
 ```vue
 <script setup>
 import { watchEffect } from 'vue'
-import { Repl, ReplStore } from '../src'
+import { Repl, ReplStore } from '@vue/repl'
 
 const store = new ReplStore({
   // initialize repl with previously serialized state
