@@ -7,10 +7,12 @@
   "files": [
     "dist"
   ],
+  "types": "dist/src/repl.d.ts",
   "exports": {
     ".": {
       "import": "./dist/vue-repl.js",
-      "require": "./dist/ssr-stub.js"
+      "require": "./dist/ssr-stub.js",
+      "types": "./dist/src/repl.d.ts"
     },
     "./style.css": "./dist/style.css",
     "./dist/style.css": "./dist/style.css"
@@ -18,7 +20,8 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "prepublishOnly": "vite build"
+    "build-types": "vue-tsc -p tsconfig.build.json && api-extractor run -c api-extractor.json && rimraf dist/src",
+    "prepublishOnly": "npm run build && npm run build-types"
   },
   "repository": {
     "type": "git",
@@ -32,12 +35,17 @@
   "homepage": "https://github.com/vuejs/repl#readme",
   "devDependencies": {
     "@babel/types": "^7.15.6",
+    "@microsoft/api-extractor": "^7.19.2",
     "@types/codemirror": "^5.60.2",
+    "@types/node": "^16.11.12",
     "@vitejs/plugin-vue": "^1.9.0",
     "codemirror": "^5.62.3",
+    "rimraf": "^3.0.2",
     "sucrase": "^3.20.1",
+    "typescript": "^4.5.4",
     "vite": "^2.6.5",
-    "vue": "^3.2.19"
+    "vue": "^3.2.19",
+    "vue-tsc": "^0.29.8"
   },
   "peerDependencies": {
     "vue": "^3.2.13"

@@ -56,8 +56,9 @@ export class ReplStore {
   state: StoreState
   compiler = defaultCompiler
   options?: SFCOptions
-  defaultVueRuntimeURL: string
-  pendingCompiler: Promise<any> | null = null
+
+  private defaultVueRuntimeURL: string
+  private pendingCompiler: Promise<any> | null = null
 
   constructor({
     serializedState = '',
