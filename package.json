@@ -7,12 +7,12 @@
   "files": [
     "dist"
   ],
-  "types": "dist/src/repl.d.ts",
+  "types": "dist/repl.d.ts",
   "exports": {
     ".": {
       "import": "./dist/vue-repl.js",
       "require": "./dist/ssr-stub.js",
-      "types": "./dist/src/repl.d.ts"
+      "types": "./dist/repl.d.ts"
     },
     "./style.css": "./dist/style.css",
     "./dist/style.css": "./dist/style.css"
