@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { ReplStore } from '../store'
+import { Store } from '../store'
 import { computed, inject, ref, VNode, Ref } from 'vue'
 
-const store = inject('store') as ReplStore
+const store = inject('store') as Store
 
 const pending = ref(false)
 const pendingFilename = ref('Comp.vue')

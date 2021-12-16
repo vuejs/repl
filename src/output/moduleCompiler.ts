@@ -1,4 +1,4 @@
-import { File, ReplStore } from '../store'
+import { File, Store } from '../store'
 import {
   babelParse,
   MagicString,
@@ -10,7 +10,7 @@ import {
 } from 'vue/compiler-sfc'
 import { ExportSpecifier, Identifier, Node } from '@babel/types'
 
-export function compileModulesForPreview(store: ReplStore) {
+export function compileModulesForPreview(store: Store) {
   const seen = new Set<File>()
   const processed: string[] = []
   processFile(store, store.state.files[store.state.mainFile], processed, seen)
@@ -37,7 +37,7 @@ const moduleKey = `__module__`
 
 // similar logic with Vite's SSR transform, except this is targeting the browser
 function processFile(
-  store: ReplStore,
+  store: Store,
   file: File,
   processed: string[],
   seen: Set<File>
@@ -71,7 +71,7 @@ function processFile(
 }
 
 function processModule(
-  store: ReplStore,
+  store: Store,
   src: string,
   filename: string
 ): [string, Set<string>] {
@@ -270,7 +270,7 @@ const scriptModuleRE =
   /<script\b[^>]*type\s*=\s*(?:"module"|'module')[^>]*>([^]*?)<\/script>/gi
 
 function processHtmlFile(
-  store: ReplStore,
+  store: Store,
   src: string,
   filename: string,
   processed: string[],
