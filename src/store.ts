@@ -47,7 +47,7 @@ export interface StoreState {
 }
 
 export interface SFCOptions {
-  script?: SFCScriptCompileOptions
+  script?: Omit<SFCScriptCompileOptions, 'id'>
   style?: SFCAsyncStyleCompileOptions
   template?: SFCTemplateCompileOptions
 }
