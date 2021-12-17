@@ -1,18 +1,13 @@
 <script setup lang="ts">
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, inject } from 'vue'
+import { ReplStore } from './store'
 
 const container = ref()
 
-// mobile only
-const showOutput = ref(false)
+const store = inject('store') as ReplStore
 
-onMounted(() => {
-  // allow starting on the output view on mobile
-  const query = new URLSearchParams(location.search)
-  if (query.has('so')) {
-    showOutput.value = true
-  }
-})
+// mobile only
+const showOutput = ref(store.initialShowOutput)
 
 const state = reactive({
   dragging: false,

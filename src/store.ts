@@ -7,6 +7,7 @@ import {
   SFCAsyncStyleCompileOptions,
   SFCTemplateCompileOptions
 } from 'vue/compiler-sfc'
+import { OutputModes } from './output/types'
 
 const defaultMainFile = 'App.vue'
 
@@ -56,15 +57,21 @@ export class ReplStore {
   state: StoreState
   compiler = defaultCompiler
   options?: SFCOptions
+  initialShowOutput: boolean
+  initialOutputMode: OutputModes
 
   private defaultVueRuntimeURL: string
   private pendingCompiler: Promise<any> | null = null
 
   constructor({
     serializedState = '',
-    defaultVueRuntimeURL = `https://unpkg.com/@vue/runtime-dom@${version}/dist/runtime-dom.esm-browser.js`
+    defaultVueRuntimeURL = `https://unpkg.com/@vue/runtime-dom@${version}/dist/runtime-dom.esm-browser.js`,
+    showOutput = false,
+    outputMode = 'preview'
   }: {
     serializedState?: string
+    showOutput?: boolean
+    outputMode?: OutputModes
     defaultVueRuntimeURL?: string
   } = {}) {
     let files: StoreState['files'] = {}
@@ -81,6 +88,8 @@ export class ReplStore {
     }
 
     this.defaultVueRuntimeURL = defaultVueRuntimeURL
+    this.initialShowOutput = showOutput
+    this.initialOutputMode = outputMode
 
     let mainFile = defaultMainFile
     if (!files[mainFile]) {

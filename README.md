@@ -26,6 +26,11 @@ const store = new ReplStore({
   // initialize repl with previously serialized state
   serializedState: location.hash.slice(1),
 
+  // start on the output pane in mobile devices, defaults to false
+  showOutput: true,
+  // start on the JS output tab, defaults to "preview"
+  outputMode: 'js',
+
   // specify the default URL to import Vue runtime from in the sandbox
   // default is the CDN link from unpkg.com with version matching Vue's version
   // from peerDependency

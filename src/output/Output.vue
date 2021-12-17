@@ -2,7 +2,8 @@
 import Preview from './Preview.vue'
 import CodeMirror from '../codemirror/CodeMirror.vue'
 import { ReplStore } from '../store'
-import { inject, ref, computed, onMounted } from 'vue'
+import { inject, ref, computed } from 'vue'
+import type { OutputModes } from './types'
 
 const props = defineProps<{
   showCompileOutput?: boolean
@@ -15,17 +16,7 @@ const modes = computed(() =>
     : (['preview'] as const)
 )
 
-type Modes = typeof modes.value[number]
-const mode = ref<Modes>('preview')
-
-onMounted(() => {
-  // allow changing the mode view based on a query param named "m" (to keep the URL short)
-  const query = new URLSearchParams(location.search)
-  const targetMode = query.get('m')
-  if ((modes.value as readonly (string | null)[]).includes(targetMode)) {
-    mode.value = targetMode as Modes
-  }
-})
+const mode = ref<OutputModes>(store.initialOutputMode)
 </script>
 
 <template>
