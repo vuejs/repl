@@ -29,9 +29,10 @@ const store = new ReplStore({
   // initialize repl with previously serialized state
   serializedState: location.hash.slice(1),
 
-  // start on the output pane in mobile devices, defaults to false
+  // starts on the output pane (mobile only) if the URL has a showOutput query
   showOutput: query.has('showOutput'),
-  // start on the JS output tab, defaults to "preview"
+  // starts on a different tab on the output pane if the URL has a outputMode query
+  // and default to the "preview" tab
   outputMode: (query.get('outputMode') || 'preview')
 
   // specify the default URL to import Vue runtime from in the sandbox

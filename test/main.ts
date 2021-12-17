@@ -1,4 +1,3 @@
-import { OutputModes } from 'src/output/types'
 import { createApp, h, watchEffect } from 'vue'
 import { Repl, ReplStore } from '../src'
 
@@ -10,7 +9,7 @@ const App = {
     const store = new ReplStore({
       serializedState: location.hash.slice(1),
       showOutput: query.has('so'),
-      outputMode: (query.get('om') || 'preview') as OutputModes,
+      outputMode: query.get('om') || 'preview',
       defaultVueRuntimeURL: import.meta.env.PROD
         ? undefined
         : `${location.origin}/src/vue-dev-proxy`
