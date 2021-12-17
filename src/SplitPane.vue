@@ -1,10 +1,18 @@
 <script setup lang="ts">
-import { ref, reactive } from 'vue'
+import { ref, reactive, onMounted } from 'vue'
 
 const container = ref()
 
 // mobile only
 const showOutput = ref(false)
+
+onMounted(() => {
+  // allow starting on the output view on mobile
+  const query = new URLSearchParams(location.search)
+  if (query.has('so')) {
+    showOutput.value = true
+  }
+})
 
 const state = reactive({
   dragging: false,
