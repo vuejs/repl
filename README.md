@@ -22,14 +22,17 @@ import '@vue/repl/style.css'
 import { watchEffect } from 'vue'
 import { Repl, ReplStore } from '@vue/repl'
 
+// retrieve some configuration options from the URL
+const query = new URLSearchParams(location.search)
+
 const store = new ReplStore({
   // initialize repl with previously serialized state
   serializedState: location.hash.slice(1),
 
   // start on the output pane in mobile devices, defaults to false
-  showOutput: true,
+  showOutput: query.has('showOutput'),
   // start on the JS output tab, defaults to "preview"
-  outputMode: 'js',
+  outputMode: (query.get('outputMode') || 'preview')
 
   // specify the default URL to import Vue runtime from in the sandbox
   // default is the CDN link from unpkg.com with version matching Vue's version

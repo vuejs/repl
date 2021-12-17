@@ -16,7 +16,11 @@ const modes = computed(() =>
     : (['preview'] as const)
 )
 
-const mode = ref<OutputModes>(store.initialOutputMode)
+const mode = ref<OutputModes>(
+  (modes.value as readonly string[]).includes(store.initialOutputMode)
+    ? store.initialOutputMode as OutputModes
+    : 'preview'
+)
 </script>
 
 <template>

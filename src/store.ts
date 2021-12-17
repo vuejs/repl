@@ -58,7 +58,7 @@ export class ReplStore {
   compiler = defaultCompiler
   options?: SFCOptions
   initialShowOutput: boolean
-  initialOutputMode: OutputModes
+  initialOutputMode: OutputModes | string
 
   private defaultVueRuntimeURL: string
   private pendingCompiler: Promise<any> | null = null
@@ -71,7 +71,8 @@ export class ReplStore {
   }: {
     serializedState?: string
     showOutput?: boolean
-    outputMode?: OutputModes
+    // loose type to allow getting from the URL without inducing a typing error
+    outputMode?: OutputModes | string
     defaultVueRuntimeURL?: string
   } = {}) {
     let files: StoreState['files'] = {}
