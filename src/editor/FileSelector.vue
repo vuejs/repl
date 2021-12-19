@@ -9,7 +9,9 @@ const pendingFilename = ref('Comp.vue')
 const importMapFile = 'import-map.json'
 const showImportMap = inject('import-map') as Ref<boolean>
 const files = computed(() =>
-  Object.keys(store.state.files).filter((f) => f !== importMapFile)
+  Object.entries(store.state.files)
+    .filter(([name, file]) => name !== importMapFile && !file.hidden)
+    .map(([name]) => name)
 )
 
 function startAddFile() {

@@ -26,15 +26,17 @@ const msg = ref('Hello World!')
 export class File {
   filename: string
   code: string
+  hidden: boolean
   compiled = {
     js: '',
     css: '',
     ssr: ''
   }
 
-  constructor(filename: string, code = '') {
+  constructor(filename: string, code = '', hidden = false) {
     this.filename = filename
     this.code = code
+    this.hidden = hidden
   }
 }
 
@@ -109,9 +111,15 @@ export class ReplStore {
     this.state.activeFile = this.state.files[filename]
   }
 
-  addFile(filename: string) {
-    this.state.files[filename] = new File(filename)
-    this.setActive(filename)
+  addFile(filename: string): void
+  addFile(file: File): void
+  addFile(fileOrFilename: string | File): void {
+    const file =
+      typeof fileOrFilename === 'string'
+        ? new File(fileOrFilename)
+        : fileOrFilename
+    this.state.files[file.filename] = file
+    if (!file.hidden) this.setActive(file.filename)
   }
 
   deleteFile(filename: string) {
