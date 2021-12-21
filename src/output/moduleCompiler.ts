@@ -12,11 +12,8 @@ import { ExportSpecifier, Identifier, Node } from '@babel/types'
 
 export function compileModulesForPreview(store: ReplStore) {
   const seen = new Set<File>()
-  const processed = processFile(
-    store,
-    store.state.files[store.state.mainFile],
-    seen
-  ).reverse()
+  const processed: string[] = []
+  processFile(store, store.state.files[store.state.mainFile], processed, seen)
 
   // also add css files that are not imported
   for (const filename in store.state.files) {
@@ -39,14 +36,19 @@ const dynamicImportKey = `__dynamic_import__`
 const moduleKey = `__module__`
 
 // similar logic with Vite's SSR transform, except this is targeting the browser
-function processFile(store: ReplStore, file: File, seen: Set<File>) {
+function processFile(
+  store: ReplStore,
+  file: File,
+  processed: string[],
+  seen: Set<File>
+) {
   if (seen.has(file)) {
     return []
   }
   seen.add(file)
 
   if (file.filename.endsWith('.html')) {
-    return processHtmlFile(store, file.code, file.filename, seen)
+    return processHtmlFile(store, file.code, file.filename, processed, seen)
   }
 
   let [js, importedFiles] = processModule(
@@ -58,15 +60,14 @@ function processFile(store: ReplStore, file: File, seen: Set<File>) {
   if (file.compiled.css) {
     js += `\nwindow.__css__ += ${JSON.stringify(file.compiled.css)}`
   }
-  // crawl imports
-  const processed = [js]
+  // crawl child imports
   if (importedFiles.size) {
     for (const imported of importedFiles) {
-      processed.push(...processFile(store, store.state.files[imported], seen))
+      processFile(store, store.state.files[imported], processed, seen)
     }
   }
-  // return a list of files to further process
-  return processed
+  // push self
+  processed.push(js)
 }
 
 function processModule(
@@ -272,8 +273,9 @@ function processHtmlFile(
   store: ReplStore,
   src: string,
   filename: string,
+  processed: string[],
   seen: Set<File>
-): string[] {
+) {
   const deps: string[] = []
   let jsCode = ''
   const html = src
@@ -281,7 +283,7 @@ function processHtmlFile(
       const [code, importedFiles] = processModule(store, content, filename)
       if (importedFiles.size) {
         for (const imported of importedFiles) {
-          deps.push(...processFile(store, store.state.files[imported], seen))
+          processFile(store, store.state.files[imported], deps, seen)
         }
       }
       jsCode += '\n' + code
@@ -291,5 +293,7 @@ function processHtmlFile(
       jsCode += '\n' + content
       return ''
     })
-  return [jsCode, ...deps, `document.body.innerHTML = ${JSON.stringify(html)}`]
+  processed.push(`document.body.innerHTML = ${JSON.stringify(html)}`)
+  processed.push(...deps)
+  processed.push(jsCode)
 }
