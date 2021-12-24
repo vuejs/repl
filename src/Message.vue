@@ -80,10 +80,14 @@ pre {
   color: #fff;
 }
 
-@media (max-width: 760px) {
+@media (max-width: 720px) {
   .dismiss {
     top: -9px;
     right: -9px;
+  }
+
+  .msg {
+    bottom: 50px;
   }
 }
 
