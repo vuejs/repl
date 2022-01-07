@@ -12,6 +12,7 @@ interface Props {
   showImportMap?: boolean
   clearConsole?: boolean
   sfcOptions?: SFCOptions
+  layout?: string
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -32,7 +33,7 @@ provide('clear-console', toRef(props, 'clearConsole'))
 
 <template>
   <div class="vue-repl">
-    <SplitPane>
+    <SplitPane :layout="layout">
       <template #left>
         <Editor />
       </template>

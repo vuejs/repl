@@ -31,7 +31,8 @@ const App = {
 
     return () =>
       h(Repl, {
-        store
+        store,
+        layout: 'vertical'
         // showCompileOutput: false,
         // showImportMap: false
       })
