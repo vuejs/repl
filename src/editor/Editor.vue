@@ -4,9 +4,9 @@ import CodeMirror from '../codemirror/CodeMirror.vue'
 import Message from '../Message.vue'
 import { debounce } from '../utils'
 import { computed, inject } from 'vue'
-import { ReplStore } from '../store'
+import { Store } from '../store'
 
-const store = inject('store') as ReplStore
+const store = inject('store') as Store
 
 const onChange = debounce((code: string) => {
   store.state.activeFile.code = code

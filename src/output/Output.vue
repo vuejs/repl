@@ -1,14 +1,14 @@
 <script setup lang="ts">
 import Preview from './Preview.vue'
 import CodeMirror from '../codemirror/CodeMirror.vue'
-import { ReplStore } from '../store'
+import { Store } from '../store'
 import { inject, ref, computed } from 'vue'
 
 const props = defineProps<{
   showCompileOutput?: boolean
 }>()
 
-const store = inject('store') as ReplStore
+const store = inject('store') as Store
 const modes = computed(() =>
   props.showCompileOutput
     ? (['preview', 'js', 'css', 'ssr'] as const)

@@ -1,4 +1,4 @@
-import { ReplStore, File } from './store'
+import { Store, File } from './store'
 import {
   SFCDescriptor,
   BindingMetadata,
@@ -17,7 +17,7 @@ async function transformTS(src: string) {
 }
 
 export async function compileFile(
-  store: ReplStore,
+  store: Store,
   { filename, code, compiled }: File
 ) {
   if (!code.trim()) {
@@ -207,7 +207,7 @@ export async function compileFile(
 }
 
 async function doCompileScript(
-  store: ReplStore,
+  store: Store,
   descriptor: SFCDescriptor,
   id: string,
   ssr: boolean,
@@ -263,7 +263,7 @@ async function doCompileScript(
 }
 
 function doCompileTemplate(
-  store: ReplStore,
+  store: Store,
   descriptor: SFCDescriptor,
   id: string,
   bindingMetadata: BindingMetadata | undefined,

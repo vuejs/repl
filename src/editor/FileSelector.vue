@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { ReplStore } from '../store'
+import { Store } from '../store'
 import { computed, inject, ref, VNode, Ref } from 'vue'
 
-const store = inject('store') as ReplStore
+const store = inject('store') as Store
 
 const pending = ref(false)
 const pendingFilename = ref('Comp.vue')
@@ -40,14 +40,25 @@ function doneAddFile() {
   }
 
   store.state.errors = []
-  pending.value = false
+  cancelAddFile()
   store.addFile(filename)
   pendingFilename.value = 'Comp.vue'
+}
+
+const fileSel = ref(null)
+function horizontalScroll(e: WheelEvent) {
+  e.preventDefault()
+  const el = fileSel.value! as HTMLElement
+  const direction = Math.abs(e.deltaX) >= Math.abs(e.deltaY) ? e.deltaX : e.deltaY
+  const distance = 30 * (direction > 0 ? 1 : -1)
+  el.scrollTo({
+    left: el.scrollLeft + distance
+  })
 }
 </script>
 
 <template>
-  <div class="file-selector" :class="{ 'has-import-map': showImportMap }">
+  <div class="file-selector" :class="{ 'has-import-map': showImportMap }" @wheel="horizontalScroll" ref="fileSel">
     <div
       v-for="(file, i) in files"
       class="file"
@@ -68,6 +79,7 @@ function doneAddFile() {
       <input
         v-model="pendingFilename"
         spellcheck="false"
+        @blur="doneAddFile"
         @keyup.enter="doneAddFile"
         @keyup.esc="cancelAddFile"
         @vnodeMounted="focus"
