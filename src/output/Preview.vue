@@ -7,15 +7,18 @@ import {
   watchEffect,
   watch,
   WatchStopHandle,
-  inject
+  inject,
+  Ref
 } from 'vue'
 import srcdoc from './srcdoc.html?raw'
 import { PreviewProxy } from './PreviewProxy'
-import { MAIN_FILE } from '../transform'
 import { compileModulesForPreview } from './moduleCompiler'
 import { ReplStore } from '../store'
 
+defineProps<{ show: boolean }>()
+
 const store = inject('store') as ReplStore
+const clearConsole = inject('clear-console') as Ref<boolean>
 const container = ref()
 const runtimeError = ref()
 const runtimeWarning = ref()
@@ -151,32 +154,41 @@ function createSandbox() {
 }
 
 async function updatePreview() {
-  // @ts-ignore
-  if (import.meta.env.PROD) {
+  if (import.meta.env.PROD && clearConsole.value) {
     console.clear()
   }
   runtimeError.value = null
   runtimeWarning.value = null
+
   try {
+    // compile code to simulated module system
     const modules = compileModulesForPreview(store)
     console.log(`[@vue/repl] successfully compiled ${modules.length} modules.`)
-    // reset modules
-    await proxy.eval([
-      `window.__modules__ = {};window.__css__ = ''`,
+
+    const codeToEval = [
+      `window.__modules__ = {};window.__css__ = '';` +
+        `if (window.__app__) window.__app__.unmount();` +
+        `document.body.innerHTML = '<div id="app"></div>'`,
       ...modules,
-      `
-  import { createApp as _createApp } from "vue"
-  
-  if (window.__app__) {
-    window.__app__.unmount()
-    document.getElementById('app').innerHTML = ''
-  }
-  
-  document.getElementById('__sfc-styles').innerHTML = window.__css__
-  const app = window.__app__ = _createApp(__modules__["${MAIN_FILE}"].default)
-  app.config.errorHandler = e => console.error(e)
-  app.mount('#app')`.trim()
-    ])
+      `document.getElementById('__sfc-styles').innerHTML = window.__css__`
+    ]
+
+    // if main file is a vue file, mount it.
+    const mainFile = store.state.mainFile
+    if (mainFile.endsWith('.vue')) {
+      codeToEval.push(
+        `import { createApp as _createApp } from "vue"
+        const AppComponent = __modules__["${mainFile}"].default
+        AppComponent.name = 'Repl'
+        const app = window.__app__ = _createApp(AppComponent)
+        app.config.unwrapInjectedRef = true
+        app.config.errorHandler = e => console.error(e)
+        app.mount('#app')`.trim()
+      )
+    }
+
+    // eval code in sandbox
+    await proxy.eval(codeToEval)
   } catch (e: any) {
     runtimeError.value = (e as Error).message
   }
@@ -184,14 +196,14 @@ async function updatePreview() {
 </script>
 
 <template>
-  <div class="vue-repl-preview-container" ref="container"></div>
+  <div class="iframe-container" v-show="show" ref="container"></div>
   <Message :err="runtimeError" />
   <Message v-if="!runtimeError" :warn="runtimeWarning" />
 </template>
 
-<style>
-.vue-repl-preview-container,
-.vue-repl-preview-container iframe {
+<style scoped>
+.iframe-container,
+.iframe-container :deep(iframe) {
   width: 100%;
   height: 100%;
   border: none;

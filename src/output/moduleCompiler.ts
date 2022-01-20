@@ -1,5 +1,4 @@
 import { File, ReplStore } from '../store'
-import { MAIN_FILE } from '../transform'
 import {
   babelParse,
   MagicString,
@@ -8,12 +7,27 @@ import {
   extractIdentifiers,
   isInDestructureAssignment,
   isStaticProperty
-} from '@vue/compiler-sfc'
-import { babelParserDefaultPlugins } from '@vue/shared'
+} from 'vue/compiler-sfc'
 import { ExportSpecifier, Identifier, Node } from '@babel/types'
 
 export function compileModulesForPreview(store: ReplStore) {
-  return processFile(store, store.state.files[MAIN_FILE]).reverse()
+  const seen = new Set<File>()
+  const processed: string[] = []
+  processFile(store, store.state.files[store.state.mainFile], processed, seen)
+
+  // also add css files that are not imported
+  for (const filename in store.state.files) {
+    if (filename.endsWith('.css')) {
+      const file = store.state.files[filename]
+      if (!seen.has(file)) {
+        processed.push(
+          `\nwindow.__css__ += ${JSON.stringify(file.compiled.css)}`
+        )
+      }
+    }
+  }
+
+  return processed
 }
 
 const modulesKey = `__modules__`
@@ -22,20 +36,50 @@ const dynamicImportKey = `__dynamic_import__`
 const moduleKey = `__module__`
 
 // similar logic with Vite's SSR transform, except this is targeting the browser
-function processFile(store: ReplStore, file: File, seen = new Set<File>()) {
+function processFile(
+  store: ReplStore,
+  file: File,
+  processed: string[],
+  seen: Set<File>
+) {
   if (seen.has(file)) {
     return []
   }
   seen.add(file)
 
-  const { js, css } = file.compiled
+  if (file.filename.endsWith('.html')) {
+    return processHtmlFile(store, file.code, file.filename, processed, seen)
+  }
 
-  const s = new MagicString(js)
+  let [js, importedFiles] = processModule(
+    store,
+    file.compiled.js,
+    file.filename
+  )
+  // append css
+  if (file.compiled.css) {
+    js += `\nwindow.__css__ += ${JSON.stringify(file.compiled.css)}`
+  }
+  // crawl child imports
+  if (importedFiles.size) {
+    for (const imported of importedFiles) {
+      processFile(store, store.state.files[imported], processed, seen)
+    }
+  }
+  // push self
+  processed.push(js)
+}
 
-  const ast = babelParse(js, {
-    sourceFilename: file.filename,
-    sourceType: 'module',
-    plugins: [...babelParserDefaultPlugins]
+function processModule(
+  store: ReplStore,
+  src: string,
+  filename: string
+): [string, Set<string>] {
+  const s = new MagicString(src)
+
+  const ast = babelParse(src, {
+    sourceFilename: filename,
+    sourceType: 'module'
   }).program.body
 
   const idToImportMap = new Map<string, string>()
@@ -68,7 +112,7 @@ function processFile(store: ReplStore, file: File, seen = new Set<File>()) {
   // 0. instantiate module
   s.prepend(
     `const ${moduleKey} = __modules__[${JSON.stringify(
-      file.filename
+      filename
     )}] = { [Symbol.toStringTag]: "Module" }\n\n`
   )
 
@@ -218,18 +262,38 @@ function processFile(store: ReplStore, file: File, seen = new Set<File>()) {
     }
   })
 
-  // append CSS injection code
-  if (css) {
-    s.append(`\nwindow.__css__ += ${JSON.stringify(css)}`)
-  }
+  return [s.toString(), importedFiles]
+}
 
-  const processed = [s.toString()]
-  if (importedFiles.size) {
-    for (const imported of importedFiles) {
-      processed.push(...processFile(store, store.state.files[imported], seen))
-    }
-  }
+const scriptRE = /<script\b(?:\s[^>]*>|>)([^]*?)<\/script>/gi
+const scriptModuleRE =
+  /<script\b[^>]*type\s*=\s*(?:"module"|'module')[^>]*>([^]*?)<\/script>/gi
 
-  // return a list of files to further process
-  return processed
+function processHtmlFile(
+  store: ReplStore,
+  src: string,
+  filename: string,
+  processed: string[],
+  seen: Set<File>
+) {
+  const deps: string[] = []
+  let jsCode = ''
+  const html = src
+    .replace(scriptModuleRE, (_, content) => {
+      const [code, importedFiles] = processModule(store, content, filename)
+      if (importedFiles.size) {
+        for (const imported of importedFiles) {
+          processFile(store, store.state.files[imported], deps, seen)
+        }
+      }
+      jsCode += '\n' + code
+      return ''
+    })
+    .replace(scriptRE, (_, content) => {
+      jsCode += '\n' + content
+      return ''
+    })
+  processed.push(`document.body.innerHTML = ${JSON.stringify(html)}`)
+  processed.push(...deps)
+  processed.push(jsCode)
 }

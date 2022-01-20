@@ -1,20 +1,27 @@
 {
   "name": "@vue/repl",
-  "version": "0.1.0",
+  "version": "0.4.9",
   "description": "Vue component for editing Vue components",
-  "main": "dist/vue-repl.js",
+  "main": "dist/ssr-stub.js",
+  "module": "dist/vue-repl.js",
   "files": [
     "dist"
   ],
+  "types": "dist/repl.d.ts",
   "exports": {
-    ".": "./dist/vue-repl.js",
+    ".": {
+      "import": "./dist/vue-repl.js",
+      "require": "./dist/ssr-stub.js",
+      "types": "./dist/repl.d.ts"
+    },
     "./style.css": "./dist/style.css",
     "./dist/style.css": "./dist/style.css"
   },
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "prepublishOnly": "vite build"
+    "build-types": "vue-tsc -p tsconfig.build.json && api-extractor run -c api-extractor.json && rimraf dist/src",
+    "prepublishOnly": "npm run build && npm run build-types"
   },
   "repository": {
     "type": "git",
@@ -27,16 +34,20 @@
   },
   "homepage": "https://github.com/vuejs/repl#readme",
   "devDependencies": {
+    "@babel/types": "^7.15.6",
+    "@microsoft/api-extractor": "^7.19.2",
     "@types/codemirror": "^5.60.2",
-    "@vitejs/plugin-vue": "^1.6.0",
-    "@vue/compiler-sfc": "^3.2.9",
+    "@types/node": "^16.11.12",
+    "@vitejs/plugin-vue": "^1.9.0",
     "codemirror": "^5.62.3",
+    "rimraf": "^3.0.2",
     "sucrase": "^3.20.1",
-    "vite": "^2.5.3",
-    "vue": "^3.2.9"
+    "typescript": "^4.5.4",
+    "vite": "^2.6.5",
+    "vue": "^3.2.19",
+    "vue-tsc": "^0.29.8"
   },
   "peerDependencies": {
-    "@vue/compiler-sfc": "^3.2.9",
-    "vue": "^3.2.9"
+    "vue": "^3.2.13"
   }
 }

@@ -1,8 +1,20 @@
-import { defineConfig } from 'vite'
+import { defineConfig, Plugin } from 'vite'
 import vue from '@vitejs/plugin-vue'
 
+const genStub: Plugin = {
+  name: 'gen-stub',
+  apply: 'build',
+  generateBundle() {
+    this.emitFile({
+      type: 'asset',
+      fileName: 'ssr-stub.js',
+      source: `module.exports = {}`
+    })
+  }
+}
+
 export default defineConfig({
-  plugins: [vue()],
+  plugins: [vue(), genStub],
   build: {
     minify: false,
     lib: {
@@ -11,7 +23,7 @@ export default defineConfig({
       fileName: () => 'vue-repl.js'
     },
     rollupOptions: {
-      external: ['vue', '@vue/compiler-sfc']
+      external: ['vue', 'vue/compiler-sfc']
     }
   }
 })

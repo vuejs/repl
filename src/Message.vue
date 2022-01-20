@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
-import { CompilerError } from '@vue/compiler-sfc'
+import { CompilerError } from 'vue/compiler-sfc'
 
 const props = defineProps(['err', 'warn'])
 
@@ -29,13 +29,14 @@ function formatMessage(err: string | Error): string {
 
 <template>
   <Transition name="fade">
-    <pre
+    <div
       v-if="!dismissed && (err || warn)"
       class="msg"
       :class="err ? 'err' : 'warn'"
-      @click="dismissed = true"
-      >{{ formatMessage(err || warn) }}</pre
     >
+      <pre>{{ formatMessage(err || warn) }}</pre>
+      <button class="dismiss" @click="dismissed = true">✕</button>
+    </div>
   </Transition>
 </template>
 
@@ -46,18 +47,43 @@ function formatMessage(err: string | Error): string {
   left: 8px;
   right: 8px;
   z-index: 10;
-  padding: 14px 20px;
   border: 2px solid transparent;
   border-radius: 6px;
   font-family: var(--font-code);
   white-space: pre-wrap;
-  max-height: calc(100% - 50px);
-  overflow-y: scroll;
+  margin-bottom: 8px;
+  max-height: calc(100% - 300px);
+  min-height: 40px;
+  display: flex;
+  align-items: stretch;
 }
 
-@media (max-width: 720px) {
-  .msg {
-    bottom: 50px;
+pre {
+  margin: 0;
+  padding: 12px 20px;
+  overflow: scroll;
+}
+
+.dismiss {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  width: 18px;
+  height: 18px;
+  line-height: 18px;
+  border-radius: 9px;
+  text-align: center;
+  display: block;
+  font-size: 9px;
+  padding: 0;
+  background-color: red;
+  color: #fff;
+}
+
+@media (max-width: 760px) {
+  .dismiss {
+    top: -9px;
+    right: -9px;
   }
 }
 
@@ -72,6 +98,10 @@ function formatMessage(err: string | Error): string {
   color: var(--color);
   border-color: var(--color);
   background-color: rgb(247, 240, 205);
+}
+
+.msg.warn .dismiss {
+  background-color: var(--color);
 }
 
 .fade-enter-active,

@@ -3,27 +3,26 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, watchEffect } from 'vue'
+import { ref, onMounted, watchEffect, inject } from 'vue'
+import { debounce } from '../utils'
 import CodeMirror from './codemirror'
 
-const el = ref()
+interface Props {
+  mode?: string
+  value?: string
+  readonly?: boolean
+}
 
-const props = defineProps({
-  mode: {
-    type: String,
-    default: 'htmlmixed'
-  },
-  value: {
-    type: String,
-    default: ''
-  },
-  readonly: {
-    type: Boolean,
-    default: false
-  }
+const props = withDefaults(defineProps<Props>(), {
+  mode: 'htmlmixed',
+  value: '',
+  readonly: false
 })
 
 const emit = defineEmits<(e: 'change', value: string) => void>()
+
+const el = ref()
+const needAutoResize = inject('autoresize')
 
 onMounted(() => {
   const addonOptions = {
@@ -48,8 +47,12 @@ onMounted(() => {
   })
 
   watchEffect(() => {
-    editor.setValue(props.value)
+    const cur = editor.getValue()
+    if (props.value !== cur) {
+      editor.setValue(props.value)
+    }
   })
+
   watchEffect(() => {
     editor.setOption('mode', props.mode)
   })
@@ -57,6 +60,15 @@ onMounted(() => {
   setTimeout(() => {
     editor.refresh()
   }, 50)
+
+  if (needAutoResize) {
+    window.addEventListener(
+      'resize',
+      debounce(() => {
+        editor.refresh()
+      })
+    )
+  }
 })
 </script>
 

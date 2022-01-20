@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import { ref, reactive, computed } from 'vue'
 
+const props = defineProps<{ layout?: string }>()
+const isVertical = computed(() => props.layout === 'vertical')
+
 const container = ref()
 
 // mobile only
@@ -21,14 +24,16 @@ let startSplit = 0
 
 function dragStart(e: MouseEvent) {
   state.dragging = true
-  startPosition = e.pageX
+  startPosition = isVertical.value ? e.pageY : e.pageX
   startSplit = boundSplit.value
 }
 
 function dragMove(e: MouseEvent) {
   if (state.dragging) {
-    const position = e.pageX
-    const totalSize = container.value.offsetWidth
+    const position = isVertical.value ? e.pageY : e.pageX
+    const totalSize = isVertical.value
+      ? container.value.offsetHeight
+      : container.value.offsetWidth
     const dp = position - startPosition
     state.split = startSplit + ~~((dp / totalSize) * 100)
   }
@@ -43,16 +48,26 @@ function dragEnd() {
   <div
     ref="container"
     class="split-pane"
-    :class="{ dragging: state.dragging, 'show-output': showOutput }"
+    :class="{
+      dragging: state.dragging,
+      'show-output': showOutput,
+      vertical: isVertical
+    }"
     @mousemove="dragMove"
     @mouseup="dragEnd"
     @mouseleave="dragEnd"
   >
-    <div class="left">
+    <div
+      class="left"
+      :style="{ [isVertical ? 'height' : 'width']: boundSplit + '%' }"
+    >
       <slot name="left" />
       <div class="dragger" @mousedown.prevent="dragStart" />
     </div>
-    <div class="right">
+    <div
+      class="right"
+      :style="{ [isVertical ? 'height' : 'width']: 100 - boundSplit + '%' }"
+    >
       <slot name="right" />
     </div>
 
@@ -81,15 +96,11 @@ function dragEnd() {
   height: 100%;
 }
 .left {
-  border-right: 1px solid #ccc;
-  width: v-bind(boundSplit + "%");
-}
-.right {
-  width: v-bind(100 - boundSplit + "%");
+  border-right: 1px solid var(--border);
 }
 .dragger {
   position: absolute;
-  z-index: 99;
+  z-index: 3;
   top: 0;
   bottom: 0;
   right: -5px;
@@ -98,27 +109,67 @@ function dragEnd() {
 }
 .toggler {
   display: none;
-  z-index: 999;
+  z-index: 3;
   font-family: var(--font-code);
-  color: #444;
+  color: var(--text-light);
   position: absolute;
   left: 50%;
   bottom: 20px;
-  background-color: #fff;
+  background-color: var(--bg);
   padding: 8px 12px;
   border-radius: 8px;
   transform: translateX(-50%);
-  box-shadow: 0 3px 8px rgba(0,0,0,0.25);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);
 }
-@media (max-width: 720px) {
-  .toggler {
+
+.dark .toggler {
+  background-color: var(--bg);
+}
+
+/* vertical */
+@media (min-width: 721px) {
+  .split-pane.vertical {
     display: block;
   }
+
+  .split-pane.vertical.dragging {
+    cursor: ns-resize;
+  }
+
+  .vertical .dragger {
+    top: auto;
+    height: 10px;
+    width: 100%;
+    left: 0;
+    right: 0;
+    bottom: -5px;
+    cursor: ns-resize;
+  }
+
+  .vertical .left,
+  .vertical .right {
+    width: 100%;
+  }
+  .vertical .left {
+    border-right: none;
+    border-bottom: 1px solid var(--border);
+  }
+}
+
+/* mobile */
+@media (max-width: 720px) {
   .left,
   .right {
     width: 100% !important;
+    height: 100% !important;
   }
-  .right {
+  .dragger {
+    display: none;
+  }
+  .split-pane .toggler {
+    display: block;
+  }
+  .split-pane .right {
     display: none;
   }
   .split-pane.show-output .right {
