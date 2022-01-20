@@ -44,10 +44,21 @@ function doneAddFile() {
   store.addFile(filename)
   pendingFilename.value = 'Comp.vue'
 }
+
+const fileSel = ref(null)
+function horizontalScroll(e: WheelEvent) {
+  e.preventDefault()
+  const el = fileSel.value! as HTMLElement
+  const direction = Math.abs(e.deltaX) >= Math.abs(e.deltaY) ? e.deltaX : e.deltaY
+  const distance = 30 * (direction > 0 ? 1 : -1)
+  el.scrollTo({
+    left: el.scrollLeft + distance
+  })
+}
 </script>
 
 <template>
-  <div class="file-selector" :class="{ 'has-import-map': showImportMap }">
+  <div class="file-selector" :class="{ 'has-import-map': showImportMap }" @wheel="horizontalScroll" ref="fileSel">
     <div
       v-for="(file, i) in files"
       class="file"
