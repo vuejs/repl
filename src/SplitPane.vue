@@ -14,10 +14,10 @@ const state = reactive({
   split: 50
 })
 
-function boundSplit() {
+const boundSplit = computed(()=>{
   const { split } = state
   return split < 20 ? 20 : split > 80 ? 80 : split
-}
+}) 
 
 let startPosition = 0
 let startSplit = 0
@@ -25,7 +25,7 @@ let startSplit = 0
 function dragStart(e: MouseEvent) {
   state.dragging = true
   startPosition = isVertical.value ? e.pageY : e.pageX
-  startSplit = boundSplit()
+  startSplit = boundSplit.value
 }
 
 function dragMove(e: MouseEvent) {
@@ -59,14 +59,14 @@ function dragEnd() {
   >
     <div
       class="left"
-      :style="{ [isVertical ? 'height' : 'width']: boundSplit() + '%' }"
+      :style="{ [isVertical ? 'height' : 'width']: boundSplit + '%' }"
     >
       <slot name="left" />
       <div class="dragger" @mousedown.prevent="dragStart" />
     </div>
     <div
       class="right"
-      :style="{ [isVertical ? 'height' : 'width']: 100 - boundSplit() + '%' }"
+      :style="{ [isVertical ? 'height' : 'width']: 100 - boundSplit + '%' }"
     >
       <slot name="right" />
     </div>

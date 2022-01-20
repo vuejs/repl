@@ -40,7 +40,7 @@ function doneAddFile() {
   }
 
   store.state.errors = []
-  pending.value = false
+  cancelAddFile()
   store.addFile(filename)
   pendingFilename.value = 'Comp.vue'
 }
@@ -79,6 +79,7 @@ function horizontalScroll(e: WheelEvent) {
       <input
         v-model="pendingFilename"
         spellcheck="false"
+        @blur="doneAddFile"
         @keyup.enter="doneAddFile"
         @keyup.esc="cancelAddFile"
         @vnodeMounted="focus"
