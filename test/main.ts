@@ -5,8 +5,11 @@ import { Repl, ReplStore } from '../src'
 
 const App = {
   setup() {
+    const query = new URLSearchParams(location.search)
     const store = new ReplStore({
       serializedState: location.hash.slice(1),
+      showOutput: query.has('so'),
+      outputMode: query.get('om') || 'preview',
       defaultVueRuntimeURL: import.meta.env.PROD
         ? undefined
         : `${location.origin}/src/vue-dev-proxy`

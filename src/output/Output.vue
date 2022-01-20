@@ -3,6 +3,7 @@ import Preview from './Preview.vue'
 import CodeMirror from '../codemirror/CodeMirror.vue'
 import { Store } from '../store'
 import { inject, ref, computed } from 'vue'
+import type { OutputModes } from './types'
 
 const props = defineProps<{
   showCompileOutput?: boolean
@@ -15,8 +16,11 @@ const modes = computed(() =>
     : (['preview'] as const)
 )
 
-type Modes = typeof modes.value[number]
-const mode = ref<Modes>('preview')
+const mode = ref<OutputModes>(
+  (modes.value as readonly string[]).includes(store.initialOutputMode)
+    ? store.initialOutputMode as OutputModes
+    : 'preview'
+)
 </script>
 
 <template>
