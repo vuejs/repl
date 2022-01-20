@@ -13,11 +13,11 @@ import {
 import srcdoc from './srcdoc.html?raw'
 import { PreviewProxy } from './PreviewProxy'
 import { compileModulesForPreview } from './moduleCompiler'
-import { ReplStore } from '../store'
+import { Store } from '../store'
 
 defineProps<{ show: boolean }>()
 
-const store = inject('store') as ReplStore
+const store = inject('store') as Store
 const clearConsole = inject('clear-console') as Ref<boolean>
 const container = ref()
 const runtimeError = ref()
