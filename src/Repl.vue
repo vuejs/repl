@@ -2,16 +2,17 @@
 import SplitPane from './SplitPane.vue'
 import Editor from './editor/Editor.vue'
 import Output from './output/Output.vue'
-import { ReplStore, SFCOptions } from './store'
+import { Store, ReplStore, SFCOptions } from './store'
 import { provide, toRef } from 'vue'
 
 interface Props {
-  store?: ReplStore
+  store?: Store
   autoResize?: boolean
   showCompileOutput?: boolean
   showImportMap?: boolean
   clearConsole?: boolean
   sfcOptions?: SFCOptions
+  layout?: string
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -32,7 +33,7 @@ provide('clear-console', toRef(props, 'clearConsole'))
 
 <template>
   <div class="vue-repl">
-    <SplitPane>
+    <SplitPane :layout="layout">
       <template #left>
         <Editor />
       </template>

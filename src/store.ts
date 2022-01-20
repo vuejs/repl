@@ -48,12 +48,22 @@ export interface StoreState {
 }
 
 export interface SFCOptions {
-  script?: SFCScriptCompileOptions
+  script?: Omit<SFCScriptCompileOptions, 'id'>
   style?: SFCAsyncStyleCompileOptions
   template?: SFCTemplateCompileOptions
 }
 
-export class ReplStore {
+export interface Store {
+  state: StoreState
+  options?: SFCOptions
+  compiler: typeof import('vue/compiler-sfc')
+  setActive: (filename: string) => void
+  addFile: (filename: string) => void
+  deleteFile: (filename: string) => void
+  getImportMap: () => any
+}
+
+export class ReplStore implements Store {
   state: StoreState
   compiler = defaultCompiler
   options?: SFCOptions
