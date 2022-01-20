@@ -60,7 +60,7 @@ export interface Store {
   options?: SFCOptions
   compiler: typeof import('vue/compiler-sfc')
   setActive: (filename: string) => void
-  addFile: (filename: string) => void
+  addFile: (filename: string | File) => void
   deleteFile: (filename: string) => void
   getImportMap: () => any
 }
@@ -131,8 +131,6 @@ export class ReplStore implements Store {
     this.state.activeFile = this.state.files[filename]
   }
 
-  addFile(filename: string): void
-  addFile(file: File): void
   addFile(fileOrFilename: string | File): void {
     const file =
       typeof fileOrFilename === 'string'
