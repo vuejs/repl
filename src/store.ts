@@ -63,6 +63,8 @@ export interface Store {
   addFile: (filename: string | File) => void
   deleteFile: (filename: string) => void
   getImportMap: () => any
+  initialShowOutput: boolean
+  initialOutputMode: OutputModes
 }
 
 export class ReplStore implements Store {
@@ -70,7 +72,7 @@ export class ReplStore implements Store {
   compiler = defaultCompiler
   options?: SFCOptions
   initialShowOutput: boolean
-  initialOutputMode: OutputModes | string
+  initialOutputMode: OutputModes
 
   private defaultVueRuntimeURL: string
   private pendingCompiler: Promise<any> | null = null
@@ -102,7 +104,7 @@ export class ReplStore implements Store {
 
     this.defaultVueRuntimeURL = defaultVueRuntimeURL
     this.initialShowOutput = showOutput
-    this.initialOutputMode = outputMode
+    this.initialOutputMode = outputMode as OutputModes
 
     let mainFile = defaultMainFile
     if (!files[mainFile]) {
