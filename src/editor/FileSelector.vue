@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import { Store } from '../store'
-import { computed, inject, ref, VNode, Ref } from 'vue'
+import { computed, inject, ref, VNode, Ref, nextTick } from 'vue'
 
 const store = inject('store') as Store
 
 const pending = ref(false)
+const isAdd = ref(false)
 const pendingFilename = ref('Comp.vue')
 const importMapFile = 'import-map.json'
 const showImportMap = inject('import-map') as Ref<boolean>
@@ -28,7 +29,9 @@ function focus({ el }: VNode) {
 
 function doneAddFile() {
   const filename = pendingFilename.value
-
+  if (isAdd.value) {
+    return
+  }
   if (!/\.(vue|js|ts|css)$/.test(filename)) {
     store.state.errors = [
       `Playground only supports *.vue, *.js, *.ts, *.css files.`
@@ -41,10 +44,14 @@ function doneAddFile() {
     return
   }
 
+  isAdd.value = true
   store.state.errors = []
   cancelAddFile()
   store.addFile(filename)
-  pendingFilename.value = 'Comp.vue'
+  nextTick(() => {
+    isAdd.value = false
+    pendingFilename.value = 'Comp.vue'
+  })
 }
 
 const fileSel = ref(null)
