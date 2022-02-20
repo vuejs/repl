@@ -61,7 +61,7 @@ function formatMessage(err: string | Error): string {
 pre {
   margin: 0;
   padding: 12px 20px;
-  white-space: initial;
+  overflow: auto;
 }
 
 .dismiss {
