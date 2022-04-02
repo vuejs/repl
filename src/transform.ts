@@ -6,14 +6,16 @@ import {
   transformRef,
   CompilerOptions
 } from 'vue/compiler-sfc'
-import { transform } from 'sucrase'
+
+import { transform } from '@babel/standalone'
 
 export const COMP_IDENTIFIER = `__sfc__`
 
-async function transformTS(src: string) {
+function transformTS(src: string, filename: string) {
   return transform(src, {
-    transforms: ['typescript']
-  }).code
+    filename,
+    presets: ['typescript'],
+  })?.code
 }
 
 export async function compileFile(
@@ -36,7 +38,7 @@ export async function compileFile(
       code = transformRef(code, { filename }).code
     }
     if (filename.endsWith('.ts')) {
-      code = await transformTS(code)
+      code = transformTS(code, filename)
     }
     compiled.js = compiled.ssr = code
     store.state.errors = []
@@ -249,7 +251,7 @@ async function doCompileScript(
         )
 
       if ((descriptor.script || descriptor.scriptSetup)!.lang === 'ts') {
-        code = await transformTS(code)
+        code = transformTS(code, `${descriptor.filename}.ts`)
       }
 
       return [code, compiledScript.bindings]
