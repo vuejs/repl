@@ -82,7 +82,7 @@ function horizontalScroll(e: WheelEvent) {
         v-model="pendingFilename"
         spellcheck="false"
         @blur="doneAddFile"
-        @keyup.enter="doneAddFile"
+        @keyup.enter="$event.target.blur()"
         @keyup.esc="cancelAddFile"
         @vnodeMounted="focus"
       />
