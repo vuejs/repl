@@ -41,7 +41,6 @@ const mode = ref<OutputModes>(
       readonly
       :language="mode === 'css' ? 'css' : 'javascript'"
       :value="store.state.activeFile.compiled[mode]"
-
     />
   </div>
 </template>
