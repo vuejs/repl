@@ -1,34 +1,41 @@
 <script setup lang="ts">
 import FileSelector from './FileSelector.vue'
-import CodeMirror from '../codemirror/CodeMirror.vue'
+import Monaco from '../monaco/Monaco.vue'
 import Message from '../Message.vue'
-import { debounce } from '../utils'
 import { computed, inject } from 'vue'
 import { Store } from '../store'
 
 const store = inject('store') as Store
 
-const onChange = debounce((code: string) => {
+const onChange = (code: string) => {
   store.state.activeFile.code = code
-}, 250)
+}
 
-const activeMode = computed(() => {
+const language = computed(() => {
   const { filename } = store.state.activeFile
-  return filename.endsWith('.vue') || filename.endsWith('.html')
-    ? 'htmlmixed'
-    : filename.endsWith('.css')
-    ? 'css'
-    : 'javascript'
+  if (filename.endsWith('.vue')) {
+    return 'vue'
+  }
+  if (filename.endsWith('.html')) {
+    return 'html'
+  }
+  if (filename.endsWith('.css')) {
+    return 'css'
+  }
+  if (filename.endsWith('.ts')) {
+    return 'typescript'
+  }
+  return 'javascript'
 })
 </script>
 
 <template>
   <FileSelector />
   <div class="editor-container">
-    <CodeMirror
-      @change="onChange"
+    <Monaco
       :value="store.state.activeFile.code"
-      :mode="activeMode"
+      :language="language"
+      @save="onChange"
     />
     <Message :err="store.state.errors[0]" />
   </div>
