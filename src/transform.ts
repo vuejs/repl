@@ -122,7 +122,10 @@ export async function compileFile(
 
   // template
   // only need dedicated compilation if not using <script setup>
-  if (descriptor.template && !descriptor.scriptSetup) {
+  if (
+    descriptor.template &&
+    (!descriptor.scriptSetup || store.options?.script?.inlineTemplate === false)
+  ) {
     const clientTemplateResult = doCompileTemplate(
       store,
       descriptor,
