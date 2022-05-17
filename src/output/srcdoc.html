@@ -56,7 +56,7 @@
 								})
 								scriptEl.innerHTML = script + `\nwindow.__next__()`
 								document.head.appendChild(scriptEl)
-								scriptEl.onrror = err => send_error(err.message, err.stack)
+								scriptEl.onerror = err => send_error(err.message, err.stack)
 								scriptEls.push(scriptEl)
 								await done
 							}
