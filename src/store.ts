@@ -58,7 +58,7 @@ export interface SFCOptions {
 export interface Store {
   state: StoreState
   options?: SFCOptions
-  compiler: typeof import('vue/compiler-sfc')
+  compiler: typeof defaultCompiler
   setActive: (filename: string) => void
   addFile: (filename: string | File) => void
   deleteFile: (filename: string) => void
