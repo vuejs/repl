@@ -27,6 +27,7 @@ function focus({ el }: VNode) {
 }
 
 function doneAddFile() {
+  if (!pending.value) return
   const filename = pendingFilename.value
 
   if (!/\.(vue|js|ts|css)$/.test(filename)) {
