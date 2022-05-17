@@ -5,7 +5,7 @@ import Output from './output/Output.vue'
 import { Store, ReplStore, SFCOptions } from './store'
 import { provide, toRef } from 'vue'
 
-interface Props {
+export interface Props {
   store?: Store
   autoResize?: boolean
   showCompileOutput?: boolean

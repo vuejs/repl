@@ -16,6 +16,7 @@ const genStub: Plugin = {
 export default defineConfig({
   plugins: [vue(), genStub],
   build: {
+    target: 'esnext',
     minify: false,
     lib: {
       entry: './src/index.ts',

@@ -7,7 +7,7 @@ import { ref, onMounted, watchEffect, inject } from 'vue'
 import { debounce } from '../utils'
 import CodeMirror from './codemirror'
 
-interface Props {
+export interface Props {
   mode?: string
   value?: string
   readonly?: boolean
