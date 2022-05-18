@@ -15,6 +15,14 @@ const genStub: Plugin = {
 
 export default defineConfig({
   plugins: [vue(), genStub],
+  optimizeDeps: {
+    include: ['path-browserify'],
+  },
+  resolve: {
+    alias: {
+      path: 'path-browserify',
+    }
+  },
   build: {
     minify: false,
     lib: {

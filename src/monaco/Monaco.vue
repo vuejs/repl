@@ -7,6 +7,7 @@ import { onMounted, onBeforeUnmount, ref, shallowRef, nextTick, watchEffect } fr
 import { loadGrammars } from './grammars';
 import * as monaco from 'monaco-editor';
 import { setupThemePromise } from './utils';
+import { setupLs, getOrCreateModel, setupValidate } from './ls';
 
 interface Props {
   value?: string
@@ -28,6 +29,22 @@ const containerRef = ref<HTMLDivElement | null>();
 const ready = ref(false);
 const editor = shallowRef<monaco.editor.IStandaloneCodeEditor | undefined>(undefined);
 
+const currentModel = shallowRef<monaco.editor.ITextModel>(
+  getOrCreateModel(
+    monaco.Uri.parse('playground:///demo.vue'),
+    'vue',
+    props.value ?? ''
+  )
+)
+
+const documentModelMap = shallowRef(new Map([[currentModel.value.uri.fsPath, currentModel.value]]))
+
+watchEffect(() => {
+  if (currentModel.value.getValue() !== props.value) {
+    currentModel.value.setValue(props.value)
+  }
+})
+
 onMounted(async () => {
   const theme = await setupThemePromise;
   ready.value = true;
@@ -37,10 +54,11 @@ onMounted(async () => {
     throw new Error("Cannot find containerRef");
   }
 
+  const ls = await setupLs(documentModelMap)
+
   const editorInstance = monaco.editor.create(containerRef.value, {
     theme,
-    value: props.value,
-    language: props.language,
+    model: currentModel.value,
     readOnly: props.readonly,
     automaticLayout: true,
     scrollBeyondLastLine: false,
@@ -62,13 +80,9 @@ onMounted(async () => {
   editorInstance.onDidChangeModelContent(() => {
     emits('change', editorInstance.getValue());
   });
-});
 
-watchEffect(() => {
-  if (editor.value && editor.value.getValue() !== props.value) {
-    editor.value.setValue(props.value);
-  }
-})
+  setupValidate(editorInstance, ls);
+});
 
 onBeforeUnmount(() => {
   editor.value?.dispose();

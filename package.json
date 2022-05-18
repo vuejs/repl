@@ -39,6 +39,10 @@
     "@types/codemirror": "^5.60.2",
     "@types/node": "^16.11.12",
     "@vitejs/plugin-vue": "^1.9.0",
+    "@vue/reactivity": "^3.2.33",
+    "@vue/runtime-core": "^3.2.33",
+    "@vue/runtime-dom": "^3.2.33",
+    "@vue/shared": "^3.2.33",
     "codemirror": "^5.62.3",
     "rimraf": "^3.0.2",
     "sucrase": "^3.20.1",
@@ -51,9 +55,11 @@
     "vue": "^3.2.13"
   },
   "dependencies": {
+    "@volar/vue-language-service": "^0.34.15",
     "monaco-editor": "^0.33.0",
     "monaco-editor-textmate": "^3.0.0",
     "monaco-textmate": "^3.0.1",
-    "onigasm": "^2.2.5"
+    "onigasm": "^2.2.5",
+    "path-browserify": "^1.0.1"
   }
 }
