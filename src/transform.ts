@@ -126,7 +126,7 @@ export async function compileFile(
     descriptor.template &&
     (!descriptor.scriptSetup || store.options?.script?.inlineTemplate === false)
   ) {
-    const clientTemplateResult = doCompileTemplate(
+    const clientTemplateResult = await doCompileTemplate(
       store,
       descriptor,
       id,
@@ -139,7 +139,7 @@ export async function compileFile(
     }
     clientCode += clientTemplateResult
 
-    const ssrTemplateResult = doCompileTemplate(
+    const ssrTemplateResult = await doCompileTemplate(
       store,
       descriptor,
       id,
@@ -265,7 +265,7 @@ async function doCompileScript(
   }
 }
 
-function doCompileTemplate(
+async function doCompileTemplate(
   store: Store,
   descriptor: SFCDescriptor,
   id: string,
@@ -296,12 +296,17 @@ function doCompileTemplate(
 
   const fnName = ssr ? `ssrRender` : `render`
 
-  return (
+  let code =
     `\n${templateResult.code.replace(
       /\nexport (function|const) (render|ssrRender)/,
       `$1 ${fnName}`
     )}` + `\n${COMP_IDENTIFIER}.${fnName} = ${fnName}`
-  )
+
+  if ((descriptor.script || descriptor.scriptSetup)!.lang === 'ts') {
+    code = await transformTS(code)
+  }
+
+  return code
 }
 
 async function hashId(filename: string) {

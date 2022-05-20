@@ -35,7 +35,12 @@ const App = {
     return () =>
       h(Repl, {
         store,
-        layout: 'vertical'
+        layout: 'vertical',
+        sfcOptions: {
+          script: {
+            // inlineTemplate: false
+          }
+        }
         // showCompileOutput: false,
         // showImportMap: false
       })
