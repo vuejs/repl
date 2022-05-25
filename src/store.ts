@@ -260,5 +260,11 @@ export class ReplStore implements Store {
     this.compiler = defaultCompiler
     this.state.vueRuntimeURL = this.defaultVueRuntimeURL
     this.state.vueServerRendererURL = this.defaultVueServerRendererURL
+    const importMap = this.getImportMap()
+    const imports = importMap.imports || (importMap.imports = {})
+    imports.vue = this.defaultVueRuntimeURL
+    imports['vue/server-renderer'] = this.defaultVueServerRendererURL
+    this.setImportMap(importMap)
+    console.info(`[@vue/repl] Now using default Vue version`)
   }
 }
