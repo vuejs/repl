@@ -13,6 +13,7 @@ export interface Props {
   clearConsole?: boolean
   sfcOptions?: SFCOptions
   layout?: string
+  ssr?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -20,7 +21,8 @@ const props = withDefaults(defineProps<Props>(), {
   autoResize: true,
   showCompileOutput: true,
   showImportMap: true,
-  clearConsole: true
+  clearConsole: true,
+  ssr: false
 })
 
 props.store.options = props.sfcOptions
@@ -38,7 +40,10 @@ provide('clear-console', toRef(props, 'clearConsole'))
         <Editor />
       </template>
       <template #right>
-        <Output :showCompileOutput="props.showCompileOutput" />
+        <Output
+          :showCompileOutput="props.showCompileOutput"
+          :ssr="!!props.ssr"
+        />
       </template>
     </SplitPane>
   </div>

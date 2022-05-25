@@ -7,6 +7,7 @@ import type { OutputModes } from './types'
 
 const props = defineProps<{
   showCompileOutput?: boolean
+  ssr: boolean
 }>()
 
 const store = inject('store') as Store
@@ -35,7 +36,7 @@ const mode = ref<OutputModes>(
   </div>
 
   <div class="output-container">
-    <Preview :show="mode === 'preview'" />
+    <Preview :show="mode === 'preview'" :ssr="ssr" />
     <CodeMirror
       v-if="mode !== 'preview'"
       readonly

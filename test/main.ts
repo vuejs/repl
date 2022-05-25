@@ -1,6 +1,5 @@
 import { createApp, h, watchEffect } from 'vue'
 import { Repl, ReplStore } from '../src'
-
 ;(window as any).process = { env: {} }
 
 const App = {
@@ -12,7 +11,10 @@ const App = {
       outputMode: query.get('om') || 'preview',
       defaultVueRuntimeURL: import.meta.env.PROD
         ? undefined
-        : `${location.origin}/src/vue-dev-proxy`
+        : `${location.origin}/src/vue-dev-proxy`,
+      defaultVueServerRendererURL: import.meta.env.PROD
+        ? undefined
+        : `${location.origin}/src/vue-server-renderer-dev-proxy`
     })
 
     watchEffect(() => history.replaceState({}, '', store.serialize()))
@@ -35,7 +37,8 @@ const App = {
     return () =>
       h(Repl, {
         store,
-        layout: 'vertical',
+        // layout: 'vertical',
+        ssr: true,
         sfcOptions: {
           script: {
             // inlineTemplate: false
