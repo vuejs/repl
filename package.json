@@ -45,7 +45,7 @@
     "sucrase": "^3.20.1",
     "typescript": "^4.5.4",
     "vite": "^2.9.8",
-    "vue": "^3.2.33",
+    "vue": "^3.2.36",
     "vue-tsc": "^0.34.15"
   },
   "peerDependencies": {
