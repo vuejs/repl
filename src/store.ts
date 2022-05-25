@@ -60,6 +60,7 @@ export interface Store {
   state: StoreState
   options?: SFCOptions
   compiler: typeof defaultCompiler
+  vueVersion?: string
   init: () => void
   setActive: (filename: string) => void
   addFile: (filename: string | File) => void
@@ -81,6 +82,7 @@ export interface StoreOptions {
 export class ReplStore implements Store {
   state: StoreState
   compiler = defaultCompiler
+  vueVersion?: string
   options?: SFCOptions
   initialShowOutput: boolean
   initialOutputMode: OutputModes
@@ -240,6 +242,7 @@ export class ReplStore implements Store {
   }
 
   async setVueVersion(version: string) {
+    this.vueVersion = version
     const compilerUrl = `https://unpkg.com/@vue/compiler-sfc@${version}/dist/compiler-sfc.esm-browser.js`
     const runtimeUrl = `https://unpkg.com/@vue/runtime-dom@${version}/dist/runtime-dom.esm-browser.js`
     const ssrUrl = `https://unpkg.com/@vue/server-renderer@${version}/dist/server-renderer.esm-browser.js`
@@ -257,6 +260,7 @@ export class ReplStore implements Store {
   }
 
   resetVueVersion() {
+    this.vueVersion = undefined
     this.compiler = defaultCompiler
     this.state.vueRuntimeURL = this.defaultVueRuntimeURL
     this.state.vueServerRendererURL = this.defaultVueServerRendererURL
