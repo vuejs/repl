@@ -196,10 +196,8 @@ async function updatePreview() {
 
     const codeToEval = [
       `window.__modules__ = {};window.__css__ = '';` +
-      `if (window.__app__) window.__app__.unmount();` +
-      isSSR
-        ? ``
-        : `document.body.innerHTML = '<div id="app"></div>'`,
+        `if (window.__app__) window.__app__.unmount();` +
+        (isSSR ? `` : `document.body.innerHTML = '<div id="app"></div>'`),
       ...modules,
       `document.getElementById('__sfc-styles').innerHTML = window.__css__`
     ]
