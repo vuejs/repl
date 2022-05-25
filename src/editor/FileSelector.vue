@@ -5,7 +5,19 @@ import { computed, inject, ref, VNode, Ref } from 'vue'
 const store = inject('store') as Store
 
 const pending = ref(false)
-const pendingFilename = ref('Comp.vue')
+const newFileCount = ref(0)
+const customizedFilename = ref('')
+const pendingFilename = computed({
+  get(): string {
+    if (customizedFilename.value) {
+      return customizedFilename.value
+    }
+    return newFileCount.value > 0 ? `Comp${newFileCount.value}.vue` : 'Comp.vue'
+  },
+  set(name: string) {
+    customizedFilename.value = name
+  }
+})
 const importMapFile = 'import-map.json'
 const showImportMap = inject('import-map') as Ref<boolean>
 const files = computed(() =>
@@ -45,7 +57,10 @@ function doneAddFile() {
   store.state.errors = []
   cancelAddFile()
   store.addFile(filename)
-  pendingFilename.value = 'Comp.vue'
+  customizedFilename.value = ''
+  if (filename === pendingFilename.value) {
+    newFileCount.value++
+  }
 }
 
 const fileSel = ref(null)
