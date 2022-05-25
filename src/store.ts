@@ -60,6 +60,7 @@ export interface Store {
   state: StoreState
   options?: SFCOptions
   compiler: typeof defaultCompiler
+  init: () => void
   setActive: (filename: string) => void
   addFile: (filename: string | File) => void
   deleteFile: (filename: string) => void
@@ -127,9 +128,11 @@ export class ReplStore implements Store {
     })
 
     this.initImportMap()
+  }
 
+  // don't start compiling until the options are set
+  init() {
     watchEffect(() => compileFile(this, this.state.activeFile))
-
     for (const file in this.state.files) {
       if (file !== defaultMainFile) {
         compileFile(this, this.state.files[file])

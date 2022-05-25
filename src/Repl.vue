@@ -26,6 +26,7 @@ const props = withDefaults(defineProps<Props>(), {
 })
 
 props.store.options = props.sfcOptions
+props.store.init()
 
 provide('store', props.store)
 provide('autoresize', props.autoResize)
