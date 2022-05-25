@@ -5,19 +5,7 @@ import { computed, inject, ref, VNode, Ref } from 'vue'
 const store = inject('store') as Store
 
 const pending = ref(false)
-const newFileCount = ref(0)
-const customizedFilename = ref('')
-const pendingFilename = computed({
-  get(): string {
-    if (customizedFilename.value) {
-      return customizedFilename.value
-    }
-    return newFileCount.value > 0 ? `Comp${newFileCount.value}.vue` : 'Comp.vue'
-  },
-  set(name: string) {
-    customizedFilename.value = name
-  }
-})
+const pendingFilename = ref('Comp.vue')
 const importMapFile = 'import-map.json'
 const showImportMap = inject('import-map') as Ref<boolean>
 const files = computed(() =>
@@ -27,6 +15,24 @@ const files = computed(() =>
 )
 
 function startAddFile() {
+  let i = 0
+  let name = `Comp.vue`
+
+  while (true) {
+    let hasConflict = false
+    for (const file in store.state.files) {
+      if (file === name) {
+        hasConflict = true
+        name = `Comp${++i}.vue`
+        break
+      }
+    }
+    if (!hasConflict) {
+      break
+    }
+  }
+
+  pendingFilename.value = name
   pending.value = true
 }
 
@@ -57,17 +63,14 @@ function doneAddFile() {
   store.state.errors = []
   cancelAddFile()
   store.addFile(filename)
-  customizedFilename.value = ''
-  if (filename === pendingFilename.value) {
-    newFileCount.value++
-  }
 }
 
 const fileSel = ref(null)
 function horizontalScroll(e: WheelEvent) {
   e.preventDefault()
   const el = fileSel.value! as HTMLElement
-  const direction = Math.abs(e.deltaX) >= Math.abs(e.deltaY) ? e.deltaX : e.deltaY
+  const direction =
+    Math.abs(e.deltaX) >= Math.abs(e.deltaY) ? e.deltaX : e.deltaY
   const distance = 30 * (direction > 0 ? 1 : -1)
   el.scrollTo({
     left: el.scrollLeft + distance
@@ -76,7 +79,12 @@ function horizontalScroll(e: WheelEvent) {
 </script>
 
 <template>
-  <div class="file-selector" :class="{ 'has-import-map': showImportMap }" @wheel="horizontalScroll" ref="fileSel">
+  <div
+    class="file-selector"
+    :class="{ 'has-import-map': showImportMap }"
+    @wheel="horizontalScroll"
+    ref="fileSel"
+  >
     <div
       v-for="(file, i) in files"
       class="file"
