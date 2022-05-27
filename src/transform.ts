@@ -304,7 +304,7 @@ async function doCompileTemplate(
       `$1 ${fnName}`
     )}` + `\n${COMP_IDENTIFIER}.${fnName} = ${fnName}`
 
-  if ((descriptor.script || descriptor.scriptSetup)!.lang === 'ts') {
+  if ((descriptor.script || descriptor.scriptSetup)?.lang === 'ts') {
     code = await transformTS(code)
   }
 
