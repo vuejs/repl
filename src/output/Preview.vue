@@ -19,6 +19,11 @@ const props = defineProps<{ show: boolean; ssr: boolean }>()
 
 const store = inject('store') as Store
 const clearConsole = inject('clear-console') as Ref<boolean>
+
+const customImportStatements = inject('custom-import-statements') as string[]
+const customAppUsageCodes = inject('custom-app-usage-codes') as string[]
+const customHeadTags = inject('custom-head-tags') as string[]
+
 const container = ref()
 const runtimeError = ref()
 const runtimeWarning = ref()
@@ -88,7 +93,7 @@ function createSandbox() {
   const sandboxSrc = srcdoc.replace(
     /<!--IMPORT_MAP-->/,
     JSON.stringify(importMap)
-  )
+  ).replace(/<!-- CUSTOM-HEAD-TAGS -->/, customHeadTags.join('\n'))
   sandbox.srcdoc = sandboxSrc
   container.value.appendChild(sandbox)
 
@@ -218,12 +223,14 @@ async function updatePreview() {
         `import { ${
           isSSR ? `createSSRApp` : `createApp`
         } as _createApp } from "vue"
+        ${customImportStatements.join('\n')}
         const _mount = () => {
           const AppComponent = __modules__["${mainFile}"].default
           AppComponent.name = 'Repl'
           const app = window.__app__ = _createApp(AppComponent)
           app.config.unwrapInjectedRef = true
           app.config.errorHandler = e => console.error(e)
+          ${customAppUsageCodes.join('\n')}
           app.mount('#app')
         }
         if (window.__ssr_promise__) {
