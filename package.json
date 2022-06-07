@@ -50,5 +50,8 @@
   },
   "peerDependencies": {
     "vue": "^3.2.13"
+  },
+  "dependencies": {
+    "pako": "^2.0.4"
   }
 }
