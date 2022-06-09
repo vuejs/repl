@@ -2,7 +2,15 @@
 import * as monaco from 'monaco-editor';
 import * as vscode from 'vscode-languageserver-protocol';
 import * as ts from 'typescript/lib/tsserverlibrary';
-import { createLanguageService, getDocumentService, type LanguageService, type LanguageServiceHost } from '@volar/vue-language-service';
+import {
+    createLanguageService,
+    getDocumentService,
+    // executePluginCommand,
+    type LanguageService,
+    type LanguageServiceHost,
+    // type ExecutePluginCommandArgs,
+    type ConfigurationHost
+} from '@volar/vue-language-service';
 import type { Ref } from 'vue';
 import { onBeforeUnmount, ref } from 'vue';
 import * as code2monaco from './code2monaco';
@@ -143,19 +151,15 @@ export async function setupLs(modelsMap: Ref<Map<string, monaco.editor.ITextMode
         args: [],
         newLine: '\n',
         useCaseSensitiveFileNames: false,
+        readFile: host.readFile,
+        fileExists: host.fileExists,
         write(s: string): void {
-            throw new Error('Function not implemented.');
-        },
-        readFile(path: string, encoding?: string): string | undefined {
             throw new Error('Function not implemented.');
         },
         writeFile(path: string, data: string, writeByteOrderMark?: boolean): void {
             throw new Error('Function not implemented.');
         },
         resolvePath(path: string): string {
-            throw new Error('Function not implemented.');
-        },
-        fileExists(path: string): boolean {
             throw new Error('Function not implemented.');
         },
         directoryExists(path: string): boolean {
@@ -189,8 +193,19 @@ export async function setupLs(modelsMap: Ref<Map<string, monaco.editor.ITextMode
     const tsWithAny = ts as any;
     tsWithAny.setSys(sys);
 
-    const ls = createLanguageService({ typescript: ts }, host, undefined, undefined, undefined, []);
-    const ds = getDocumentService({ typescript: ts }, undefined, undefined, []);
+    const configurationHost: ConfigurationHost = {
+        getConfiguration<T>(seation: string): T {
+            // disabled because it these required for doExecuteCommand implementation
+            if (seation === 'volar.codeLens.pugTools' || seation === 'volar.codeLens.scriptSetupTools') {
+                return false as any;
+            }
+            return undefined as any;
+        },
+        onDidChangeConfiguration() { },
+        rootUris: ['/'],
+    };
+    const ls = createLanguageService({ typescript: ts }, host, undefined, undefined, configurationHost, []);
+    const ds = getDocumentService({ typescript: ts }, configurationHost, undefined, []);
     disposables.value.push(ls);
 
     const completionItems = new WeakMap<monaco.languages.CompletionItem, vscode.CompletionItem>();
@@ -521,17 +536,17 @@ export async function setupLs(modelsMap: Ref<Map<string, monaco.editor.ITextMode
             },
         }),
         // same with DefinitionProvider
-        monaco.languages.registerDeclarationProvider(lang, {
-            provideDeclaration: async (model, position) => {
-                const codeResult = await ls.findDefinition(
-                    model.uri.toString(),
-                    monaco2code.asPosition(position),
-                );
-                if (codeResult) {
-                    return codeResult.map(code2monaco.asLocation);
-                }
-            },
-        }),
+        // monaco.languages.registerDeclarationProvider(lang, {
+        //     provideDeclaration: async (model, position) => {
+        //         const codeResult = await ls.findDefinition(
+        //             model.uri.toString(),
+        //             monaco2code.asPosition(position),
+        //         );
+        //         if (codeResult) {
+        //             return codeResult.map(code2monaco.asLocation);
+        //         }
+        //     },
+        // }),
         monaco.languages.registerSelectionRangeProvider(lang, {
             provideSelectionRanges: async (model, positions) => {
                 const document = getTextDocument(model);
@@ -561,6 +576,17 @@ export async function setupLs(modelsMap: Ref<Map<string, monaco.editor.ITextMode
                 }
             },
         }),
+        //     return ls.doExecuteCommand(executePluginCommand, args, {
+        //         token: {} as any,
+        //         workDoneProgress: {
+        //             begin() { },
+        //             report() { },
+        //             done() { },
+        //         },
+        //         applyEdit: (paramOrEdit) => connection.workspace.applyEdit(paramOrEdit),
+        //         sendNotification: (type, params) => connection.sendNotification(type, params),
+        //     });
+        // }),
     );
 
     return ls;

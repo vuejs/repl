@@ -145,7 +145,7 @@ export function asLocation(definition: vscode.LocationLink | vscode.Location): m
     if (vscode.LocationLink.is(definition)) {
         return {
             uri: asUri(definition.targetUri),
-            range: asRange(definition.targetRange),
+            range: asRange(definition.targetSelectionRange),
         };
     }
     else {
