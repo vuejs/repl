@@ -272,20 +272,17 @@ export function setupValidate(editor: monaco.editor.IStandaloneCodeEditor, ls: L
             throw new Error('No model');
         }
 
-        const diagnostics = await ls.doValidation(model.uri.toString());
+        const diagnostics = await ls.doValidation(model.uri.toString(), unfinishResult => {
+            monaco.editor.setModelMarkers(
+                model,
+                lang,
+                unfinishResult.map(code2monaco.asMarkerData),
+            );
+        });
         monaco.editor.setModelMarkers(
             model,
             lang,
-            diagnostics.map((diagnostic) => {
-                return {
-                    severity: diagnostic.severity === 1 ? monaco.MarkerSeverity.Error : monaco.MarkerSeverity.Warning,
-                    startLineNumber: diagnostic.range.start.line + 1,
-                    startColumn: diagnostic.range.start.character + 1,
-                    endLineNumber: diagnostic.range.end.line + 1,
-                    endColumn: diagnostic.range.end.character + 1,
-                    message: diagnostic.message,
-                };
-            }),
+            diagnostics.map(code2monaco.asMarkerData),
         );
     };
 

@@ -175,3 +175,47 @@ export function asParameterInformation(parameterInformation: vscode.ParameterInf
         documentation: parameterInformation.documentation,
     };
 }
+
+export function asMarkerData(diagnostic: vscode.Diagnostic): monaco.editor.IMarkerData {
+    return {
+        code: diagnostic.code?.toString(),
+        severity: asMarkerSeverity(diagnostic.severity),
+        message: diagnostic.message,
+        source: diagnostic.source,
+        ...asRange(diagnostic.range),
+        relatedInformation: diagnostic.relatedInformation?.map(asRelatedInformation),
+        tags: diagnostic.tags?.map(asMarkerTag),
+    };
+}
+
+export function asMarkerTag(tag: vscode.DiagnosticTag): monaco.MarkerTag {
+    switch (tag) {
+        case vscode.DiagnosticTag.Unnecessary:
+            return monaco.MarkerTag.Unnecessary;
+        case vscode.DiagnosticTag.Deprecated:
+            return monaco.MarkerTag.Deprecated;
+    }
+}
+
+export function asRelatedInformation(relatedInformation: vscode.DiagnosticRelatedInformation): monaco.editor.IRelatedInformation {
+    return {
+        resource: asUri(relatedInformation.location.uri),
+        message: relatedInformation.message,
+        ...asRange(relatedInformation.location.range),
+    };
+}
+
+export function asMarkerSeverity(severity: vscode.DiagnosticSeverity | undefined): monaco.MarkerSeverity {
+    switch (severity) {
+        case vscode.DiagnosticSeverity.Error:
+            return monaco.MarkerSeverity.Error;
+        case vscode.DiagnosticSeverity.Warning:
+            return monaco.MarkerSeverity.Warning;
+        case vscode.DiagnosticSeverity.Information:
+            return monaco.MarkerSeverity.Info;
+        case vscode.DiagnosticSeverity.Hint:
+            return monaco.MarkerSeverity.Hint;
+        default:
+            return monaco.MarkerSeverity.Info;
+    }
+}
