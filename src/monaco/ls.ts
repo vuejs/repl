@@ -196,6 +196,7 @@ export async function setupLs(modelsMap: Ref<Map<string, monaco.editor.ITextMode
     const completionItems = new WeakMap<monaco.languages.CompletionItem, vscode.CompletionItem>();
     const codeLens = new WeakMap<monaco.languages.CodeLens, vscode.CodeLens>();
     const codeActions = new WeakMap<monaco.languages.CodeAction, vscode.CodeAction>();
+    const colorInformations = new WeakMap<monaco.languages.IColorInformation, vscode.ColorInformation>();
     const documents = new WeakMap<monaco.editor.ITextModel, vscode.TextDocument>();
 
     disposables.value.push(
@@ -254,7 +255,7 @@ export async function setupLs(modelsMap: Ref<Map<string, monaco.editor.ITextMode
         }),
         monaco.languages.registerDocumentSymbolProvider(lang, {
             provideDocumentSymbols: async (model) => {
-                const document = documents.get(model);
+                const document = getTextDocument(model);
                 if (document) {
                     const codeResult = await ds.findDocumentSymbols(document);
                     if (codeResult) {
@@ -276,7 +277,7 @@ export async function setupLs(modelsMap: Ref<Map<string, monaco.editor.ITextMode
         }),
         monaco.languages.registerLinkedEditingRangeProvider(lang, {
             provideLinkedEditingRanges: async (model, position) => {
-                const document = documents.get(model);
+                const document = getTextDocument(model);
                 if (document) {
                     const codeResult = await ds.findLinkedEditingRanges(
                         document,
@@ -395,7 +396,7 @@ export async function setupLs(modelsMap: Ref<Map<string, monaco.editor.ITextMode
         }),
         monaco.languages.registerDocumentFormattingEditProvider(lang, {
             provideDocumentFormattingEdits: async (model, options) => {
-                const document = documents.get(model);
+                const document = getTextDocument(model);
                 if (document) {
                     const codeResult = await ds.format(
                         document,
@@ -409,7 +410,7 @@ export async function setupLs(modelsMap: Ref<Map<string, monaco.editor.ITextMode
         }),
         monaco.languages.registerDocumentRangeFormattingEditProvider(lang, {
             provideDocumentRangeFormattingEdits: async (model, range, options) => {
-                const document = documents.get(model);
+                const document = getTextDocument(model);
                 if (document) {
                     const codeResult = await ds.format(
                         document,
@@ -425,7 +426,7 @@ export async function setupLs(modelsMap: Ref<Map<string, monaco.editor.ITextMode
         monaco.languages.registerOnTypeFormattingEditProvider(lang, {
             autoFormatTriggerCharacters: ['}', ';', '\n'],
             provideOnTypeFormattingEdits: async (model, position, ch, options) => {
-                const document = documents.get(model);
+                const document = getTextDocument(model);
                 if (document) {
                     const codeResult = await ds.format(
                         document,
@@ -478,6 +479,34 @@ export async function setupLs(modelsMap: Ref<Map<string, monaco.editor.ITextMode
                     completionItems.set(monacoItem, codeItem);
                 }
                 return monacoItem;
+            },
+        }),
+        monaco.languages.registerColorProvider(lang, {
+            provideDocumentColors: async (model) => {
+                const document = getTextDocument(model);
+                if (document) {
+                    const codeResult = await ds.findDocumentColors(document);
+                    if (codeResult) {
+                        return codeResult.map(code2monaco.asColorInformation);
+                    }
+                }
+            },
+            provideColorPresentations: async (model, monacoResult) => {
+                const document = getTextDocument(model);
+                const codeResult = colorInformations.get(monacoResult);
+                if (document && codeResult) {
+                    const codeColors = await ds.getColorPresentations(
+                        document,
+                        codeResult.color,
+                        {
+                            start: document.positionAt(0),
+                            end: document.positionAt(document.getText().length),
+                        },
+                    );
+                    if (codeColors) {
+                        return codeColors.map(code2monaco.asColorPresentation);
+                    }
+                }
             },
         }),
     );

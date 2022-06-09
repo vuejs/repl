@@ -411,3 +411,18 @@ export function asLink(item: vscode.DocumentLink): monaco.languages.ILink {
         tooltip: item.tooltip,
     };
 }
+
+export function asColorInformation(item: vscode.ColorInformation): monaco.languages.IColorInformation {
+    return {
+        range: asRange(item.range),
+        color: item.color,
+    };
+}
+
+export function asColorPresentation(item: vscode.ColorPresentation): monaco.languages.IColorPresentation {
+    return {
+        label: item.label,
+        textEdit: item.textEdit ? asTextEdit(item.textEdit) : undefined,
+        additionalTextEdits: item.additionalTextEdits ? item.additionalTextEdits.map(asTextEdit) : undefined,
+    };
+}
