@@ -10,19 +10,27 @@ import {
 } from 'vue/compiler-sfc'
 import { ExportSpecifier, Identifier, Node } from '@babel/types'
 
-export function compileModulesForPreview(store: Store) {
+export function compileModulesForPreview(store: Store, isSSR = false) {
   const seen = new Set<File>()
   const processed: string[] = []
-  processFile(store, store.state.files[store.state.mainFile], processed, seen)
+  processFile(
+    store,
+    store.state.files[store.state.mainFile],
+    processed,
+    seen,
+    isSSR
+  )
 
-  // also add css files that are not imported
-  for (const filename in store.state.files) {
-    if (filename.endsWith('.css')) {
-      const file = store.state.files[filename]
-      if (!seen.has(file)) {
-        processed.push(
-          `\nwindow.__css__ += ${JSON.stringify(file.compiled.css)}`
-        )
+  if (!isSSR) {
+    // also add css files that are not imported
+    for (const filename in store.state.files) {
+      if (filename.endsWith('.css')) {
+        const file = store.state.files[filename]
+        if (!seen.has(file)) {
+          processed.push(
+            `\nwindow.__css__ += ${JSON.stringify(file.compiled.css)}`
+          )
+        }
       }
     }
   }
@@ -40,30 +48,31 @@ function processFile(
   store: Store,
   file: File,
   processed: string[],
-  seen: Set<File>
+  seen: Set<File>,
+  isSSR: boolean
 ) {
   if (seen.has(file)) {
     return []
   }
   seen.add(file)
 
-  if (file.filename.endsWith('.html')) {
+  if (!isSSR && file.filename.endsWith('.html')) {
     return processHtmlFile(store, file.code, file.filename, processed, seen)
   }
 
   let [js, importedFiles] = processModule(
     store,
-    file.compiled.js,
+    isSSR ? file.compiled.ssr : file.compiled.js,
     file.filename
   )
   // append css
-  if (file.compiled.css) {
+  if (!isSSR && file.compiled.css) {
     js += `\nwindow.__css__ += ${JSON.stringify(file.compiled.css)}`
   }
   // crawl child imports
   if (importedFiles.size) {
     for (const imported of importedFiles) {
-      processFile(store, store.state.files[imported], processed, seen)
+      processFile(store, store.state.files[imported], processed, seen, isSSR)
     }
   }
   // push self
@@ -111,7 +120,7 @@ function processModule(
 
   // 0. instantiate module
   s.prepend(
-    `const ${moduleKey} = __modules__[${JSON.stringify(
+    `const ${moduleKey} = ${modulesKey}[${JSON.stringify(
       filename
     )}] = { [Symbol.toStringTag]: "Module" }\n\n`
   )
@@ -283,7 +292,7 @@ function processHtmlFile(
       const [code, importedFiles] = processModule(store, content, filename)
       if (importedFiles.size) {
         for (const imported of importedFiles) {
-          processFile(store, store.state.files[imported], deps, seen)
+          processFile(store, store.state.files[imported], deps, seen, false)
         }
       }
       jsCode += '\n' + code

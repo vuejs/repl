@@ -7,7 +7,7 @@ import { EditorComponentType } from './types';
 import EditorContainer from './editor/EditorContainer.vue';
 import CodeMirrorEditor from './editor/CodeMirrorEditor.vue';
 
-interface Props {
+export interface Props {
   store?: Store
   autoResize?: boolean
   showCompileOutput?: boolean
@@ -15,6 +15,7 @@ interface Props {
   clearConsole?: boolean
   sfcOptions?: SFCOptions
   layout?: string
+  ssr?: boolean
   editor?: EditorComponentType
 }
 
@@ -24,10 +25,12 @@ const props = withDefaults(defineProps<Props>(), {
   showCompileOutput: true,
   showImportMap: true,
   clearConsole: true,
+  ssr: false,
   editor: CodeMirrorEditor
 })
 
 props.store.options = props.sfcOptions
+props.store.init()
 
 provide('store', props.store)
 provide('autoresize', props.autoResize)
@@ -45,6 +48,7 @@ provide('clear-console', toRef(props, 'clearConsole'))
         <Output
           :showCompileOutput="props.showCompileOutput"
           :editor-component="editor"
+          :ssr="!!props.ssr"
         />
       </template>
     </SplitPane>

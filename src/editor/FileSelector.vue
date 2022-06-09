@@ -15,6 +15,24 @@ const files = computed(() =>
 )
 
 function startAddFile() {
+  let i = 0
+  let name = `Comp.vue`
+
+  while (true) {
+    let hasConflict = false
+    for (const file in store.state.files) {
+      if (file === name) {
+        hasConflict = true
+        name = `Comp${++i}.vue`
+        break
+      }
+    }
+    if (!hasConflict) {
+      break
+    }
+  }
+
+  pendingFilename.value = name
   pending.value = true
 }
 
@@ -27,6 +45,7 @@ function focus({ el }: VNode) {
 }
 
 function doneAddFile() {
+  if (!pending.value) return
   const filename = pendingFilename.value
 
   if (!/\.(vue|js|ts|css)$/.test(filename)) {
@@ -44,14 +63,14 @@ function doneAddFile() {
   store.state.errors = []
   cancelAddFile()
   store.addFile(filename)
-  pendingFilename.value = 'Comp.vue'
 }
 
 const fileSel = ref(null)
 function horizontalScroll(e: WheelEvent) {
   e.preventDefault()
   const el = fileSel.value! as HTMLElement
-  const direction = Math.abs(e.deltaX) >= Math.abs(e.deltaY) ? e.deltaX : e.deltaY
+  const direction =
+    Math.abs(e.deltaX) >= Math.abs(e.deltaY) ? e.deltaX : e.deltaY
   const distance = 30 * (direction > 0 ? 1 : -1)
   el.scrollTo({
     left: el.scrollLeft + distance
@@ -60,7 +79,12 @@ function horizontalScroll(e: WheelEvent) {
 </script>
 
 <template>
-  <div class="file-selector" :class="{ 'has-import-map': showImportMap }" @wheel="horizontalScroll" ref="fileSel">
+  <div
+    class="file-selector"
+    :class="{ 'has-import-map': showImportMap }"
+    @wheel="horizontalScroll"
+    ref="fileSel"
+  >
     <div
       v-for="(file, i) in files"
       class="file"

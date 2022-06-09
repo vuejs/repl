@@ -7,6 +7,8 @@ import {
   CompilerOptions
 } from 'vue/compiler-sfc'
 import { transform } from 'sucrase'
+// @ts-ignore
+import hashId from 'hash-sum'
 
 export const COMP_IDENTIFIER = `__sfc__`
 
@@ -48,7 +50,7 @@ export async function compileFile(
     return
   }
 
-  const id = await hashId(filename)
+  const id = hashId(filename)
   const { errors, descriptor } = store.compiler.parse(code, {
     filename,
     sourceMap: true
@@ -122,8 +124,11 @@ export async function compileFile(
 
   // template
   // only need dedicated compilation if not using <script setup>
-  if (descriptor.template && !descriptor.scriptSetup) {
-    const clientTemplateResult = doCompileTemplate(
+  if (
+    descriptor.template &&
+    (!descriptor.scriptSetup || store.options?.script?.inlineTemplate === false)
+  ) {
+    const clientTemplateResult = await doCompileTemplate(
       store,
       descriptor,
       id,
@@ -136,7 +141,7 @@ export async function compileFile(
     }
     clientCode += clientTemplateResult
 
-    const ssrTemplateResult = doCompileTemplate(
+    const ssrTemplateResult = await doCompileTemplate(
       store,
       descriptor,
       id,
@@ -262,7 +267,7 @@ async function doCompileScript(
   }
 }
 
-function doCompileTemplate(
+async function doCompileTemplate(
   store: Store,
   descriptor: SFCDescriptor,
   id: string,
@@ -293,18 +298,15 @@ function doCompileTemplate(
 
   const fnName = ssr ? `ssrRender` : `render`
 
-  return (
+  let code =
     `\n${templateResult.code.replace(
       /\nexport (function|const) (render|ssrRender)/,
       `$1 ${fnName}`
     )}` + `\n${COMP_IDENTIFIER}.${fnName} = ${fnName}`
-  )
-}
 
-async function hashId(filename: string) {
-  const msgUint8 = new TextEncoder().encode(filename) // encode as (utf-8) Uint8Array
-  const hashBuffer = await crypto.subtle.digest('SHA-256', msgUint8) // hash the message
-  const hashArray = Array.from(new Uint8Array(hashBuffer)) // convert buffer to byte array
-  const hashHex = hashArray.map((b) => b.toString(16).padStart(2, '0')).join('') // convert bytes to hex string
-  return hashHex.slice(0, 8)
+  if ((descriptor.script || descriptor.scriptSetup)!.lang === 'ts') {
+    code = await transformTS(code)
+  }
+
+  return code
 }

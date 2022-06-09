@@ -47,6 +47,7 @@ export interface StoreState {
   activeFile: File
   errors: (string | Error)[]
   vueRuntimeURL: string
+  vueServerRendererURL: string
 }
 
 export interface SFCOptions {
@@ -58,7 +59,9 @@ export interface SFCOptions {
 export interface Store {
   state: StoreState
   options?: SFCOptions
-  compiler: typeof import('vue/compiler-sfc')
+  compiler: typeof defaultCompiler
+  vueVersion?: string
+  init: () => void
   setActive: (filename: string) => void
   addFile: (filename: string | File) => void
   deleteFile: (filename: string) => void
@@ -67,28 +70,34 @@ export interface Store {
   initialOutputMode: OutputModes
 }
 
+export interface StoreOptions {
+  serializedState?: string
+  showOutput?: boolean
+  // loose type to allow getting from the URL without inducing a typing error
+  outputMode?: OutputModes | string
+  defaultVueRuntimeURL?: string
+  defaultVueServerRendererURL?: string
+}
+
 export class ReplStore implements Store {
   state: StoreState
   compiler = defaultCompiler
+  vueVersion?: string
   options?: SFCOptions
   initialShowOutput: boolean
   initialOutputMode: OutputModes
 
   private defaultVueRuntimeURL: string
+  private defaultVueServerRendererURL: string
   private pendingCompiler: Promise<any> | null = null
 
   constructor({
     serializedState = '',
     defaultVueRuntimeURL = `https://unpkg.com/@vue/runtime-dom@${version}/dist/runtime-dom.esm-browser.js`,
+    defaultVueServerRendererURL = `https://unpkg.com/@vue/server-renderer@${version}/dist/server-renderer.esm-browser.js`,
     showOutput = false,
     outputMode = 'preview'
-  }: {
-    serializedState?: string
-    showOutput?: boolean
-    // loose type to allow getting from the URL without inducing a typing error
-    outputMode?: OutputModes | string
-    defaultVueRuntimeURL?: string
-  } = {}) {
+  }: StoreOptions = {}) {
     let files: StoreState['files'] = {}
 
     if (serializedState) {
@@ -103,6 +112,7 @@ export class ReplStore implements Store {
     }
 
     this.defaultVueRuntimeURL = defaultVueRuntimeURL
+    this.defaultVueServerRendererURL = defaultVueServerRendererURL
     this.initialShowOutput = showOutput
     this.initialOutputMode = outputMode as OutputModes
 
@@ -115,13 +125,16 @@ export class ReplStore implements Store {
       files,
       activeFile: files[mainFile],
       errors: [],
-      vueRuntimeURL: this.defaultVueRuntimeURL
+      vueRuntimeURL: this.defaultVueRuntimeURL,
+      vueServerRendererURL: this.defaultVueServerRendererURL
     })
 
     this.initImportMap()
+  }
 
+  // don't start compiling until the options are set
+  init() {
     watchEffect(() => compileFile(this, this.state.activeFile))
-
     for (const file in this.state.files) {
       if (file !== defaultMainFile) {
         compileFile(this, this.state.files[file])
@@ -202,6 +215,10 @@ export class ReplStore implements Store {
           json.imports.vue = this.defaultVueRuntimeURL
           map.code = JSON.stringify(json, null, 2)
         }
+        if (!json.imports['vue/server-renderer']) {
+          json.imports['vue/server-renderer'] = this.defaultVueServerRendererURL
+          map.code = JSON.stringify(json, null, 2)
+        }
       } catch (e) {}
     }
   }
@@ -225,20 +242,33 @@ export class ReplStore implements Store {
   }
 
   async setVueVersion(version: string) {
+    this.vueVersion = version
     const compilerUrl = `https://unpkg.com/@vue/compiler-sfc@${version}/dist/compiler-sfc.esm-browser.js`
     const runtimeUrl = `https://unpkg.com/@vue/runtime-dom@${version}/dist/runtime-dom.esm-browser.js`
+    const ssrUrl = `https://unpkg.com/@vue/server-renderer@${version}/dist/server-renderer.esm-browser.js`
     this.pendingCompiler = import(/* @vite-ignore */ compilerUrl)
     this.compiler = await this.pendingCompiler
     this.pendingCompiler = null
     this.state.vueRuntimeURL = runtimeUrl
+    this.state.vueServerRendererURL = ssrUrl
     const importMap = this.getImportMap()
-    ;(importMap.imports || (importMap.imports = {})).vue = runtimeUrl
+    const imports = importMap.imports || (importMap.imports = {})
+    imports.vue = runtimeUrl
+    imports['vue/server-renderer'] = ssrUrl
     this.setImportMap(importMap)
     console.info(`[@vue/repl] Now using Vue version: ${version}`)
   }
 
   resetVueVersion() {
+    this.vueVersion = undefined
     this.compiler = defaultCompiler
     this.state.vueRuntimeURL = this.defaultVueRuntimeURL
+    this.state.vueServerRendererURL = this.defaultVueServerRendererURL
+    const importMap = this.getImportMap()
+    const imports = importMap.imports || (importMap.imports = {})
+    imports.vue = this.defaultVueRuntimeURL
+    imports['vue/server-renderer'] = this.defaultVueServerRendererURL
+    this.setImportMap(importMap)
+    console.info(`[@vue/repl] Now using default Vue version`)
   }
 }

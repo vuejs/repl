@@ -1,16 +1,14 @@
 <script setup lang="ts">
 import Preview from './Preview.vue'
 import { Store } from '../store'
-import { inject, ref, computed, toRef } from 'vue'
+import { inject, ref, computed } from 'vue'
 import type { OutputModes } from './types'
-import { EditorComponentType } from '../types'
+import CodeMirror from '../codemirror/CodeMirror.vue'
 
 const props = defineProps<{
   showCompileOutput?: boolean
-  editorComponent: EditorComponentType
+  ssr: boolean
 }>()
-
-const EditorComponent = toRef(props, 'editorComponent')
 
 const store = inject('store') as Store
 const modes = computed(() =>
@@ -38,11 +36,11 @@ const mode = ref<OutputModes>(
   </div>
 
   <div class="output-container">
-    <Preview :show="mode === 'preview'" />
-    <EditorComponent
+    <Preview :show="mode === 'preview'" :ssr="ssr"/>
+    <CodeMirror
       v-if="mode !== 'preview'"
       readonly
-      :filename="mode === 'css' ? 'a.css' : 'a.js'"
+      :mode="mode === 'css' ? 'css' : 'javascript'"
       :value="store.state.activeFile.compiled[mode]"
     />
   </div>
