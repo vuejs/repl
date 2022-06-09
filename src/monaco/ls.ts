@@ -191,12 +191,14 @@ export async function setupLs(modelsMap: Ref<Map<string, monaco.editor.ITextMode
     const ls = createLanguageService({ typescript: ts }, host, undefined, undefined, undefined, []);
     disposables.value.push(ls);
 
+    const completionItems = new WeakMap<monaco.languages.CompletionItem, vscode.CompletionItem>();
+
     disposables.value.push(
         monaco.languages.registerCompletionItemProvider(lang, {
             // https://github.com/johnsoncodehk/volar/blob/2f786182250d27e99cc3714fbfc7d209616e2289/packages/vue-language-server/src/registers/registerlanguageFeatures.ts#L57
             triggerCharacters: '!@#$%^&*()_+-=`~{}|[]\:";\'<>?,./ '.split(''),
             provideCompletionItems: async (model, position, context) => {
-                const result = await ls.doComplete(
+                const codeResult = await ls.doComplete(
                     model.uri.fsPath,
                     {
                         line: position.lineNumber - 1,
@@ -207,7 +209,22 @@ export async function setupLs(modelsMap: Ref<Map<string, monaco.editor.ITextMode
                         triggerCharacter: context.triggerCharacter,
                     },
                 );
-                return code2monaco.asCompletionList(result);
+                const monacoResult = code2monaco.asCompletionList(codeResult);
+                for (let i = 0; i < codeResult.items.length; i++) {
+                    const codeItem = codeResult.items[i];
+                    const monacoItem = monacoResult.suggestions[i];
+                    completionItems.set(monacoItem, codeItem);
+                }
+                return monacoResult;
+            },
+            resolveCompletionItem: async (monacoItem, token) => {
+                let codeItem = completionItems.get(monacoItem);
+                if (codeItem) {
+                    codeItem = await ls.doCompletionResolve(codeItem);
+                    monacoItem = code2monaco.asCompletionItem(codeItem);
+                    completionItems.set(monacoItem, codeItem);
+                }
+                return monacoItem;
             },
         }),
     );
