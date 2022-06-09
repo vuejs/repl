@@ -1,4 +1,5 @@
 {
+    "version": "https://github.com/johnsoncodehk/volar/commit/2ddb2fa78e317fee86a90c76ad78746ff35ef86e",
     "name": "vue",
     "scopeName": "source.vue",
     "patterns": [
