@@ -195,6 +195,7 @@ export async function setupLs(modelsMap: Ref<Map<string, monaco.editor.ITextMode
 
     const completionItems = new WeakMap<monaco.languages.CompletionItem, vscode.CompletionItem>();
     const codeLens = new WeakMap<monaco.languages.CodeLens, vscode.CodeLens>();
+    const codeActions = new WeakMap<monaco.languages.CodeAction, vscode.CodeAction>();
     const documents = new WeakMap<monaco.editor.ITextModel, vscode.TextDocument>();
 
     disposables.value.push(
@@ -352,6 +353,46 @@ export async function setupLs(modelsMap: Ref<Map<string, monaco.editor.ITextMode
                 return moncaoResult;
             },
         }),
+        monaco.languages.registerCodeActionProvider(lang, {
+            provideCodeActions: async (model, range, context) => {
+                const diagnostics: vscode.Diagnostic[] = [];
+                for (const marker of context.markers) {
+                    const diagnostic = _diagnostics.get(marker);
+                    if (diagnostic) {
+                        diagnostics.push(diagnostic);
+                    }
+                }
+                const codeResult = await ls.doCodeActions(
+                    model.uri.toString(),
+                    monaco2code.asRange(range),
+                    {
+                        diagnostics: diagnostics,
+                        only: context.only ? [context.only] : undefined,
+                    },
+                );
+                if (codeResult) {
+                    const monacoResult = codeResult.map(code2monaco.asCodeAction);
+                    for (let i = 0; i < monacoResult.length; i++) {
+                        codeActions.set(monacoResult[i], codeResult[i]);
+                    }
+                    return {
+                        actions: monacoResult,
+                        dispose: () => { },
+                    };
+                }
+            },
+            resolveCodeAction: async (moncaoResult) => {
+                let codeResult = codeActions.get(moncaoResult);
+                if (codeResult) {
+                    codeResult = await ls.doCodeActionResolve(codeResult);
+                    if (codeResult) {
+                        moncaoResult = code2monaco.asCodeAction(codeResult);
+                        codeActions.set(moncaoResult, codeResult);
+                    }
+                }
+                return moncaoResult;
+            },
+        }),
         monaco.languages.registerCompletionItemProvider(lang, {
             // https://github.com/johnsoncodehk/volar/blob/2f786182250d27e99cc3714fbfc7d209616e2289/packages/vue-language-server/src/registers/registerlanguageFeatures.ts#L57
             triggerCharacters: '!@#$%^&*()_+-=`~{}|[]\:";\'<>?,./ '.split(''),
@@ -396,6 +437,8 @@ export async function setupLs(modelsMap: Ref<Map<string, monaco.editor.ITextMode
     }
 }
 
+const _diagnostics = new WeakMap<monaco.editor.IMarkerData, vscode.Diagnostic>();
+
 export function setupValidate(editor: monaco.editor.IStandaloneCodeEditor, ls: LanguageService) {
     const worker = async () => {
         const model = editor.getModel();
@@ -407,13 +450,13 @@ export function setupValidate(editor: monaco.editor.IStandaloneCodeEditor, ls: L
             monaco.editor.setModelMarkers(
                 model,
                 lang,
-                unfinishResult.map(code2monaco.asMarkerData),
+                toMarkers(unfinishResult),
             );
         });
         monaco.editor.setModelMarkers(
             model,
             lang,
-            diagnostics.map(code2monaco.asMarkerData),
+            toMarkers(diagnostics),
         );
     };
 
@@ -427,4 +470,12 @@ export function setupValidate(editor: monaco.editor.IStandaloneCodeEditor, ls: L
             worker();
         }),
     );
+}
+
+function toMarkers(errors: vscode.Diagnostic[]) {
+    return errors.map(error => {
+        const marker = code2monaco.asMarkerData(error);
+        _diagnostics.set(marker, error);
+        return marker;
+    });
 }

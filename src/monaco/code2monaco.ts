@@ -384,3 +384,22 @@ export function asDocumentHighlightKind(kind: vscode.DocumentHighlightKind | und
             return monaco.languages.DocumentHighlightKind.Text;
     }
 }
+
+export function asCodeLens(item: vscode.CodeLens): monaco.languages.CodeLens {
+    return {
+        range: asRange(item.range),
+        command: item.command ? asCommand(item.command) : undefined,
+    };
+}
+
+export function asCodeAction(item: vscode.CodeAction): monaco.languages.CodeAction {
+    return {
+        title: item.title,
+        command: item.command ? asCommand(item.command) : undefined,
+        edit: item.edit ? asWorkspaceEdit(item.edit) : undefined,
+        diagnostics: item.diagnostics ? item.diagnostics.map(asMarkerData) : undefined,
+        kind: item.kind,
+        isPreferred: item.isPreferred,
+        disabled: item.disabled?.reason,
+    };
+}
