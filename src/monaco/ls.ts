@@ -312,6 +312,17 @@ export async function setupLs(modelsMap: Ref<Map<string, monaco.editor.ITextMode
                 }
             },
         }),
+        monaco.languages.registerTypeDefinitionProvider(lang, {
+            provideTypeDefinition: async (model, position) => {
+                const codeResult = await ls.findTypeDefinition(
+                    model.uri.toString(),
+                    monaco2code.asPosition(position),
+                );
+                if (codeResult) {
+                    return codeResult.map(code2monaco.asLocation);
+                }
+            },
+        }),
         monaco.languages.registerCompletionItemProvider(lang, {
             // https://github.com/johnsoncodehk/volar/blob/2f786182250d27e99cc3714fbfc7d209616e2289/packages/vue-language-server/src/registers/registerlanguageFeatures.ts#L57
             triggerCharacters: '!@#$%^&*()_+-=`~{}|[]\:";\'<>?,./ '.split(''),
