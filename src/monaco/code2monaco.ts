@@ -151,3 +151,27 @@ export function asLocation(definition: vscode.LocationLink): monaco.languages.Lo
 export function asUri(uri: vscode.URI): monaco.Uri {
     return monaco.Uri.parse(uri);
 }
+
+export function asSignatureHelp(signatureHelp: vscode.SignatureHelp): monaco.languages.SignatureHelp {
+    return {
+        signatures: signatureHelp.signatures.map(asSignatureInformation),
+        activeSignature: signatureHelp.activeSignature ?? 0,
+        activeParameter: signatureHelp.activeParameter ?? 0,
+    };
+}
+
+export function asSignatureInformation(signatureInformation: vscode.SignatureInformation): monaco.languages.SignatureInformation {
+    return {
+        label: signatureInformation.label,
+        documentation: signatureInformation.documentation,
+        parameters: signatureInformation.parameters ? signatureInformation.parameters.map(asParameterInformation) : [],
+        activeParameter: signatureInformation.activeParameter,
+    };
+}
+
+export function asParameterInformation(parameterInformation: vscode.ParameterInformation): monaco.languages.ParameterInformation {
+    return {
+        label: parameterInformation.label,
+        documentation: parameterInformation.documentation,
+    };
+}

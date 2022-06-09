@@ -248,30 +248,16 @@ export async function setupLs(modelsMap: Ref<Map<string, monaco.editor.ITextMode
         monaco.languages.registerSignatureHelpProvider(lang, {
             signatureHelpTriggerCharacters: ['(', ','],
             provideSignatureHelp: async (model, position) => {
-                const result = await ls.getSignatureHelp(model.uri.toString(), {
-                    line: position.lineNumber - 1,
-                    character: position.column - 1,
-                });
-                if (!result) {
-                    return undefined;
+                const codeResult = await ls.getSignatureHelp(
+                    model.uri.toString(),
+                    monaco2code.asPosition(position),
+                );
+                if (codeResult) {
+                    return {
+                        value: code2monaco.asSignatureHelp(codeResult),
+                        dispose: () => { },
+                    };
                 }
-
-                return {
-                    value: {
-                        signatures: result.signatures.map((x) => ({
-                            label: x.label,
-                            documentation: x.documentation,
-                            parameters:
-                                x.parameters?.map((y) => ({
-                                    label: y.label,
-                                    documentation: y.documentation,
-                                })) ?? [],
-                        })),
-                        activeSignature: result.activeSignature!,
-                        activeParameter: result.activeParameter!,
-                    },
-                    dispose: () => { },
-                };
             },
         }),
     );
