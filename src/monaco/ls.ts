@@ -407,6 +407,21 @@ export async function setupLs(modelsMap: Ref<Map<string, monaco.editor.ITextMode
                 }
             },
         }),
+        monaco.languages.registerDocumentRangeFormattingEditProvider(lang, {
+            provideDocumentRangeFormattingEdits: async (model, range, options) => {
+                const document = documents.get(model);
+                if (document) {
+                    const codeResult = await ds.format(
+                        document,
+                        monaco2code.asFormattingOptions(options),
+                        monaco2code.asRange(range),
+                    );
+                    if (codeResult) {
+                        return codeResult.map(code2monaco.asTextEdit);
+                    }
+                }
+            },
+        }),
         monaco.languages.registerCompletionItemProvider(lang, {
             // https://github.com/johnsoncodehk/volar/blob/2f786182250d27e99cc3714fbfc7d209616e2289/packages/vue-language-server/src/registers/registerlanguageFeatures.ts#L57
             triggerCharacters: '!@#$%^&*()_+-=`~{}|[]\:";\'<>?,./ '.split(''),
