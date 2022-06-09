@@ -140,3 +140,14 @@ export function asMarkdownString(markdownString: vscode.Hover['contents']): mona
         return [markdownString];
     }
 }
+
+export function asLocation(definition: vscode.LocationLink): monaco.languages.Location {
+    return {
+        uri: asUri(definition.targetUri),
+        range: asRange(definition.targetRange),
+    };
+}
+
+export function asUri(uri: vscode.URI): monaco.Uri {
+    return monaco.Uri.parse(uri);
+}

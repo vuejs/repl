@@ -36,21 +36,21 @@ onBeforeUnmount(() => {
 });
 
 export async function setupLs(modelsMap: Ref<Map<string, monaco.editor.ITextModel>>): Promise<LanguageService> {
-    const libEs5Url = monaco.Uri.parse('playground:///lib.es5.d.ts');
-    const libDomUrl = monaco.Uri.parse('playground:///lib.dom.d.ts');
-    const libDtsUrl = monaco.Uri.parse('playground:///lib.d.ts');
-    const libPromiseUrl = monaco.Uri.parse('playground:///lib.es2015.promise.d.ts');
+    const libEs5Url = monaco.Uri.parse('file:///lib.es5.d.ts');
+    const libDomUrl = monaco.Uri.parse('file:///lib.dom.d.ts');
+    const libDtsUrl = monaco.Uri.parse('file:///lib.d.ts');
+    const libPromiseUrl = monaco.Uri.parse('file:///lib.es2015.promise.d.ts');
 
     const libEs5Model = getOrCreateModel(libEs5Url, 'typescript', libEs5Content);
     const libDomModel = getOrCreateModel(libDomUrl, 'typescript', libDomContent);
     const libDtsModel = getOrCreateModel(libDtsUrl, 'typescript', libDtsContent);
     const libPromiseModel = getOrCreateModel(libPromiseUrl, 'typescript', libPromiseContent);
 
-    const vueUrl = monaco.Uri.parse('playground:///node_modules/vue/index.d.ts');
-    const vueRuntimeDomUrl = monaco.Uri.parse('playground:///node_modules/%40vue/runtime-dom/index.d.ts');
-    const vueRuntimeCoreUrl = monaco.Uri.parse('playground:///node_modules/%40vue/runtime-core/index.d.ts');
-    const vueSharedUrl = monaco.Uri.parse('playground:///node_modules/%40vue/shared/index.d.ts');
-    const vueReactivityUrl = monaco.Uri.parse('playground:///node_modules/%40vue/reactivity/index.d.ts');
+    const vueUrl = monaco.Uri.parse('file:///node_modules/vue/index.d.ts');
+    const vueRuntimeDomUrl = monaco.Uri.parse('file:///node_modules/%40vue/runtime-dom/index.d.ts');
+    const vueRuntimeCoreUrl = monaco.Uri.parse('file:///node_modules/%40vue/runtime-core/index.d.ts');
+    const vueSharedUrl = monaco.Uri.parse('file:///node_modules/%40vue/shared/index.d.ts');
+    const vueReactivityUrl = monaco.Uri.parse('file:///node_modules/%40vue/reactivity/index.d.ts');
 
     const vueModel = getOrCreateModel(vueUrl, 'typescript', vueContent);
     const vueRuntimeDomModel = getOrCreateModel(vueRuntimeDomUrl, 'typescript', vueRuntimeDomContent);
@@ -222,9 +222,6 @@ export async function setupLs(modelsMap: Ref<Map<string, monaco.editor.ITextMode
                 return monacoItem;
             },
         }),
-    );
-
-    disposables.value.push(
         monaco.languages.registerHoverProvider(lang, {
             provideHover: async (model, position) => {
                 const codeResult = await ls.doHover(
@@ -236,38 +233,18 @@ export async function setupLs(modelsMap: Ref<Map<string, monaco.editor.ITextMode
                 }
             },
         }),
-    );
-
-    disposables.value.push(
         monaco.languages.registerDefinitionProvider(lang, {
             provideDefinition: async (model, position) => {
-                const result = await ls.findDefinition(model.uri.toString(), {
-                    line: position.lineNumber - 1,
-                    character: position.column - 1,
-                });
-                if (!result || !result.length) {
-                    return undefined;
+                const codeResult = await ls.findDefinition(
+                    model.uri.toString(),
+                    monaco2code.asPosition(position),
+                );
+                // TODO: can't show if only one result from libs
+                if (codeResult) {
+                    return codeResult.map(code2monaco.asLocation);
                 }
-                return result.map((x) => ({
-                    uri: monaco.Uri.parse(x.targetUri).with({ scheme: 'playground' }),
-                    range: {
-                        startLineNumber: x.targetRange.start.line + 1,
-                        startColumn: x.targetRange.start.character + 1,
-                        endLineNumber: x.targetRange.end.line + 1,
-                        endColumn: x.targetRange.end.character + 1,
-                    },
-                    targetSelectionRange: {
-                        startLineNumber: x.targetSelectionRange.start.line + 1,
-                        startColumn: x.targetSelectionRange.start.character + 1,
-                        endLineNumber: x.targetSelectionRange.end.line + 1,
-                        endColumn: x.targetSelectionRange.end.character + 1,
-                    },
-                }));
             },
         }),
-    );
-
-    disposables.value.push(
         monaco.languages.registerSignatureHelpProvider(lang, {
             signatureHelpTriggerCharacters: ['(', ','],
             provideSignatureHelp: async (model, position) => {
