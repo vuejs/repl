@@ -544,6 +544,23 @@ export async function setupLs(modelsMap: Ref<Map<string, monaco.editor.ITextMode
                 }
             },
         }),
+        // TODO: registerDocumentSemanticTokensProvider
+        // TODO: registerDocumentRangeSemanticTokensProvider
+        // TODO: registerInlineCompletionsProvider
+        monaco.languages.registerInlayHintsProvider(lang, {
+            provideInlayHints: async (model, range) => {
+                const codeResult = await ls.getInlayHints(
+                    model.uri.toString(),
+                    monaco2code.asRange(range),
+                );
+                if (codeResult) {
+                    return {
+                        hints: codeResult.map(code2monaco.asInlayHint),
+                        dispose: () => { },
+                    };
+                }
+            },
+        }),
     );
 
     return ls;
