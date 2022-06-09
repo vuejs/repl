@@ -403,3 +403,11 @@ export function asCodeAction(item: vscode.CodeAction): monaco.languages.CodeActi
         disabled: item.disabled?.reason,
     };
 }
+
+export function asLink(item: vscode.DocumentLink): monaco.languages.ILink {
+    return {
+        range: asRange(item.range),
+        url: item.target,
+        tooltip: item.tooltip,
+    };
+}

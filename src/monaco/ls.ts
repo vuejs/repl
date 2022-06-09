@@ -443,6 +443,18 @@ export async function setupLs(modelsMap: Ref<Map<string, monaco.editor.ITextMode
                 return [];
             },
         }),
+        monaco.languages.registerLinkProvider(lang, {
+            provideLinks: async (model) => {
+                const codeResult = await ls.findDocumentLinks(
+                    model.uri.toString(),
+                );
+                if (codeResult) {
+                    return {
+                        links: codeResult.map(code2monaco.asLink),
+                    };
+                }
+            },
+        }),
         monaco.languages.registerCompletionItemProvider(lang, {
             // https://github.com/johnsoncodehk/volar/blob/2f786182250d27e99cc3714fbfc7d209616e2289/packages/vue-language-server/src/registers/registerlanguageFeatures.ts#L57
             triggerCharacters: '!@#$%^&*()_+-=`~{}|[]\:";\'<>?,./ '.split(''),
