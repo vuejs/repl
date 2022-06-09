@@ -520,6 +520,18 @@ export async function setupLs(modelsMap: Ref<Map<string, monaco.editor.ITextMode
                 }
             },
         }),
+        // same with DefinitionProvider
+        monaco.languages.registerDeclarationProvider(lang, {
+            provideDeclaration: async (model, position) => {
+                const codeResult = await ls.findDefinition(
+                    model.uri.toString(),
+                    monaco2code.asPosition(position),
+                );
+                if (codeResult) {
+                    return codeResult.map(code2monaco.asLocation);
+                }
+            },
+        }),
     );
 
     return ls;
