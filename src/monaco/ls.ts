@@ -1,8 +1,8 @@
 /* eslint-disable sonarjs/no-duplicate-string */
 import * as monaco from 'monaco-editor';
-import type * as vscode from 'vscode-languageserver-protocol';
+import * as vscode from 'vscode-languageserver-protocol';
 import * as ts from 'typescript/lib/tsserverlibrary';
-import { createLanguageService, type LanguageService, type LanguageServiceHost } from '@volar/vue-language-service';
+import { createLanguageService, getDocumentService, type LanguageService, type LanguageServiceHost } from '@volar/vue-language-service';
 import type { Ref } from 'vue';
 import { onBeforeUnmount, ref } from 'vue';
 import * as code2monaco from './code2monaco';
@@ -190,9 +190,11 @@ export async function setupLs(modelsMap: Ref<Map<string, monaco.editor.ITextMode
     tsWithAny.setSys(sys);
 
     const ls = createLanguageService({ typescript: ts }, host, undefined, undefined, undefined, []);
+    const ds = getDocumentService({ typescript: ts }, undefined, undefined, []);
     disposables.value.push(ls);
 
     const completionItems = new WeakMap<monaco.languages.CompletionItem, vscode.CompletionItem>();
+    const documents = new WeakMap<monaco.editor.ITextModel, vscode.TextDocument>();
 
     disposables.value.push(
         // TODO: registerTokensProviderFactory
@@ -219,6 +221,43 @@ export async function setupLs(modelsMap: Ref<Map<string, monaco.editor.ITextMode
                 );
                 if (codeResult) {
                     return code2monaco.asWorkspaceEdit(codeResult);
+                }
+            },
+        }),
+        monaco.languages.registerSignatureHelpProvider(lang, {
+            signatureHelpTriggerCharacters: ['(', ','],
+            provideSignatureHelp: async (model, position) => {
+                const codeResult = await ls.getSignatureHelp(
+                    model.uri.toString(),
+                    monaco2code.asPosition(position),
+                );
+                if (codeResult) {
+                    return {
+                        value: code2monaco.asSignatureHelp(codeResult),
+                        dispose: () => { },
+                    };
+                }
+            },
+        }),
+        monaco.languages.registerHoverProvider(lang, {
+            provideHover: async (model, position) => {
+                const codeResult = await ls.doHover(
+                    model.uri.toString(),
+                    monaco2code.asPosition(position),
+                );
+                if (codeResult) {
+                    return code2monaco.asHover(codeResult);
+                }
+            },
+        }),
+        monaco.languages.registerDocumentSymbolProvider(lang, {
+            provideDocumentSymbols: async (model) => {
+                const document = documents.get(model);
+                if (document) {
+                    const codeResult = await ds.findDocumentSymbols(document);
+                    if (codeResult) {
+                        return codeResult.map(code2monaco.asDocumentSymbol);
+                    }
                 }
             },
         }),
@@ -249,17 +288,6 @@ export async function setupLs(modelsMap: Ref<Map<string, monaco.editor.ITextMode
                 return monacoItem;
             },
         }),
-        monaco.languages.registerHoverProvider(lang, {
-            provideHover: async (model, position) => {
-                const codeResult = await ls.doHover(
-                    model.uri.toString(),
-                    monaco2code.asPosition(position),
-                );
-                if (codeResult) {
-                    return code2monaco.asHover(codeResult);
-                }
-            },
-        }),
         monaco.languages.registerDefinitionProvider(lang, {
             provideDefinition: async (model, position) => {
                 const codeResult = await ls.findDefinition(
@@ -272,24 +300,23 @@ export async function setupLs(modelsMap: Ref<Map<string, monaco.editor.ITextMode
                 }
             },
         }),
-        monaco.languages.registerSignatureHelpProvider(lang, {
-            signatureHelpTriggerCharacters: ['(', ','],
-            provideSignatureHelp: async (model, position) => {
-                const codeResult = await ls.getSignatureHelp(
-                    model.uri.toString(),
-                    monaco2code.asPosition(position),
-                );
-                if (codeResult) {
-                    return {
-                        value: code2monaco.asSignatureHelp(codeResult),
-                        dispose: () => { },
-                    };
-                }
-            },
-        }),
     );
 
     return ls;
+
+    function getTextDocument(model: monaco.editor.ITextModel) {
+        let document = documents.get(model);
+        if (!document || document.version !== model.getVersionId()) {
+            document = vscode.TextDocument.create(
+                model.uri.toString(),
+                model.getLanguageId(),
+                model.getVersionId(),
+                model.getValue(),
+            );
+            documents.set(model, document);
+        }
+        return document;
+    }
 }
 
 export function setupValidate(editor: monaco.editor.IStandaloneCodeEditor, ls: LanguageService) {

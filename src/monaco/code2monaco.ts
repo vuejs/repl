@@ -285,3 +285,82 @@ export function asWorkspaceEdit(workspaceEdit: vscode.WorkspaceEdit): monaco.lan
     }
     return result;
 }
+
+export function asDocumentSymbol(symbol: vscode.SymbolInformation): monaco.languages.DocumentSymbol {
+    return {
+        name: symbol.name,
+        detail: '',
+        kind: asSymbolKind(symbol.kind),
+        tags: symbol.tags?.map(asSymbolTag) ?? [],
+        containerName: symbol.containerName,
+        range: asRange(symbol.location.range),
+        selectionRange: asRange(symbol.location.range),
+        children: [],
+    };
+}
+
+export function asSymbolTag(tag: vscode.SymbolTag): monaco.languages.SymbolTag {
+    switch (tag) {
+        case vscode.SymbolTag.Deprecated:
+            return monaco.languages.SymbolTag.Deprecated;
+    }
+}
+
+export function asSymbolKind(kind: vscode.SymbolKind): monaco.languages.SymbolKind {
+    switch (kind) {
+        case vscode.SymbolKind.File:
+            return monaco.languages.SymbolKind.File;
+        case vscode.SymbolKind.Module:
+            return monaco.languages.SymbolKind.Module;
+        case vscode.SymbolKind.Namespace:
+            return monaco.languages.SymbolKind.Namespace;
+        case vscode.SymbolKind.Package:
+            return monaco.languages.SymbolKind.Package;
+        case vscode.SymbolKind.Class:
+            return monaco.languages.SymbolKind.Class;
+        case vscode.SymbolKind.Method:
+            return monaco.languages.SymbolKind.Method;
+        case vscode.SymbolKind.Property:
+            return monaco.languages.SymbolKind.Property;
+        case vscode.SymbolKind.Field:
+            return monaco.languages.SymbolKind.Field;
+        case vscode.SymbolKind.Constructor:
+            return monaco.languages.SymbolKind.Constructor;
+        case vscode.SymbolKind.Enum:
+            return monaco.languages.SymbolKind.Enum;
+        case vscode.SymbolKind.Interface:
+            return monaco.languages.SymbolKind.Interface;
+        case vscode.SymbolKind.Function:
+            return monaco.languages.SymbolKind.Function;
+        case vscode.SymbolKind.Variable:
+            return monaco.languages.SymbolKind.Variable;
+        case vscode.SymbolKind.Constant:
+            return monaco.languages.SymbolKind.Constant;
+        case vscode.SymbolKind.String:
+            return monaco.languages.SymbolKind.String;
+        case vscode.SymbolKind.Number:
+            return monaco.languages.SymbolKind.Number;
+        case vscode.SymbolKind.Boolean:
+            return monaco.languages.SymbolKind.Boolean;
+        case vscode.SymbolKind.Array:
+            return monaco.languages.SymbolKind.Array;
+        case vscode.SymbolKind.Object:
+            return monaco.languages.SymbolKind.Object;
+        case vscode.SymbolKind.Key:
+            return monaco.languages.SymbolKind.Key;
+        case vscode.SymbolKind.Null:
+            return monaco.languages.SymbolKind.Null;
+        case vscode.SymbolKind.EnumMember:
+            return monaco.languages.SymbolKind.EnumMember;
+        case vscode.SymbolKind.Struct:
+            return monaco.languages.SymbolKind.Struct;
+        case vscode.SymbolKind.Event:
+            return monaco.languages.SymbolKind.Event;
+        case vscode.SymbolKind.Operator:
+            return monaco.languages.SymbolKind.Operator;
+        case vscode.SymbolKind.TypeParameter:
+            return monaco.languages.SymbolKind.TypeParameter;
+        default:
+            return monaco.languages.SymbolKind.File;
+    }
+}
