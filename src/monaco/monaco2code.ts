@@ -33,3 +33,10 @@ export function asTriggerKind(kind: monaco.languages.CompletionTriggerKind): vsc
             return vscode.CompletionTriggerKind.TriggerForIncompleteCompletions;
     }
 }
+
+export function asFormattingOptions(options: monaco.languages.FormattingOptions): vscode.FormattingOptions {
+    return {
+        tabSize: options.tabSize,
+        insertSpaces: options.insertSpaces,
+    };
+}
