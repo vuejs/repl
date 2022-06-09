@@ -1,5 +1,5 @@
 import * as monaco from 'monaco-editor';
-import * as vscode from 'vscode-languageserver-types';
+import * as vscode from 'vscode-languageserver-protocol';
 
 export function asCompletionList(list: vscode.CompletionList): monaco.languages.CompletionList {
     return {
@@ -120,4 +120,23 @@ export function asRange(range: vscode.Range): monaco.IRange {
         endLineNumber: range.end.line + 1,
         endColumn: range.end.character + 1,
     };
+}
+
+export function asHover(hover: vscode.Hover): monaco.languages.Hover {
+    return {
+        contents: asMarkdownString(hover.contents),
+        range: hover.range ? asRange(hover.range) : undefined,
+    };
+}
+
+export function asMarkdownString(markdownString: vscode.Hover['contents']): monaco.IMarkdownString[] {
+    if (typeof markdownString === 'string') {
+        return [{ value: markdownString }]
+    }
+    else if (Array.isArray(markdownString)) {
+        return markdownString.map(asMarkdownString).flat();
+    }
+    else {
+        return [markdownString];
+    }
 }

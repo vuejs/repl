@@ -21,7 +21,7 @@ specifiers:
   sucrase: ^3.20.1
   typescript: ^4.5.4
   vite: ^2.6.5
-  vscode-languageserver-types: ^3.17.1
+  vscode-languageserver-protocol: ^3.17.1
   vue: ^3.2.37
   vue-tsc: ^0.37.3
 
@@ -48,7 +48,7 @@ devDependencies:
   sucrase: 3.21.0
   typescript: 4.7.3
   vite: 2.9.10
-  vscode-languageserver-types: 3.17.1
+  vscode-languageserver-protocol: 3.17.1
   vue: 3.2.37
   vue-tsc: 0.37.3_typescript@4.7.3
 
@@ -1352,14 +1352,12 @@ packages:
   /vscode-jsonrpc/8.0.1:
     resolution: {integrity: sha512-N/WKvghIajmEvXpatSzvTvOIz61ZSmOSa4BRA4pTLi+1+jozquQKP/MkaylP9iB68k73Oua1feLQvH3xQuigiQ==}
     engines: {node: '>=14.0.0'}
-    dev: false
 
   /vscode-languageserver-protocol/3.17.1:
     resolution: {integrity: sha512-BNlAYgQoYwlSgDLJhSG+DeA8G1JyECqRzM2YO6tMmMji3Ad9Mw6AW7vnZMti90qlAKb0LqAlJfSVGEdqMMNzKg==}
     dependencies:
       vscode-jsonrpc: 8.0.1
       vscode-languageserver-types: 3.17.1
-    dev: false
 
   /vscode-languageserver-textdocument/1.0.5:
     resolution: {integrity: sha512-1ah7zyQjKBudnMiHbZmxz5bYNM9KKZYz+5VQLj+yr8l+9w3g+WAhCkUkWbhMEdC5u0ub4Ndiye/fDyS8ghIKQg==}

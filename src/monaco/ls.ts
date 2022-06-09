@@ -1,11 +1,12 @@
 /* eslint-disable sonarjs/no-duplicate-string */
 import * as monaco from 'monaco-editor';
-import type * as vscode from 'vscode-languageserver-types';
+import type * as vscode from 'vscode-languageserver-protocol';
 import * as ts from 'typescript/lib/tsserverlibrary';
 import { createLanguageService, type LanguageService, type LanguageServiceHost } from '@volar/vue-language-service';
 import type { Ref } from 'vue';
 import { onBeforeUnmount, ref } from 'vue';
 import * as code2monaco from './code2monaco';
+import * as monaco2code from './monaco2code';
 import libEs5Content from 'typescript/lib/lib.es5.d.ts?raw';
 import libDomContent from 'typescript/lib/lib.dom.d.ts?raw';
 import libDtsContent from 'typescript/lib/lib.d.ts?raw';
@@ -199,15 +200,9 @@ export async function setupLs(modelsMap: Ref<Map<string, monaco.editor.ITextMode
             triggerCharacters: '!@#$%^&*()_+-=`~{}|[]\:";\'<>?,./ '.split(''),
             provideCompletionItems: async (model, position, context) => {
                 const codeResult = await ls.doComplete(
-                    model.uri.fsPath,
-                    {
-                        line: position.lineNumber - 1,
-                        character: position.column - 1,
-                    },
-                    {
-                        triggerKind: (context.triggerKind + 1) as any,
-                        triggerCharacter: context.triggerCharacter,
-                    },
+                    model.uri.toString(),
+                    monaco2code.asPosition(position),
+                    monaco2code.asCompletionContext(context),
                 );
                 const monacoResult = code2monaco.asCompletionList(codeResult);
                 for (let i = 0; i < codeResult.items.length; i++) {
@@ -232,25 +227,13 @@ export async function setupLs(modelsMap: Ref<Map<string, monaco.editor.ITextMode
     disposables.value.push(
         monaco.languages.registerHoverProvider(lang, {
             provideHover: async (model, position) => {
-                const info: vscode.Hover | undefined = await ls.doHover(model.uri.fsPath, {
-                    line: position.lineNumber - 1,
-                    character: position.column - 1,
-                });
-                if (!info) {
-                    return undefined;
+                const codeResult = await ls.doHover(
+                    model.uri.toString(),
+                    monaco2code.asPosition(position),
+                );
+                if (codeResult) {
+                    return code2monaco.asHover(codeResult);
                 }
-                const results: monaco.languages.Hover = {
-                    contents: (Array.isArray(info.contents)
-                        ? (info.contents as string[])
-                        : typeof info.contents === 'string'
-                            ? [info.contents]
-                            : [info.contents.value]
-                    ).map((x) => ({
-                        value: x,
-                    })),
-                };
-
-                return results;
             },
         }),
     );
@@ -258,7 +241,7 @@ export async function setupLs(modelsMap: Ref<Map<string, monaco.editor.ITextMode
     disposables.value.push(
         monaco.languages.registerDefinitionProvider(lang, {
             provideDefinition: async (model, position) => {
-                const result = await ls.findDefinition(model.uri.fsPath, {
+                const result = await ls.findDefinition(model.uri.toString(), {
                     line: position.lineNumber - 1,
                     character: position.column - 1,
                 });
@@ -288,7 +271,7 @@ export async function setupLs(modelsMap: Ref<Map<string, monaco.editor.ITextMode
         monaco.languages.registerSignatureHelpProvider(lang, {
             signatureHelpTriggerCharacters: ['(', ','],
             provideSignatureHelp: async (model, position) => {
-                const result = await ls.getSignatureHelp(model.uri.fsPath, {
+                const result = await ls.getSignatureHelp(model.uri.toString(), {
                     line: position.lineNumber - 1,
                     character: position.column - 1,
                 });
@@ -326,7 +309,7 @@ export function setupValidate(editor: monaco.editor.IStandaloneCodeEditor, ls: L
             throw new Error('No model');
         }
 
-        const diagnostics = await ls.doValidation(model.uri.fsPath);
+        const diagnostics = await ls.doValidation(model.uri.toString());
         monaco.editor.setModelMarkers(
             model,
             lang,
