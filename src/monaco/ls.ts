@@ -1,8 +1,8 @@
 /* eslint-disable sonarjs/no-duplicate-string */
 import * as monaco from 'monaco-editor';
-import type * as vscode from 'vscode-languageserver-protocol';
+import * as vscode from 'vscode-languageserver-protocol';
 import * as ts from 'typescript/lib/tsserverlibrary';
-import { createLanguageService, type LanguageService, type LanguageServiceHost } from '@volar/vue-language-service';
+import { createLanguageService, getDocumentService, type LanguageService, type LanguageServiceHost } from '@volar/vue-language-service';
 import type { Ref } from 'vue';
 import { onBeforeUnmount, ref } from 'vue';
 import * as code2monaco from './code2monaco';
@@ -190,9 +190,14 @@ export async function setupLs(modelsMap: Ref<Map<string, monaco.editor.ITextMode
     tsWithAny.setSys(sys);
 
     const ls = createLanguageService({ typescript: ts }, host, undefined, undefined, undefined, []);
+    const ds = getDocumentService({ typescript: ts }, undefined, undefined, []);
     disposables.value.push(ls);
 
     const completionItems = new WeakMap<monaco.languages.CompletionItem, vscode.CompletionItem>();
+    const codeLens = new WeakMap<monaco.languages.CodeLens, vscode.CodeLens>();
+    const codeActions = new WeakMap<monaco.languages.CodeAction, vscode.CodeAction>();
+    const colorInformations = new WeakMap<monaco.languages.IColorInformation, vscode.ColorInformation>();
+    const documents = new WeakMap<monaco.editor.ITextModel, vscode.TextDocument>();
 
     disposables.value.push(
         // TODO: registerTokensProviderFactory
@@ -222,56 +227,6 @@ export async function setupLs(modelsMap: Ref<Map<string, monaco.editor.ITextMode
                 }
             },
         }),
-        monaco.languages.registerCompletionItemProvider(lang, {
-            // https://github.com/johnsoncodehk/volar/blob/2f786182250d27e99cc3714fbfc7d209616e2289/packages/vue-language-server/src/registers/registerlanguageFeatures.ts#L57
-            triggerCharacters: '!@#$%^&*()_+-=`~{}|[]\:";\'<>?,./ '.split(''),
-            provideCompletionItems: async (model, position, context) => {
-                const codeResult = await ls.doComplete(
-                    model.uri.toString(),
-                    monaco2code.asPosition(position),
-                    monaco2code.asCompletionContext(context),
-                );
-                const monacoResult = code2monaco.asCompletionList(codeResult);
-                for (let i = 0; i < codeResult.items.length; i++) {
-                    const codeItem = codeResult.items[i];
-                    const monacoItem = monacoResult.suggestions[i];
-                    completionItems.set(monacoItem, codeItem);
-                }
-                return monacoResult;
-            },
-            resolveCompletionItem: async (monacoItem, token) => {
-                let codeItem = completionItems.get(monacoItem);
-                if (codeItem) {
-                    codeItem = await ls.doCompletionResolve(codeItem);
-                    monacoItem = code2monaco.asCompletionItem(codeItem);
-                    completionItems.set(monacoItem, codeItem);
-                }
-                return monacoItem;
-            },
-        }),
-        monaco.languages.registerHoverProvider(lang, {
-            provideHover: async (model, position) => {
-                const codeResult = await ls.doHover(
-                    model.uri.toString(),
-                    monaco2code.asPosition(position),
-                );
-                if (codeResult) {
-                    return code2monaco.asHover(codeResult);
-                }
-            },
-        }),
-        monaco.languages.registerDefinitionProvider(lang, {
-            provideDefinition: async (model, position) => {
-                const codeResult = await ls.findDefinition(
-                    model.uri.toString(),
-                    monaco2code.asPosition(position),
-                );
-                // TODO: can't show if only one result from libs
-                if (codeResult) {
-                    return codeResult.map(code2monaco.asLocation);
-                }
-            },
-        }),
         monaco.languages.registerSignatureHelpProvider(lang, {
             signatureHelpTriggerCharacters: ['(', ','],
             provideSignatureHelp: async (model, position) => {
@@ -287,10 +242,328 @@ export async function setupLs(modelsMap: Ref<Map<string, monaco.editor.ITextMode
                 }
             },
         }),
+        monaco.languages.registerHoverProvider(lang, {
+            provideHover: async (model, position) => {
+                const codeResult = await ls.doHover(
+                    model.uri.toString(),
+                    monaco2code.asPosition(position),
+                );
+                if (codeResult) {
+                    return code2monaco.asHover(codeResult);
+                }
+            },
+        }),
+        monaco.languages.registerDocumentSymbolProvider(lang, {
+            provideDocumentSymbols: async (model) => {
+                const document = getTextDocument(model);
+                if (document) {
+                    const codeResult = await ds.findDocumentSymbols(document);
+                    if (codeResult) {
+                        return codeResult.map(code2monaco.asDocumentSymbol);
+                    }
+                }
+            },
+        }),
+        monaco.languages.registerDocumentHighlightProvider(lang, {
+            provideDocumentHighlights: async (model, position) => {
+                const codeResult = await ls.findDocumentHighlights(
+                    model.uri.toString(),
+                    monaco2code.asPosition(position),
+                );
+                if (codeResult) {
+                    return codeResult.map(code2monaco.asDocumentHighlight);
+                }
+            },
+        }),
+        monaco.languages.registerLinkedEditingRangeProvider(lang, {
+            provideLinkedEditingRanges: async (model, position) => {
+                const document = getTextDocument(model);
+                if (document) {
+                    const codeResult = await ds.findLinkedEditingRanges(
+                        document,
+                        monaco2code.asPosition(position),
+                    );
+                    if (codeResult) {
+                        return {
+                            ranges: codeResult.ranges.map(code2monaco.asRange),
+                            wordPattern: codeResult.wordPattern ? new RegExp(codeResult.wordPattern) : undefined,
+                        };
+                    }
+                }
+            },
+        }),
+        monaco.languages.registerDefinitionProvider(lang, {
+            provideDefinition: async (model, position) => {
+                const codeResult = await ls.findDefinition(
+                    model.uri.toString(),
+                    monaco2code.asPosition(position),
+                );
+                // TODO: can't show if only one result from libs
+                if (codeResult) {
+                    return codeResult.map(code2monaco.asLocation);
+                }
+            },
+        }),
+        monaco.languages.registerImplementationProvider(lang, {
+            provideImplementation: async (model, position) => {
+                const codeResult = await ls.findImplementations(
+                    model.uri.toString(),
+                    monaco2code.asPosition(position),
+                );
+                if (codeResult) {
+                    return codeResult.map(code2monaco.asLocation);
+                }
+            },
+        }),
+        monaco.languages.registerTypeDefinitionProvider(lang, {
+            provideTypeDefinition: async (model, position) => {
+                const codeResult = await ls.findTypeDefinition(
+                    model.uri.toString(),
+                    monaco2code.asPosition(position),
+                );
+                if (codeResult) {
+                    return codeResult.map(code2monaco.asLocation);
+                }
+            },
+        }),
+        monaco.languages.registerCodeLensProvider(lang, {
+            provideCodeLenses: async (model) => {
+                const codeResult = await ls.doCodeLens(
+                    model.uri.toString(),
+                );
+                if (codeResult) {
+                    const monacoResult = codeResult.map(code2monaco.asCodeLens);
+                    for (let i = 0; i < monacoResult.length; i++) {
+                        codeLens.set(monacoResult[i], codeResult[i]);
+                    }
+                    return {
+                        lenses: monacoResult,
+                        dispose: () => { },
+                    };
+                }
+            },
+            resolveCodeLens: async (model, moncaoResult) => {
+                let codeResult = codeLens.get(moncaoResult);
+                if (codeResult) {
+                    codeResult = await ls.doCodeLensResolve(codeResult);
+                    if (codeResult) {
+                        moncaoResult = code2monaco.asCodeLens(codeResult);
+                        codeLens.set(moncaoResult, codeResult);
+                    }
+                }
+                return moncaoResult;
+            },
+        }),
+        monaco.languages.registerCodeActionProvider(lang, {
+            provideCodeActions: async (model, range, context) => {
+                const diagnostics: vscode.Diagnostic[] = [];
+                for (const marker of context.markers) {
+                    const diagnostic = _diagnostics.get(marker);
+                    if (diagnostic) {
+                        diagnostics.push(diagnostic);
+                    }
+                }
+                const codeResult = await ls.doCodeActions(
+                    model.uri.toString(),
+                    monaco2code.asRange(range),
+                    {
+                        diagnostics: diagnostics,
+                        only: context.only ? [context.only] : undefined,
+                    },
+                );
+                if (codeResult) {
+                    const monacoResult = codeResult.map(code2monaco.asCodeAction);
+                    for (let i = 0; i < monacoResult.length; i++) {
+                        codeActions.set(monacoResult[i], codeResult[i]);
+                    }
+                    return {
+                        actions: monacoResult,
+                        dispose: () => { },
+                    };
+                }
+            },
+            resolveCodeAction: async (moncaoResult) => {
+                let codeResult = codeActions.get(moncaoResult);
+                if (codeResult) {
+                    codeResult = await ls.doCodeActionResolve(codeResult);
+                    if (codeResult) {
+                        moncaoResult = code2monaco.asCodeAction(codeResult);
+                        codeActions.set(moncaoResult, codeResult);
+                    }
+                }
+                return moncaoResult;
+            },
+        }),
+        monaco.languages.registerDocumentFormattingEditProvider(lang, {
+            provideDocumentFormattingEdits: async (model, options) => {
+                const document = getTextDocument(model);
+                if (document) {
+                    const codeResult = await ds.format(
+                        document,
+                        monaco2code.asFormattingOptions(options),
+                    );
+                    if (codeResult) {
+                        return codeResult.map(code2monaco.asTextEdit);
+                    }
+                }
+            },
+        }),
+        monaco.languages.registerDocumentRangeFormattingEditProvider(lang, {
+            provideDocumentRangeFormattingEdits: async (model, range, options) => {
+                const document = getTextDocument(model);
+                if (document) {
+                    const codeResult = await ds.format(
+                        document,
+                        monaco2code.asFormattingOptions(options),
+                        monaco2code.asRange(range),
+                    );
+                    if (codeResult) {
+                        return codeResult.map(code2monaco.asTextEdit);
+                    }
+                }
+            },
+        }),
+        monaco.languages.registerOnTypeFormattingEditProvider(lang, {
+            autoFormatTriggerCharacters: ['}', ';', '\n'],
+            provideOnTypeFormattingEdits: async (model, position, ch, options) => {
+                const document = getTextDocument(model);
+                if (document) {
+                    const codeResult = await ds.format(
+                        document,
+                        monaco2code.asFormattingOptions(options),
+                        undefined,
+                        {
+                            ch: ch,
+                            position: monaco2code.asPosition(position),
+                        },
+                    );
+                    if (codeResult) {
+                        return codeResult.map(code2monaco.asTextEdit);
+                    }
+                }
+                return [];
+            },
+        }),
+        monaco.languages.registerLinkProvider(lang, {
+            provideLinks: async (model) => {
+                const codeResult = await ls.findDocumentLinks(
+                    model.uri.toString(),
+                );
+                if (codeResult) {
+                    return {
+                        links: codeResult.map(code2monaco.asLink),
+                    };
+                }
+            },
+        }),
+        monaco.languages.registerCompletionItemProvider(lang, {
+            // https://github.com/johnsoncodehk/volar/blob/2f786182250d27e99cc3714fbfc7d209616e2289/packages/vue-language-server/src/registers/registerlanguageFeatures.ts#L57
+            triggerCharacters: '!@#$%^&*()_+-=`~{}|[]\:";\'<>?,./ '.split(''),
+            provideCompletionItems: async (model, position, context) => {
+                const codeResult = await ls.doComplete(
+                    model.uri.toString(),
+                    monaco2code.asPosition(position),
+                    monaco2code.asCompletionContext(context),
+                );
+                const monacoResult = code2monaco.asCompletionList(codeResult);
+                for (let i = 0; i < codeResult.items.length; i++) {
+                    completionItems.set(monacoResult.suggestions[i], codeResult.items[i]);
+                }
+                return monacoResult;
+            },
+            resolveCompletionItem: async (monacoItem, token) => {
+                let codeItem = completionItems.get(monacoItem);
+                if (codeItem) {
+                    codeItem = await ls.doCompletionResolve(codeItem);
+                    monacoItem = code2monaco.asCompletionItem(codeItem);
+                    completionItems.set(monacoItem, codeItem);
+                }
+                return monacoItem;
+            },
+        }),
+        monaco.languages.registerColorProvider(lang, {
+            provideDocumentColors: async (model) => {
+                const document = getTextDocument(model);
+                if (document) {
+                    const codeResult = await ds.findDocumentColors(document);
+                    if (codeResult) {
+                        return codeResult.map(code2monaco.asColorInformation);
+                    }
+                }
+            },
+            provideColorPresentations: async (model, monacoResult) => {
+                const document = getTextDocument(model);
+                const codeResult = colorInformations.get(monacoResult);
+                if (document && codeResult) {
+                    const codeColors = await ds.getColorPresentations(
+                        document,
+                        codeResult.color,
+                        {
+                            start: document.positionAt(0),
+                            end: document.positionAt(document.getText().length),
+                        },
+                    );
+                    if (codeColors) {
+                        return codeColors.map(code2monaco.asColorPresentation);
+                    }
+                }
+            },
+        }),
+        monaco.languages.registerFoldingRangeProvider(lang, {
+            provideFoldingRanges: async (model) => {
+                const document = getTextDocument(model);
+                if (document) {
+                    const codeResult = await ds.getFoldingRanges(document);
+                    if (codeResult) {
+                        return codeResult.map(code2monaco.asFoldingRange);
+                    }
+                }
+            },
+        }),
+        // same with DefinitionProvider
+        monaco.languages.registerDeclarationProvider(lang, {
+            provideDeclaration: async (model, position) => {
+                const codeResult = await ls.findDefinition(
+                    model.uri.toString(),
+                    monaco2code.asPosition(position),
+                );
+                if (codeResult) {
+                    return codeResult.map(code2monaco.asLocation);
+                }
+            },
+        }),
+        monaco.languages.registerSelectionRangeProvider(lang, {
+            provideSelectionRanges: async (model, positions) => {
+                const document = getTextDocument(model);
+                if (document) {
+                    const codeResults = await Promise.all(positions.map(position => ds.getSelectionRanges(
+                        document,
+                        [monaco2code.asPosition(position)],
+                    )));
+                    return codeResults.map(codeResult => codeResult?.map(code2monaco.asSelectionRange) ?? []);
+                }
+            },
+        }),
     );
 
     return ls;
+
+    function getTextDocument(model: monaco.editor.ITextModel) {
+        let document = documents.get(model);
+        if (!document || document.version !== model.getVersionId()) {
+            document = vscode.TextDocument.create(
+                model.uri.toString(),
+                model.getLanguageId(),
+                model.getVersionId(),
+                model.getValue(),
+            );
+            documents.set(model, document);
+        }
+        return document;
+    }
 }
+
+const _diagnostics = new WeakMap<monaco.editor.IMarkerData, vscode.Diagnostic>();
 
 export function setupValidate(editor: monaco.editor.IStandaloneCodeEditor, ls: LanguageService) {
     const worker = async () => {
@@ -303,13 +576,13 @@ export function setupValidate(editor: monaco.editor.IStandaloneCodeEditor, ls: L
             monaco.editor.setModelMarkers(
                 model,
                 lang,
-                unfinishResult.map(code2monaco.asMarkerData),
+                toMarkers(unfinishResult),
             );
         });
         monaco.editor.setModelMarkers(
             model,
             lang,
-            diagnostics.map(code2monaco.asMarkerData),
+            toMarkers(diagnostics),
         );
     };
 
@@ -323,4 +596,12 @@ export function setupValidate(editor: monaco.editor.IStandaloneCodeEditor, ls: L
             worker();
         }),
     );
+}
+
+function toMarkers(errors: vscode.Diagnostic[]) {
+    return errors.map(error => {
+        const marker = code2monaco.asMarkerData(error);
+        _diagnostics.set(marker, error);
+        return marker;
+    });
 }
