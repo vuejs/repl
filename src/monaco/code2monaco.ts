@@ -426,3 +426,13 @@ export function asColorPresentation(item: vscode.ColorPresentation): monaco.lang
         additionalTextEdits: item.additionalTextEdits ? item.additionalTextEdits.map(asTextEdit) : undefined,
     };
 }
+
+export function asFoldingRange(item: vscode.FoldingRange): monaco.languages.FoldingRange {
+    return {
+        start: item.startLine,
+        end: item.endLine,
+        kind: {
+            value: item.kind ?? '',
+        },
+    };
+}

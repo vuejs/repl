@@ -509,6 +509,17 @@ export async function setupLs(modelsMap: Ref<Map<string, monaco.editor.ITextMode
                 }
             },
         }),
+        monaco.languages.registerFoldingRangeProvider(lang, {
+            provideFoldingRanges: async (model) => {
+                const document = getTextDocument(model);
+                if (document) {
+                    const codeResult = await ds.getFoldingRanges(document);
+                    if (codeResult) {
+                        return codeResult.map(code2monaco.asFoldingRange);
+                    }
+                }
+            },
+        }),
     );
 
     return ls;
