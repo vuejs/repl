@@ -76,19 +76,25 @@ export async function setupLs(modelsMap: Ref<Map<string, monaco.editor.ITextMode
     monaco.languages.typescript.typescriptDefaults.addExtraLib(libDtsModel.getValue(), libDtsUrl.toString());
 
     const host: LanguageServiceHost = {
+        readFile(fileName) {
+            return modelsMap.value.get(fileName)?.getValue();
+        },
+        fileExists(fileName) {
+            return modelsMap.value.has(fileName);
+        },
         getCompilationSettings(): ts.CompilerOptions {
             console.log('getCompilationSettings');
             return {
                 ...ts.getDefaultCompilerOptions(),
+                allowJs: true,
+                jsx: ts.JsxEmit.Preserve,
                 module: ts.ModuleKind.ESNext,
                 moduleResolution: ts.ModuleResolutionKind.NodeJs,
                 lib: [...localMap.keys(), ...nodeModulesMap.keys()],
             };
         },
         getVueCompilationSettings() {
-            return {
-                experimentalCompatMode: 3
-            }
+            return {};
         },
         getScriptFileNames(): string[] {
             console.log('getScriptFileNames');
@@ -216,8 +222,8 @@ export async function setupLs(modelsMap: Ref<Map<string, monaco.editor.ITextMode
                     contents: (Array.isArray(info.contents)
                         ? (info.contents as string[])
                         : typeof info.contents === 'string'
-                        ? [info.contents]
-                        : [info.contents.value]
+                            ? [info.contents]
+                            : [info.contents.value]
                     ).map((x) => ({
                         value: x,
                     })),
@@ -283,7 +289,7 @@ export async function setupLs(modelsMap: Ref<Map<string, monaco.editor.ITextMode
                         activeSignature: result.activeSignature!,
                         activeParameter: result.activeParameter!,
                     },
-                    dispose: () => {},
+                    dispose: () => { },
                 };
             },
         }),
