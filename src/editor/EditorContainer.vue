@@ -1,41 +1,32 @@
 <script setup lang="ts">
 import FileSelector from './FileSelector.vue'
-import Monaco from '../monaco/Monaco.vue'
 import Message from '../Message.vue'
-import { computed, inject } from 'vue'
+import { debounce } from '../utils'
+import { inject, toRef } from 'vue'
 import { Store } from '../store'
+import { EditorComponentType } from '../types'
+
+const props = defineProps<{
+    editorComponent: EditorComponentType
+}>()
+
+const EditorComponent = toRef(props, 'editorComponent')
 
 const store = inject('store') as Store
 
-const onChange = (code: string) => {
+const onChange = debounce((code: string) => {
   store.state.activeFile.code = code
-}
+}, 250)
 
-const language = computed(() => {
-  const { filename } = store.state.activeFile
-  if (filename.endsWith('.vue')) {
-    return 'vue'
-  }
-  if (filename.endsWith('.html')) {
-    return 'html'
-  }
-  if (filename.endsWith('.css')) {
-    return 'css'
-  }
-  if (filename.endsWith('.ts')) {
-    return 'typescript'
-  }
-  return 'javascript'
-})
 </script>
 
 <template>
   <FileSelector />
   <div class="editor-container">
-    <Monaco
+    <EditorComponent
+      @change="onChange"
       :value="store.state.activeFile.code"
-      :language="language"
-      @save="onChange"
+      :filename="store.state.activeFile.filename"
     />
     <Message :err="store.state.errors[0]" />
   </div>

@@ -15,6 +15,7 @@
     "esModuleInterop": true,
     "removeComments": false,
     "lib": ["esnext", "dom"],
+    "jsx": "preserve",
     "rootDir": "."
   },
   "include": ["src", "test", "vite.config.ts"]

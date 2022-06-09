@@ -1,13 +1,16 @@
 <script setup lang="ts">
 import Preview from './Preview.vue'
-import Monaco from '../monaco/Monaco.vue'
 import { Store } from '../store'
-import { inject, ref, computed } from 'vue'
+import { inject, ref, computed, toRef } from 'vue'
 import type { OutputModes } from './types'
+import { EditorComponentType } from '../types'
 
 const props = defineProps<{
   showCompileOutput?: boolean
+  editorComponent: EditorComponentType
 }>()
+
+const EditorComponent = toRef(props, 'editorComponent')
 
 const store = inject('store') as Store
 const modes = computed(() =>
@@ -36,10 +39,10 @@ const mode = ref<OutputModes>(
 
   <div class="output-container">
     <Preview :show="mode === 'preview'" />
-    <Monaco
+    <EditorComponent
       v-if="mode !== 'preview'"
       readonly
-      :language="mode === 'css' ? 'css' : 'javascript'"
+      :filename="mode === 'css' ? 'a.css' : 'a.js'"
       :value="store.state.activeFile.compiled[mode]"
     />
   </div>
