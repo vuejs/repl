@@ -9,13 +9,11 @@ import * as monaco from 'monaco-editor';
 import { setupThemePromise } from './utils';
 import { setupLs, getOrCreateModel, setupValidate } from './ls';
 
-interface Props {
+const props = withDefaults(defineProps<{
   value?: string
   language?: string;
   readonly?: boolean
-}
-
-const props = withDefaults(defineProps<Props>(), {
+}>(), {
   value: '',
   readonly: false
 })
