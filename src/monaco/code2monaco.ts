@@ -99,7 +99,7 @@ export function asTextEdit(edit: vscode.TextEdit): monaco.languages.TextEdit {
 }
 
 export function asCompletionItemRange(textEdit: vscode.CompletionItem['textEdit']): monaco.languages.CompletionItem['range'] {
-    if (textEdit && 'insert' in textEdit && 'replace' in textEdit) {
+    if (textEdit && vscode.InsertReplaceEdit.is(textEdit)) {
         const result: monaco.languages.CompletionItemRanges = {
             insert: asRange(textEdit.insert),
             replace: asRange(textEdit.replace),
@@ -142,7 +142,7 @@ export function asMarkdownString(markdownString: vscode.Hover['contents']): mona
 }
 
 export function asLocation(definition: vscode.LocationLink | vscode.Location): monaco.languages.Location {
-    if ('targetUri' in definition) {
+    if (vscode.LocationLink.is(definition)) {
         return {
             uri: asUri(definition.targetUri),
             range: asRange(definition.targetRange),
@@ -226,4 +226,62 @@ export function asMarkerSeverity(severity: vscode.DiagnosticSeverity | undefined
         default:
             return monaco.MarkerSeverity.Info;
     }
+}
+
+export function asWorkspaceEdit(workspaceEdit: vscode.WorkspaceEdit): monaco.languages.WorkspaceEdit {
+    const result: monaco.languages.WorkspaceEdit = {
+        edits: [],
+    };
+    if (workspaceEdit.changes) {
+        for (const uri in workspaceEdit.changes) {
+            const edits = workspaceEdit.changes[uri];
+            for (const edit of edits) {
+                result.edits.push({
+                    resource: asUri(uri),
+                    edit: asTextEdit(edit),
+                });
+            }
+        }
+    }
+    if (workspaceEdit.documentChanges) {
+        for (const documentChange of workspaceEdit.documentChanges) {
+            if (vscode.TextDocumentEdit.is(documentChange)) {
+                for (const edit of documentChange.edits) {
+                    result.edits.push({
+                        resource: asUri(documentChange.textDocument.uri),
+                        edit: asTextEdit(edit),
+                    });
+                }
+            }
+            else if (vscode.CreateFile.is(documentChange)) {
+                result.edits.push({
+                    newUri: asUri(documentChange.uri),
+                    options: {
+                        overwrite: documentChange.options?.overwrite ?? false,
+                        ignoreIfExists: documentChange.options?.ignoreIfExists ?? false,
+                    },
+                });
+            }
+            else if (vscode.RenameFile.is(documentChange)) {
+                result.edits.push({
+                    oldUri: asUri(documentChange.oldUri),
+                    newUri: asUri(documentChange.newUri),
+                    options: {
+                        overwrite: documentChange.options?.overwrite ?? false,
+                        ignoreIfExists: documentChange.options?.ignoreIfExists ?? false,
+                    },
+                });
+            }
+            else if (vscode.DeleteFile.is(documentChange)) {
+                result.edits.push({
+                    oldUri: asUri(documentChange.uri),
+                    options: {
+                        recursive: documentChange.options?.recursive ?? false,
+                        ignoreIfNotExists: documentChange.options?.ignoreIfNotExists ?? false,
+                    },
+                });
+            }
+        }
+    }
+    return result;
 }
