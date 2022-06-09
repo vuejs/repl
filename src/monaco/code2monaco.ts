@@ -436,3 +436,9 @@ export function asFoldingRange(item: vscode.FoldingRange): monaco.languages.Fold
         },
     };
 }
+
+export function asSelectionRange(item: vscode.SelectionRange): monaco.languages.SelectionRange {
+    return {
+        range: asRange(item.range),
+    };
+}

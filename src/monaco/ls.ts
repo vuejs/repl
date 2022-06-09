@@ -532,6 +532,18 @@ export async function setupLs(modelsMap: Ref<Map<string, monaco.editor.ITextMode
                 }
             },
         }),
+        monaco.languages.registerSelectionRangeProvider(lang, {
+            provideSelectionRanges: async (model, positions) => {
+                const document = getTextDocument(model);
+                if (document) {
+                    const codeResults = await Promise.all(positions.map(position => ds.getSelectionRanges(
+                        document,
+                        [monaco2code.asPosition(position)],
+                    )));
+                    return codeResults.map(codeResult => codeResult?.map(code2monaco.asSelectionRange) ?? []);
+                }
+            },
+        }),
     );
 
     return ls;
