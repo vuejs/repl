@@ -364,3 +364,23 @@ export function asSymbolKind(kind: vscode.SymbolKind): monaco.languages.SymbolKi
             return monaco.languages.SymbolKind.File;
     }
 }
+
+export function asDocumentHighlight(highlight: vscode.DocumentHighlight): monaco.languages.DocumentHighlight {
+    return {
+        range: asRange(highlight.range),
+        kind: asDocumentHighlightKind(highlight.kind),
+    };
+}
+
+export function asDocumentHighlightKind(kind: vscode.DocumentHighlightKind | undefined): monaco.languages.DocumentHighlightKind {
+    switch (kind) {
+        case vscode.DocumentHighlightKind.Text:
+            return monaco.languages.DocumentHighlightKind.Text;
+        case vscode.DocumentHighlightKind.Read:
+            return monaco.languages.DocumentHighlightKind.Read;
+        case vscode.DocumentHighlightKind.Write:
+            return monaco.languages.DocumentHighlightKind.Write;
+        default:
+            return monaco.languages.DocumentHighlightKind.Text;
+    }
+}
