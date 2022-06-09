@@ -75,12 +75,18 @@ export async function setupLs(modelsMap: Ref<Map<string, monaco.editor.ITextMode
     monaco.languages.typescript.typescriptDefaults.addExtraLib(libPromiseModel.getValue(), libPromiseUrl.toString());
     monaco.languages.typescript.typescriptDefaults.addExtraLib(libDtsModel.getValue(), libDtsUrl.toString());
 
+    const scriptSnapshots = new Map<string, ts.IScriptSnapshot>();
+
     const host: LanguageServiceHost = {
         readFile(fileName) {
-            return modelsMap.value.get(fileName)?.getValue();
+            return modelsMap.value.get(fileName)?.getValue()
+                ?? localMap.get(fileName)?.getValue()
+                ?? nodeModulesMap.get(fileName)?.getValue();
         },
         fileExists(fileName) {
-            return modelsMap.value.has(fileName);
+            return modelsMap.value.has(fileName)
+                || localMap.has(fileName)
+                || nodeModulesMap.has(fileName);
         },
         getCompilationSettings(): ts.CompilerOptions {
             console.log('getCompilationSettings');
@@ -112,16 +118,15 @@ export async function setupLs(modelsMap: Ref<Map<string, monaco.editor.ITextMode
         },
         getScriptSnapshot(fileName: string): ts.IScriptSnapshot | undefined {
             console.log('getScriptSnapshot', fileName);
-            if (localMap.has(fileName)) {
-                return ts.ScriptSnapshot.fromString(localMap.get(fileName)!.getValue());
+            let scriptSnapshot = scriptSnapshots.get(fileName);
+            if (!scriptSnapshot || scriptSnapshot.getText(0, scriptSnapshot.getLength()) !== this.readFile(fileName)) {
+                const fileContent = this.readFile(fileName);
+                if (fileContent !== undefined) {
+                    scriptSnapshot = ts.ScriptSnapshot.fromString(fileContent);
+                    scriptSnapshots.set(fileName, scriptSnapshot);
+                }
             }
-            if (nodeModulesMap.has(fileName)) {
-                return ts.ScriptSnapshot.fromString(nodeModulesMap.get(fileName)!.getValue());
-            }
-            if (modelsMap.value.has(fileName)) {
-                return ts.ScriptSnapshot.fromString(modelsMap.value.get(fileName)!.getValue());
-            }
-            return undefined;
+            return scriptSnapshot;
         },
         getCurrentDirectory(): string {
             console.log('getCurrentDirectory');
