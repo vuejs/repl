@@ -1,9 +1,14 @@
 import * as monaco from 'monaco-editor';
 import * as vscode from 'vscode-languageserver-types';
 
-function vscodeCompletionItemKindToMonaco(
-    kind: vscode.CompletionItemKind | undefined,
-): monaco.languages.CompletionItemKind {
+export function asCompletionList(list: vscode.CompletionList): monaco.languages.CompletionList {
+    return {
+        incomplete: list.isIncomplete,
+        suggestions: list.items.map(asCompletionItem),
+    };
+}
+
+export function asCompletionItemKind(kind: vscode.CompletionItemKind | undefined): monaco.languages.CompletionItemKind {
     switch (kind) {
         case vscode.CompletionItemKind.Method:
             return monaco.languages.CompletionItemKind.Method;
@@ -60,12 +65,59 @@ function vscodeCompletionItemKindToMonaco(
     }
 }
 
-export function vscodeCompletionItemToMonaco(item: vscode.CompletionItem): monaco.languages.CompletionItem {
+export function asCompletionItem(item: vscode.CompletionItem): monaco.languages.CompletionItem {
     return {
         label: item.label,
-        insertText: item.insertText ?? item.label,
-        kind: vscodeCompletionItemKindToMonaco(item.kind),
+        kind: asCompletionItemKind(item.kind),
+        tags: item.tags,
+        detail: item.detail,
+        documentation: item.documentation,
         sortText: item.sortText,
-        range: undefined!,
+        filterText: item.filterText,
+        preselect: item.preselect,
+        insertText: item.textEdit?.newText ?? item.insertText ?? item.label,
+        range: asCompletionItemRange(item.textEdit),
+        commitCharacters: item.commitCharacters,
+        additionalTextEdits: item.additionalTextEdits?.map(asTextEdit),
+        command: item.command ? asCommand(item.command) : undefined,
+    };
+}
+
+export function asCommand(command: vscode.Command): monaco.languages.Command {
+    return {
+        id: command.command,
+        title: command.title,
+        arguments: command.arguments,
+    };
+}
+
+export function asTextEdit(edit: vscode.TextEdit): monaco.languages.TextEdit {
+    return {
+        range: asRange(edit.range),
+        text: edit.newText,
+    };
+}
+
+export function asCompletionItemRange(textEdit: vscode.CompletionItem['textEdit']): monaco.languages.CompletionItem['range'] {
+    if (textEdit && 'insert' in textEdit && 'replace' in textEdit) {
+        const result: monaco.languages.CompletionItemRanges = {
+            insert: asRange(textEdit.insert),
+            replace: asRange(textEdit.replace),
+        };
+        return result;
+    }
+    else if (textEdit) {
+        return asRange(textEdit.range);
+    }
+    // @ts-expect-error
+    return undefined;
+}
+
+export function asRange(range: vscode.Range): monaco.IRange {
+    return {
+        startLineNumber: range.start.line + 1,
+        startColumn: range.start.character + 1,
+        endLineNumber: range.end.line + 1,
+        endColumn: range.end.character + 1,
     };
 }

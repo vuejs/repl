@@ -5,7 +5,7 @@ import * as ts from 'typescript/lib/tsserverlibrary';
 import { createLanguageService, type LanguageService, type LanguageServiceHost } from '@volar/vue-language-service';
 import type { Ref } from 'vue';
 import { onBeforeUnmount, ref } from 'vue';
-import { vscodeCompletionItemToMonaco } from './converter';
+import * as code2monaco from './code2monaco';
 import libEs5Content from 'typescript/lib/lib.es5.d.ts?raw';
 import libDomContent from 'typescript/lib/lib.dom.d.ts?raw';
 import libDtsContent from 'typescript/lib/lib.d.ts?raw';
@@ -193,7 +193,8 @@ export async function setupLs(modelsMap: Ref<Map<string, monaco.editor.ITextMode
 
     disposables.value.push(
         monaco.languages.registerCompletionItemProvider(lang, {
-            triggerCharacters: ['.'],
+            // https://github.com/johnsoncodehk/volar/blob/2f786182250d27e99cc3714fbfc7d209616e2289/packages/vue-language-server/src/registers/registerlanguageFeatures.ts#L57
+            triggerCharacters: '!@#$%^&*()_+-=`~{}|[]\:";\'<>?,./ '.split(''),
             provideCompletionItems: async (model, position, context) => {
                 const result = await ls.doComplete(
                     model.uri.fsPath,
@@ -206,9 +207,7 @@ export async function setupLs(modelsMap: Ref<Map<string, monaco.editor.ITextMode
                         triggerCharacter: context.triggerCharacter,
                     },
                 );
-                return {
-                    suggestions: result.items.map(vscodeCompletionItemToMonaco),
-                };
+                return code2monaco.asCompletionList(result);
             },
         }),
     );
