@@ -442,3 +442,49 @@ export function asSelectionRange(item: vscode.SelectionRange): monaco.languages.
         range: asRange(item.range),
     };
 }
+
+export function asInlayHint(item: vscode.InlayHint): monaco.languages.InlayHint {
+    return {
+        label: asInlayHintLabel(item.label),
+        tooltip: item.tooltip,
+        command: undefined,
+        position: asPosition(item.position),
+        kind: item.kind ? asInlayHintKind(item.kind) : undefined,
+        paddingLeft: item.paddingLeft,
+        paddingRight: item.paddingRight,
+    };
+}
+
+export function asInlayHintKind(kind: vscode.InlayHintKind): monaco.languages.InlayHintKind {
+    switch (kind) {
+        case vscode.InlayHintKind.Parameter:
+            return monaco.languages.InlayHintKind.Parameter;
+        case vscode.InlayHintKind.Type:
+            return monaco.languages.InlayHintKind.Type;
+    }
+}
+
+export function asInlayHintLabel(label: vscode.InlayHint['label']): monaco.languages.InlayHint['label'] {
+    if (typeof label === 'string') {
+        return label;
+    }
+    else {
+        return label.map(asInlayHintLabelPart);
+    }
+}
+
+export function asInlayHintLabelPart(part: vscode.InlayHintLabelPart): monaco.languages.InlayHintLabelPart {
+    return {
+        label: part.value,
+        tooltip: part.tooltip,
+        command: part.command ? asCommand(part.command) : undefined,
+        location: part.location ? asLocation(part.location) : undefined,
+    };
+}
+
+export function asPosition(position: vscode.Position): monaco.Position {
+    return {
+        lineNumber: position.line + 1,
+        column: position.character + 1,
+    } as unknown as monaco.Position;
+}
