@@ -31,7 +31,7 @@ const editor = shallowRef<monaco.editor.IStandaloneCodeEditor | undefined>(undef
 
 const currentModel = shallowRef<monaco.editor.ITextModel>(
   getOrCreateModel(
-    monaco.Uri.parse('playground:///demo.vue'),
+    monaco.Uri.parse('file:///demo.vue'),
     'vue',
     props.value ?? ''
   )
