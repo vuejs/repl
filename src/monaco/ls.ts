@@ -194,6 +194,7 @@ export async function setupLs(modelsMap: Ref<Map<string, monaco.editor.ITextMode
     disposables.value.push(ls);
 
     const completionItems = new WeakMap<monaco.languages.CompletionItem, vscode.CompletionItem>();
+    const codeLens = new WeakMap<monaco.languages.CodeLens, vscode.CodeLens>();
     const documents = new WeakMap<monaco.editor.ITextModel, vscode.TextDocument>();
 
     disposables.value.push(
@@ -323,6 +324,34 @@ export async function setupLs(modelsMap: Ref<Map<string, monaco.editor.ITextMode
                 }
             },
         }),
+        monaco.languages.registerCodeLensProvider(lang, {
+            provideCodeLenses: async (model) => {
+                const codeResult = await ls.doCodeLens(
+                    model.uri.toString(),
+                );
+                if (codeResult) {
+                    const monacoResult = codeResult.map(code2monaco.asCodeLens);
+                    for (let i = 0; i < monacoResult.length; i++) {
+                        codeLens.set(monacoResult[i], codeResult[i]);
+                    }
+                    return {
+                        lenses: monacoResult,
+                        dispose: () => { },
+                    };
+                }
+            },
+            resolveCodeLens: async (model, moncaoResult) => {
+                let codeResult = codeLens.get(moncaoResult);
+                if (codeResult) {
+                    codeResult = await ls.doCodeLensResolve(codeResult);
+                    if (codeResult) {
+                        moncaoResult = code2monaco.asCodeLens(codeResult);
+                        codeLens.set(moncaoResult, codeResult);
+                    }
+                }
+                return moncaoResult;
+            },
+        }),
         monaco.languages.registerCompletionItemProvider(lang, {
             // https://github.com/johnsoncodehk/volar/blob/2f786182250d27e99cc3714fbfc7d209616e2289/packages/vue-language-server/src/registers/registerlanguageFeatures.ts#L57
             triggerCharacters: '!@#$%^&*()_+-=`~{}|[]\:";\'<>?,./ '.split(''),
@@ -334,9 +363,7 @@ export async function setupLs(modelsMap: Ref<Map<string, monaco.editor.ITextMode
                 );
                 const monacoResult = code2monaco.asCompletionList(codeResult);
                 for (let i = 0; i < codeResult.items.length; i++) {
-                    const codeItem = codeResult.items[i];
-                    const monacoItem = monacoResult.suggestions[i];
-                    completionItems.set(monacoItem, codeItem);
+                    completionItems.set(monacoResult.suggestions[i], codeResult.items[i]);
                 }
                 return monacoResult;
             },
