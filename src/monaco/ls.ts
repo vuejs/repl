@@ -190,8 +190,8 @@ export async function setupLs(modelsMap: Ref<Map<string, monaco.editor.ITextMode
             throw new Error('Function not implemented.');
         },
     };
-    const tsWithAny = ts as any;
-    tsWithAny.setSys(sys);
+    // @ts-expect-error
+    ts.setSys(sys);
 
     const configurationHost: ConfigurationHost = {
         getConfiguration<T>(seation: string): T {
