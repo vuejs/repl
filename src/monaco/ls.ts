@@ -289,6 +289,29 @@ export async function setupLs(modelsMap: Ref<Map<string, monaco.editor.ITextMode
                 }
             },
         }),
+        monaco.languages.registerDefinitionProvider(lang, {
+            provideDefinition: async (model, position) => {
+                const codeResult = await ls.findDefinition(
+                    model.uri.toString(),
+                    monaco2code.asPosition(position),
+                );
+                // TODO: can't show if only one result from libs
+                if (codeResult) {
+                    return codeResult.map(code2monaco.asLocation);
+                }
+            },
+        }),
+        monaco.languages.registerImplementationProvider(lang, {
+            provideImplementation: async (model, position) => {
+                const codeResult = await ls.findImplementations(
+                    model.uri.toString(),
+                    monaco2code.asPosition(position),
+                );
+                if (codeResult) {
+                    return codeResult.map(code2monaco.asLocation);
+                }
+            },
+        }),
         monaco.languages.registerCompletionItemProvider(lang, {
             // https://github.com/johnsoncodehk/volar/blob/2f786182250d27e99cc3714fbfc7d209616e2289/packages/vue-language-server/src/registers/registerlanguageFeatures.ts#L57
             triggerCharacters: '!@#$%^&*()_+-=`~{}|[]\:";\'<>?,./ '.split(''),
@@ -314,18 +337,6 @@ export async function setupLs(modelsMap: Ref<Map<string, monaco.editor.ITextMode
                     completionItems.set(monacoItem, codeItem);
                 }
                 return monacoItem;
-            },
-        }),
-        monaco.languages.registerDefinitionProvider(lang, {
-            provideDefinition: async (model, position) => {
-                const codeResult = await ls.findDefinition(
-                    model.uri.toString(),
-                    monaco2code.asPosition(position),
-                );
-                // TODO: can't show if only one result from libs
-                if (codeResult) {
-                    return codeResult.map(code2monaco.asLocation);
-                }
             },
         }),
     );
