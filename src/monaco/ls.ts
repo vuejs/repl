@@ -43,7 +43,7 @@ onBeforeUnmount(() => {
     });
 });
 
-export async function setupLs(modelsMap: Ref<Map<string, monaco.editor.ITextModel>>): Promise<LanguageService> {
+export async function setupLs(editor: monaco.editor.IStandaloneCodeEditor, modelsMap: Ref<Map<string, monaco.editor.ITextModel>>): Promise<LanguageService> {
     const libEs5Url = monaco.Uri.parse('file:///lib.es5.d.ts');
     const libDomUrl = monaco.Uri.parse('file:///lib.dom.d.ts');
     const libDtsUrl = monaco.Uri.parse('file:///lib.d.ts');
@@ -215,6 +215,49 @@ export async function setupLs(modelsMap: Ref<Map<string, monaco.editor.ITextMode
     const documents = new WeakMap<monaco.editor.ITextModel, vscode.TextDocument>();
 
     disposables.value.push(
+        editor.onDidChangeModelContent(async e => {
+            const model = editor.getModel();
+            const monacoSelection = editor.getSelection();
+            if (model && monacoSelection && e.changes.length === 1) {
+                const document = documents.get(model);
+                if (document) {
+                    const range = monaco2code.asRange(monacoSelection);
+                    const change = e.changes[0];
+                    // auto-close-tag
+                    let edit = await ds.doAutoInsert(document, range.start, {
+                        lastChange: {
+                            range: monaco2code.asRange(change.range),
+                            rangeOffset: change.rangeOffset,
+                            rangeLength: change.rangeLength,
+                            text: change.text,
+                        },
+                    });
+                    if (!edit) {
+                        // auto .value
+                        edit = await ls.doAutoInsert(document.uri, range.start, {
+                            lastChange: {
+                                range: monaco2code.asRange(change.range),
+                                rangeOffset: change.rangeOffset,
+                                rangeLength: change.rangeLength,
+                                text: change.text,
+                            },
+                        });
+                    }
+                    if (edit) {
+                        if (typeof edit == 'string') {
+                            model.applyEdits([{
+                                range: monacoSelection,
+                                text: edit,
+                            }]);
+                        }
+                        else {
+                            model.applyEdits([code2monaco.asTextEdit(edit)]);
+                        }
+                    }
+                }
+            }
+        }),
+
         // TODO: registerTokensProviderFactory
         // TODO: setTokensProvider
         // TODO: setMonarchTokensProvider

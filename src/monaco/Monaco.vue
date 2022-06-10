@@ -52,8 +52,6 @@ onMounted(async () => {
     throw new Error("Cannot find containerRef");
   }
 
-  const ls = await setupLs(documentModelMap)
-
   const editorInstance = monaco.editor.create(containerRef.value, {
     theme,
     model: currentModel.value,
@@ -68,6 +66,8 @@ onMounted(async () => {
     },
   });
   editor.value = editorInstance
+
+  const ls = await setupLs(editorInstance, documentModelMap)
 
   await loadGrammars(editorInstance);
 

@@ -7,7 +7,7 @@ export function asPosition(position: monaco.Position): vscode.Position {
     );
 }
 
-export function asRange(range: monaco.Range): vscode.Range {
+export function asRange(range: monaco.IRange): vscode.Range {
     return vscode.Range.create(
         range.startLineNumber - 1,
         range.startColumn - 1,
