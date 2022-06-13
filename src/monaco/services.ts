@@ -1,4 +1,4 @@
-import { worker } from 'monaco-editor-core';
+import type { worker } from 'monaco-editor-core';
 // import { prepareServiceVirtualFiles } from './prepare';
 import * as ts from 'typescript/lib/tsserverlibrary';
 import {
@@ -11,42 +11,64 @@ import {
 } from '@volar/vue-language-service';
 
 export function getLanguageServiceAndDocumentsService(
-    getModelsMap: () => Map<string, worker.IMirrorModel>
+    getModels: () => worker.IMirrorModel[],
+    getExtraLibs: () => Record<string, string>
 ) {
     const scriptSnapshots = new Map<string, ts.IScriptSnapshot>();
 
+    const findInModels = (fileName: string) => {
+        return getModels().find(x => {
+            return x.uri.toString() === fileName || x.uri.fsPath === fileName
+        });
+    }
+
+    const findInExtraLibs = (fileName: string): string | undefined => {
+        return getExtraLibs()[fileName];
+    }
+
     const host: LanguageServiceHost = {
         readFile(fileName) {
-            const modelsMap = getModelsMap();
-            return modelsMap.get(fileName)?.getValue()
+            const model = findInModels(fileName);
+            if (model) {
+                return model.getValue()
+            }
+
+            const extraLibs = findInExtraLibs(fileName);
+            return extraLibs
         },
         fileExists(fileName) {
-            const modelsMap = getModelsMap();
-            return modelsMap.has(fileName)
+            return !!(findInModels(fileName) || findInExtraLibs(fileName))
         },
         getCompilationSettings(): ts.CompilerOptions {
-            console.log('getCompilationSettings');
-            const modelsMap = getModelsMap();
             return {
                 ...ts.getDefaultCompilerOptions(),
                 allowJs: true,
                 jsx: ts.JsxEmit.Preserve,
                 module: ts.ModuleKind.ESNext,
                 moduleResolution: ts.ModuleResolutionKind.NodeJs,
-                lib: [...modelsMap.keys()],
             };
         },
         getVueCompilationSettings() {
             return {};
         },
         getScriptFileNames(): string[] {
-            console.log('getScriptFileNames');
-            const modelsMap = getModelsMap();
-            return [...Array.from(modelsMap.keys())];
+            const modelNames = getModels().map(x => x.uri.fsPath);
+            const extraLibNames = Object.keys(getExtraLibs());
+            const fileNames = [...modelNames, ...extraLibNames];
+            return fileNames;
         },
         getScriptVersion(fileName: string): string {
-            const modelsMap = getModelsMap();
-            return modelsMap.get(fileName)?.version?.toString() ?? 'unknown version';
+            const model = findInModels(fileName);
+            if (model) {
+                return `${model.version}`
+            }
+
+            const extraLibs = findInExtraLibs(fileName);
+            if (extraLibs) {
+                return '1'
+            }
+
+            return 'unknown version';
         },
         getScriptSnapshot(fileName: string): ts.IScriptSnapshot | undefined {
             console.log('getScriptSnapshot', fileName);

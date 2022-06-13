@@ -1,4 +1,4 @@
-import { Uri, editor, languages } from 'monaco-editor-core';
+import { Uri, languages } from 'monaco-editor-core';
 
 import libEs5Content from 'typescript/lib/lib.es5.d.ts?raw';
 import libDomContent from 'typescript/lib/lib.dom.d.ts?raw';
@@ -17,10 +17,10 @@ export function prepareServiceVirtualFiles() {
     const libDtsUrl = Uri.parse('file:///lib.d.ts');
     const libPromiseUrl = Uri.parse('file:///lib.es2015.promise.d.ts');
 
-    const libEs5Model = getOrCreateModel(libEs5Url, 'typescript', libEs5Content);
-    const libDomModel = getOrCreateModel(libDomUrl, 'typescript', libDomContent);
-    const libDtsModel = getOrCreateModel(libDtsUrl, 'typescript', libDtsContent);
-    const libPromiseModel = getOrCreateModel(libPromiseUrl, 'typescript', libPromiseContent);
+    const libEs5Model = getOrCreateModel(libEs5Url, undefined, libEs5Content);
+    const libDomModel = getOrCreateModel(libDomUrl, undefined, libDomContent);
+    const libDtsModel = getOrCreateModel(libDtsUrl, undefined, libDtsContent);
+    const libPromiseModel = getOrCreateModel(libPromiseUrl, undefined, libPromiseContent);
 
     const vueUrl = Uri.parse('file:///node_modules/vue/index.d.ts');
     const vueRuntimeDomUrl = Uri.parse('file:///node_modules/%40vue/runtime-dom/index.d.ts');
@@ -28,32 +28,20 @@ export function prepareServiceVirtualFiles() {
     const vueSharedUrl = Uri.parse('file:///node_modules/%40vue/shared/index.d.ts');
     const vueReactivityUrl = Uri.parse('file:///node_modules/%40vue/reactivity/index.d.ts');
 
-    const vueModel = getOrCreateModel(vueUrl, 'typescript', vueContent);
-    const vueRuntimeDomModel = getOrCreateModel(vueRuntimeDomUrl, 'typescript', vueRuntimeDomContent);
-    const vueRuntimeCoreModel = getOrCreateModel(vueRuntimeCoreUrl, 'typescript', vueRuntimeCoreContent);
-    const vueSharedModel = getOrCreateModel(vueSharedUrl, 'typescript', vueSharedContent);
-    const vueReactivityModel = getOrCreateModel(vueReactivityUrl, 'typescript', vueReactivityContent);
+    const vueModel = getOrCreateModel(vueUrl, undefined, vueContent);
+    const vueRuntimeDomModel = getOrCreateModel(vueRuntimeDomUrl, undefined, vueRuntimeDomContent);
+    const vueRuntimeCoreModel = getOrCreateModel(vueRuntimeCoreUrl, undefined, vueRuntimeCoreContent);
+    const vueSharedModel = getOrCreateModel(vueSharedUrl, undefined, vueSharedContent);
+    const vueReactivityModel = getOrCreateModel(vueReactivityUrl, undefined, vueReactivityContent);
 
-    const localMap = new Map<string, editor.ITextModel>();
-    localMap.set(libEs5Url.fsPath, libEs5Model);
-    localMap.set(libDomUrl.fsPath, libDomModel);
-    localMap.set(libPromiseUrl.fsPath, libPromiseModel);
-    localMap.set(libDtsUrl.fsPath, libDtsModel);
+    languages.vue.vueDefaults.addExtraLib(libEs5Model.uri.fsPath, libEs5Model.getValue());
+    languages.vue.vueDefaults.addExtraLib(libDomModel.uri.fsPath, libDomModel.getValue());
+    languages.vue.vueDefaults.addExtraLib(libPromiseModel.uri.fsPath, libPromiseModel.getValue());
+    languages.vue.vueDefaults.addExtraLib(libDtsModel.uri.fsPath, libDtsModel.getValue());
 
-    const nodeModulesMap = new Map<string, editor.ITextModel>();
-    nodeModulesMap.set(vueUrl.fsPath, vueModel);
-    nodeModulesMap.set(vueRuntimeDomUrl.fsPath, vueRuntimeDomModel);
-    nodeModulesMap.set(vueRuntimeCoreUrl.fsPath, vueRuntimeCoreModel);
-    nodeModulesMap.set(vueSharedUrl.fsPath, vueSharedModel);
-    nodeModulesMap.set(vueReactivityUrl.fsPath, vueReactivityModel);
-
-    languages.typescript.typescriptDefaults.addExtraLib(libEs5Model.getValue(), libEs5Url.toString());
-    languages.typescript.typescriptDefaults.addExtraLib(libDomModel.getValue(), libDomUrl.toString());
-    languages.typescript.typescriptDefaults.addExtraLib(libPromiseModel.getValue(), libPromiseUrl.toString());
-    languages.typescript.typescriptDefaults.addExtraLib(libDtsModel.getValue(), libDtsUrl.toString());
-
-    return {
-        localMap,
-        nodeModulesMap
-    }
+    languages.vue.vueDefaults.addExtraLib(vueModel.uri.fsPath, vueModel.getValue());
+    languages.vue.vueDefaults.addExtraLib(vueRuntimeDomModel.uri.fsPath, vueRuntimeDomModel.getValue());
+    languages.vue.vueDefaults.addExtraLib(vueRuntimeCoreModel.uri.fsPath, vueRuntimeCoreModel.getValue());
+    languages.vue.vueDefaults.addExtraLib(vueSharedModel.uri.fsPath, vueSharedModel.getValue());
+    languages.vue.vueDefaults.addExtraLib(vueReactivityModel.uri.fsPath, vueReactivityModel.getValue());
 }

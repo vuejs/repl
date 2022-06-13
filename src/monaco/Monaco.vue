@@ -2,13 +2,14 @@
 import { setupMonacoEnv } from './env';
 setupMonacoEnv();
 import './monaco.contribution'
+
 </script>
 <script lang="ts" setup>
 import { onMounted, onBeforeUnmount, ref, shallowRef, nextTick, watchEffect } from 'vue';
 import { loadGrammars } from './grammars';
 import * as monaco from 'monaco-editor-core';
+import { prepareServiceVirtualFiles } from './prepare';
 import { setupThemePromise, getOrCreateModel } from './utils';
-// import { setupLs, setupValidate } from './ls';
 
 const props = withDefaults(defineProps<{
   value?: string
@@ -36,9 +37,7 @@ const currentModel = shallowRef<monaco.editor.ITextModel>(
   )
 )
 
-// const documentModelMap = shallowRef(new Map([[
-//   currentModel.value.uri.fsPath, currentModel.value
-// ]]))
+prepareServiceVirtualFiles()
 
 watchEffect(() => {
   if (currentModel.value.getValue() !== props.value) {
@@ -81,10 +80,6 @@ onMounted(async () => {
   editorInstance.onDidChangeModelContent(() => {
     emits('change', editorInstance.getValue());
   });
-
-
-
-  // setupValidate(editorInstance, ls);
 });
 
 onBeforeUnmount(() => {

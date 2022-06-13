@@ -39,7 +39,6 @@ export default defineConfig({
     
     rollupOptions: {
       input: {
-        'main': './index.html',
         'vue-repl': './src/index.ts',
         'vue-repl-monaco-editor': './src/editor/MonacoEditor.vue',
       },

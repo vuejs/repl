@@ -3,7 +3,7 @@ import { loadWASM } from 'onigasm';
 import { theme } from './themes/converted';
 import onigasm from 'onigasm/lib/onigasm.wasm?url'
 
-export function getOrCreateModel(uri: Uri, lang: string, value: string) {
+export function getOrCreateModel(uri: Uri, lang: string | undefined, value: string) {
   const model = editor.getModel(uri);
   if (model) {
       model.setValue(value);

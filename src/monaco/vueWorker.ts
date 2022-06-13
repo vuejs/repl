@@ -1,405 +1,214 @@
-import { languages, editor, worker, CancellationToken, Position, Range } from 'monaco-editor-core';
+import type { worker } from 'monaco-editor-core';
 import { getLanguageServiceAndDocumentsService } from './services';
-import * as code2monaco from './code2monaco';
-import * as monaco2code from './monaco2code';
 import * as vscode from 'vscode-languageserver-protocol';
 
 export interface ICreateData {
 	languageId: string;
+    extraLibs?: Record<string, string>
 }
 
-export interface IVueWorker extends
-    languages.HoverProvider,
-    languages.DocumentSymbolProvider,
-    languages.DocumentHighlightProvider,
-    languages.LinkedEditingRangeProvider,
-    languages.DefinitionProvider,
-    languages.ImplementationProvider,
-    languages.TypeDefinitionProvider,
-    languages.CodeLensProvider,
-    languages.CodeActionProvider,
-    Omit<languages.DocumentFormattingEditProvider, 'displayName'>,
-    Omit<languages.DocumentRangeFormattingEditProvider, 'displayName'>,
-    languages.OnTypeFormattingEditProvider,
-    languages.LinkProvider,
-    languages.CompletionItemProvider,
-    languages.DocumentColorProvider,
-    languages.FoldingRangeProvider,
-    languages.DeclarationProvider,
-    languages.SignatureHelpProvider,
-    languages.RenameProvider,
-    languages.ReferenceProvider,
-    languages.SelectionRangeProvider,
-    languages.InlayHintsProvider {
+type LSType = ReturnType<typeof getLanguageServiceAndDocumentsService>["ls"]
+type DSType = ReturnType<typeof getLanguageServiceAndDocumentsService>["ds"]
 
-}
+type TailArgs<T extends (...args: any[]) => void> =
+    T extends (a: any, ...args: infer Args) => void ?
+    Args : never;
 
-export class WorkerTriggerCharacters {
-    autoFormatTriggerCharacters = ['}', ';', '\n']
-    
-    triggerCharacters = '!@#$%^&*()_+-=`~{}|[]\:";\'<>?,./ '.split('')
+type Args<T extends (...args: any[]) => void> =
+    T extends (...args: infer A) => void ?
+    A : never;
 
-    signatureHelpTriggerCharacters = ['(', ',']
-}
+export class VueWorker {
+    private _languageId: string;
+    private _ctx: worker.IWorkerContext;
 
-export class VueWorker extends WorkerTriggerCharacters implements IVueWorker {
-	private _ls: ReturnType<typeof getLanguageServiceAndDocumentsService>["ls"];
-	private _ds: ReturnType<typeof getLanguageServiceAndDocumentsService>["ds"];
-
-    private _completionItems = new WeakMap<languages.CompletionItem, vscode.CompletionItem>();
-    private _codeLens = new WeakMap<languages.CodeLens, vscode.CodeLens>();
-    private _codeActions = new WeakMap<languages.CodeAction, vscode.CodeAction>();
-    private _colorInformations = new WeakMap<languages.IColorInformation, vscode.ColorInformation>();
-    private _documents = new WeakMap<editor.ITextModel, vscode.TextDocument>();
-    private _diagnostics = new WeakMap<editor.IMarkerData, vscode.Diagnostic>();
+	private _ls: LSType;
+	private _ds: DSType;
+    private _extraLibs: Record<string, string>;
+    private _modelDocuments = new WeakMap<worker.IMirrorModel, vscode.TextDocument>();
 
     constructor (
         ctx: worker.IWorkerContext,
         createData: ICreateData
     ) {
-        super();
+        this._ctx = ctx;
+        this._languageId = createData.languageId;
+        this._extraLibs = createData.extraLibs ?? {}
 
-        const modelsMap = new Map(ctx.getMirrorModels().map(x => [x.uri.fsPath, x]));
-        const { ls, ds } = getLanguageServiceAndDocumentsService(() => modelsMap)
+        const { ls, ds } = getLanguageServiceAndDocumentsService(
+            () => this._ctx.getMirrorModels(),
+            () => this._extraLibs
+        )
         this._ls = ls;
         this._ds = ds;
     }
 
-    getTextDocument(model: editor.ITextModel) {
-        let document = this._documents.get(model);
-        if (!document || document.version !== model.getVersionId()) {
+    updateExtraLibs(extraLibs: Record<string, string>) {
+        this._extraLibs = extraLibs;
+    }
+
+    private runWithDocument<T>(uri: string, callback: (doc: vscode.TextDocument) => T) {
+        const model = this._ctx.getMirrorModels().find(x => x.uri);
+        if (model) {
+            const document = this.getModelDocument(model);
+            return callback(document)
+        }
+    }
+
+    async doDSAutoInsert (uri: string, ...args: TailArgs<DSType['doAutoInsert']>) {
+        return this.runWithDocument(uri, async document => {
+            return await this._ds.doAutoInsert(document, ...args);
+        })
+    }
+
+    async doLSAutoInsert(...args: Args<LSType['doAutoInsert']>) {
+        return await this._ls.doAutoInsert(...args);
+    }
+
+    async getFoldingRanges(uri: string, ...args: TailArgs<DSType['getFoldingRanges']>) {
+        return this.runWithDocument(uri, async document => {
+            return await this._ds.getFoldingRanges(document, ...args);
+        })
+    }
+
+    async getColorPresentations(uri: string, ...args: TailArgs<DSType['getColorPresentations']>) {
+        return this.runWithDocument(uri, async document => {
+            return await this._ds.getColorPresentations(document, ...args);
+        })
+    }
+
+    async getSelectionRanges(uri: string, ...args: TailArgs<DSType['getSelectionRanges']>) {
+        return this.runWithDocument(uri, async document => {
+            return await this._ds.getSelectionRanges(document, ...args);
+        })
+    }
+
+    async findDocumentColors(uri: string, ...args: TailArgs<DSType['findDocumentColors']>) {
+        return this.runWithDocument(uri, async document => {
+            return await this._ds.findDocumentColors(document, ...args);
+        })
+    }
+
+    async findDocumentSymbols(uri: string, ...args: TailArgs<DSType['findDocumentSymbols']>) {
+        return this.runWithDocument(uri, async document => {
+            return await this._ds.findDocumentSymbols(document, ...args);
+        })
+    }
+
+    async findLinkedEditingRanges(uri: string, ...args: TailArgs<DSType['findLinkedEditingRanges']>) {
+        return this.runWithDocument(uri, async document => {
+            return await this._ds.findLinkedEditingRanges(document, ...args);
+        })
+    }
+
+    async format(uri: string, ...args: TailArgs<DSType['format']>) {
+        return this.runWithDocument(uri, async document => {
+            return await this._ds.format(document, ...args);
+        })
+    }
+
+    async doCodeActions(...args: Args<LSType['doCodeActions']>) {
+        return await this._ls.doCodeActions(...args)
+    }
+
+    async doCodeActionResolve(...args: Args<LSType['doCodeActionResolve']>) {
+        return await this._ls.doCodeActionResolve(...args)
+    }
+
+    async doCodeLens(...args: Args<LSType['doCodeLens']>) {
+        return await this._ls.doCodeLens(...args)
+    }
+
+    async doCodeLensResolve(...args: Args<LSType['doCodeLensResolve']>) {
+        return await this._ls.doCodeLensResolve(...args)
+    }
+    
+    async doComplete(...args: Args<LSType['doComplete']>) {
+        return await this._ls.doComplete(...args)
+    }
+
+    async doCompletionResolve(...args: Args<LSType['doCompletionResolve']>) {
+        return await this._ls.doCompletionResolve(...args)
+    }
+
+    async doHover(...args: Args<LSType['doHover']>) {
+        console.log('doHover', args)
+        const result = await this._ls.doHover(...args)
+        console.log(result);
+        return result
+    }
+
+    async doRename(...args: Args<LSType['doRename']>) {
+        return await this._ls.doRename(...args)
+    }
+
+    async doValidation(...args: Args<LSType['doValidation']>) {
+        return await this._ls.doValidation(...args);
+    }
+
+    async findDefinition(...args: Args<LSType['findDefinition']>) {
+        return await this._ls.findDefinition(...args)
+    }
+
+    async findDocumentHighlights(...args: Args<LSType['findDocumentHighlights']>) {
+        return await this._ls.findDocumentHighlights(...args)
+    }
+
+    async findDocumentLinks(...args: Args<LSType['findDocumentLinks']>) {
+        return await this._ls.findDocumentLinks(...args)
+    }
+
+    async findFileReferences(...args: Args<LSType['findFileReferences']>) {
+        return await this._ls.findFileReferences(...args)
+    }
+
+    async findImplementations(...args: Args<LSType['findImplementations']>) {
+        return await this._ls.findImplementations(...args)
+    }
+
+    async findReferences(...args: Args<LSType['findReferences']>) {
+        return await this._ls.findReferences(...args)
+    }
+
+    async findTypeDefinition(...args: Args<LSType['findTypeDefinition']>) {
+        return await this._ls.findTypeDefinition(...args)
+    }
+
+    async findWorkspaceSymbols(...args: Args<LSType['findWorkspaceSymbols']>) {
+        return await this._ls.findWorkspaceSymbols(...args)
+    }
+
+    async getEditsForFileRename(...args: Args<LSType['getEditsForFileRename']>) {
+        return await this._ls.getEditsForFileRename(...args)
+    }
+    
+    async getInlayHints(...args: Args<LSType['getInlayHints']>) {
+        return await this._ls.getInlayHints(...args)
+    }
+
+    async getSemanticTokens(...args: Args<LSType['getSemanticTokens']>) {
+        return await this._ls.getSemanticTokens(...args)
+    }
+
+    async getSignatureHelp(...args: Args<LSType['getSignatureHelp']>) {
+        return await this._ls.getSignatureHelp(...args)
+    }
+
+    async prepareRename(...args: Args<LSType['prepareRename']>) {
+        return await this._ls.prepareRename(...args)
+    }
+
+    getModelDocument(model: worker.IMirrorModel) {
+        let document = this._modelDocuments.get(model);
+        if (!document || document.version !== model.version) {
             document = vscode.TextDocument.create(
                 model.uri.toString(),
-                model.getLanguageId(),
-                model.getVersionId(),
+                this._languageId,
+                model.version,
                 model.getValue(),
             );
-            this._documents.set(model, document);
+            this._modelDocuments.set(model, document);
         }
         return document;
     }
-
-    async provideDocumentSymbols(model: editor.ITextModel, token: CancellationToken): Promise<languages.DocumentSymbol[] | null | undefined> {
-        const document = this.getTextDocument(model);
-        if (document) {
-            const codeResult = await this._ds.findDocumentSymbols(document);
-            if (codeResult) {
-                return codeResult.map(code2monaco.asDocumentSymbol);
-            }
-        }
-    }
-
-    async provideDocumentHighlights(model: editor.ITextModel, position: Position, token: CancellationToken): Promise<languages.DocumentHighlight[] | null | undefined> {
-        const codeResult = await this._ls.findDocumentHighlights(
-            model.uri.toString(),
-            monaco2code.asPosition(position),
-        );
-        if (codeResult) {
-            return codeResult.map(code2monaco.asDocumentHighlight);
-        }
-    }
-
-    async provideLinkedEditingRanges(model: editor.ITextModel, position: Position, token: CancellationToken): Promise<languages.LinkedEditingRanges | null | undefined> {
-        const document = this.getTextDocument(model);
-        if (document) {
-            const codeResult = await this._ds.findLinkedEditingRanges(
-                document,
-                monaco2code.asPosition(position),
-            );
-            if (codeResult) {
-                return {
-                    ranges: codeResult.ranges.map(code2monaco.asRange),
-                    wordPattern: codeResult.wordPattern ? new RegExp(codeResult.wordPattern) : undefined,
-                };
-            }
-        }
-    }
-
-    async provideDefinition(model: editor.ITextModel, position: Position, token: CancellationToken): Promise<languages.Definition | null | undefined> {
-        const codeResult = await this._ls.findDefinition(
-            model.uri.toString(),
-            monaco2code.asPosition(position),
-        );
-        // TODO: can't show if only one result from libs
-        if (codeResult) {
-            return codeResult.map(code2monaco.asLocation);
-        }
-    }
-
-    async provideImplementation(model: editor.ITextModel, position: Position, token: CancellationToken): Promise<languages.Definition | null | undefined> {
-        const codeResult = await this._ls.findImplementations(
-            model.uri.toString(),
-            monaco2code.asPosition(position),
-        );
-        if (codeResult) {
-            return codeResult.map(code2monaco.asLocation);
-        }
-    }
-
-    async provideTypeDefinition(model: editor.ITextModel, position: Position, token: CancellationToken): Promise<languages.Definition | null | undefined> {
-        const codeResult = await this._ls.findTypeDefinition(
-            model.uri.toString(),
-            monaco2code.asPosition(position),
-        );
-        if (codeResult) {
-            return codeResult.map(code2monaco.asLocation);
-        }
-    }
-
-    async provideCodeLenses(model: editor.ITextModel, token: CancellationToken): Promise<languages.CodeLensList | null | undefined> {
-        const codeResult = await this._ls.doCodeLens(
-            model.uri.toString(),
-        );
-        if (codeResult) {
-            const monacoResult = codeResult.map(code2monaco.asCodeLens);
-            for (let i = 0; i < monacoResult.length; i++) {
-                this._codeLens.set(monacoResult[i], codeResult[i]);
-            }
-            return {
-                lenses: monacoResult,
-                dispose: () => { },
-            };
-        }
-    }
-
-    async provideCodeActions(model: editor.ITextModel, range: Range, context: languages.CodeActionContext, token: CancellationToken): Promise<languages.CodeActionList | null | undefined> {
-        const diagnostics: vscode.Diagnostic[] = [];
-        for (const marker of context.markers) {
-            const diagnostic = this._diagnostics.get(marker);
-            if (diagnostic) {
-                diagnostics.push(diagnostic);
-            }
-        }
-        const codeResult = await this._ls.doCodeActions(
-            model.uri.toString(),
-            monaco2code.asRange(range),
-            {
-                diagnostics: diagnostics,
-                only: context.only ? [context.only] : undefined,
-            },
-        );
-        if (codeResult) {
-            const monacoResult = codeResult.map(code2monaco.asCodeAction);
-            for (let i = 0; i < monacoResult.length; i++) {
-                this._codeActions.set(monacoResult[i], codeResult[i]);
-            }
-            return {
-                actions: monacoResult,
-                dispose: () => { },
-            };
-        }
-    }
-
-    async resolveCodeAction (moncaoResult: languages.CodeAction): Promise<languages.CodeAction> {
-        let codeResult = this._codeActions.get(moncaoResult);
-        if (codeResult) {
-            codeResult = await this._ls.doCodeActionResolve(codeResult);
-            if (codeResult) {
-                moncaoResult = code2monaco.asCodeAction(codeResult);
-                this._codeActions.set(moncaoResult, codeResult);
-            }
-        }
-        return moncaoResult;
-    }
-
-    async provideDocumentFormattingEdits(model: editor.ITextModel, options: languages.FormattingOptions, token: CancellationToken): Promise<languages.TextEdit[] | null | undefined> {
-        const document = this.getTextDocument(model);
-        if (document) {
-            const codeResult = await this._ds.format(
-                document,
-                monaco2code.asFormattingOptions(options),
-            );
-            if (codeResult) {
-                return codeResult.map(code2monaco.asTextEdit);
-            }
-        }
-    }
-
-    async provideDocumentRangeFormattingEdits(model: editor.ITextModel, range: Range, options: languages.FormattingOptions, token: CancellationToken): Promise<languages.TextEdit[] | null | undefined> {
-        const document = this.getTextDocument(model);
-        if (document) {
-            const codeResult = await this._ds.format(
-                document,
-                monaco2code.asFormattingOptions(options),
-                monaco2code.asRange(range),
-            );
-            if (codeResult) {
-                return codeResult.map(code2monaco.asTextEdit);
-            }
-        }
-    }
-
-    async provideOnTypeFormattingEdits(model: editor.ITextModel, position: Position, ch: string, options: languages.FormattingOptions, token: CancellationToken): Promise<languages.TextEdit[] | null | undefined> {
-        const document = this.getTextDocument(model);
-        if (document) {
-            const codeResult = await this._ds.format(
-                document,
-                monaco2code.asFormattingOptions(options),
-                undefined,
-                {
-                    ch: ch,
-                    position: monaco2code.asPosition(position),
-                },
-            );
-            if (codeResult) {
-                return codeResult.map(code2monaco.asTextEdit);
-            }
-        }
-        return [];
-    }
-
-    async provideLinks(model: editor.ITextModel, token: CancellationToken): Promise<languages.ILinksList | null | undefined> {
-        const codeResult = await this._ls.findDocumentLinks(
-            model.uri.toString(),
-        );
-        if (codeResult) {
-            return {
-                links: codeResult.map(code2monaco.asLink),
-            };
-        }
-    }
-
-    async provideCompletionItems(model: editor.ITextModel, position: Position, context: languages.CompletionContext, token: CancellationToken): Promise<languages.CompletionList | null | undefined> {
-        const codeResult = await this._ls.doComplete(
-            model.uri.toString(),
-            monaco2code.asPosition(position),
-            monaco2code.asCompletionContext(context),
-        );
-        const monacoResult = code2monaco.asCompletionList(codeResult);
-        for (let i = 0; i < codeResult.items.length; i++) {
-            this._completionItems.set(monacoResult.suggestions[i], codeResult.items[i]);
-        }
-        return monacoResult;
-    }
-
-    async resolveCompletionItem(monacoItem: languages.CompletionItem, token: CancellationToken) {
-        let codeItem = this._completionItems.get(monacoItem);
-        if (codeItem) {
-            codeItem = await this._ls.doCompletionResolve(codeItem);
-            monacoItem = code2monaco.asCompletionItem(codeItem);
-            this._completionItems.set(monacoItem, codeItem);
-        }
-        return monacoItem;
-    }
-
-    async provideDocumentColors(model: editor.ITextModel, token: CancellationToken): Promise<languages.IColorInformation[] | null | undefined> {
-        const document = this.getTextDocument(model);
-        if (document) {
-            const codeResult = await this._ds.findDocumentColors(document);
-            if (codeResult) {
-                return codeResult.map(code2monaco.asColorInformation);
-            }
-        }
-    }
-
-    async provideColorPresentations (model: editor.ITextModel, monacoResult: languages.IColorInformation) {
-        const document = this.getTextDocument(model);
-        const codeResult = this._colorInformations.get(monacoResult);
-        if (document && codeResult) {
-            const codeColors = await this._ds.getColorPresentations(
-                document,
-                codeResult.color,
-                {
-                    start: document.positionAt(0),
-                    end: document.positionAt(document.getText().length),
-                },
-            );
-            if (codeColors) {
-                return codeColors.map(code2monaco.asColorPresentation);
-            }
-        }
-    }
-
-    async provideFoldingRanges(model: editor.ITextModel, context: languages.FoldingContext, token: CancellationToken): Promise<languages.FoldingRange[] | null | undefined> {
-        const document = this.getTextDocument(model);
-        if (document) {
-            const codeResult = await this._ds.getFoldingRanges(document);
-            if (codeResult) {
-                return codeResult.map(code2monaco.asFoldingRange);
-            }
-        }
-    }
-
-    async provideDeclaration(model: editor.ITextModel, position: Position, token: CancellationToken): Promise<languages.Definition | null | undefined> {
-        const codeResult = await this._ls.findDefinition(
-            model.uri.toString(),
-            monaco2code.asPosition(position),
-        );
-        if (codeResult) {
-            return codeResult.map(code2monaco.asLocation);
-        }
-    }
-
-    async provideSelectionRanges(model: editor.ITextModel, positions: Position[], token: CancellationToken): Promise<languages.SelectionRange[][] | null | undefined> {
-        const document = this.getTextDocument(model);
-        if (document) {
-            const codeResults = await Promise.all(positions.map(position => this._ds.getSelectionRanges(
-                document,
-                [monaco2code.asPosition(position)],
-            )));
-            return codeResults.map(codeResult => codeResult?.map(code2monaco.asSelectionRange) ?? []);
-        }
-    }
-
-    async provideSignatureHelp(model: editor.ITextModel, position: Position, token: CancellationToken, context: languages.SignatureHelpContext): Promise<languages.SignatureHelpResult | null | undefined> {
-        const codeResult = await this._ls.getSignatureHelp(
-            model.uri.toString(),
-            monaco2code.asPosition(position),
-        );
-        if (codeResult) {
-            return {
-                value: code2monaco.asSignatureHelp(codeResult),
-                dispose: () => { },
-            };
-        }
-    }
-
-    async provideRenameEdits(model: editor.ITextModel, position: Position, newName: string, token: CancellationToken): Promise<(languages.WorkspaceEdit & languages.Rejection) | null | undefined> {
-        const codeResult = await this._ls.doRename(
-            model.uri.toString(),
-            monaco2code.asPosition(position),
-            newName,
-        );
-        if (codeResult) {
-            return code2monaco.asWorkspaceEdit(codeResult);
-        }
-    }
-
-    async provideReferences(model: editor.ITextModel, position: Position, context: languages.ReferenceContext, token: CancellationToken): Promise<languages.Location[] | null | undefined> {
-        const codeResult = await this._ls.findReferences(
-            model.uri.toString(),
-            monaco2code.asPosition(position),
-        );
-        // TODO: can't show if only one result from libs
-        if (codeResult) {
-            return codeResult.map(code2monaco.asLocation);
-        }
-    }
-
-    async provideInlayHints(model: editor.ITextModel, range: Range, token: CancellationToken): Promise<languages.InlayHintList | null | undefined> {
-        const codeResult = await this._ls.getInlayHints(
-            model.uri.toString(),
-            monaco2code.asRange(range),
-        );
-        if (codeResult) {
-            return {
-                hints: codeResult.map(code2monaco.asInlayHint),
-                dispose: () => { },
-            };
-        }
-    }
-    
-    async provideHover(model: editor.ITextModel, position: Position, token: CancellationToken): Promise<languages.Hover | null | undefined> {
-        const codeResult = await this._ls.doHover(
-            model.uri.toString(),
-            monaco2code.asPosition(position),
-        );
-        if (codeResult) {
-            return code2monaco.asHover(codeResult);
-        }    
-    }
-}
-
-export function create(ctx: worker.IWorkerContext, createData: ICreateData): IVueWorker {
-    return new VueWorker(ctx, createData)
 }

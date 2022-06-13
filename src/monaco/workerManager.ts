@@ -9,6 +9,7 @@ export class WorkerManager {
 	private _idleCheckInterval: number;
 	private _lastUsedTime: number;
 	private _configChangeListener: IDisposable;
+	private _extraLibChangeListener: IDisposable;
 
 	private _worker: editor.MonacoWebWorker<VueWorker> | null;
 	private _client: Promise<VueWorker> | null;
@@ -20,6 +21,13 @@ export class WorkerManager {
 		this._idleCheckInterval = window.setInterval(() => this._checkIfIdle(), 30 * 1000);
 		this._lastUsedTime = 0;
 		this._configChangeListener = this._defaults.onDidChange(() => this._stopWorker());
+		this._extraLibChangeListener = this._defaults.onExtraLibChange(() => this._updateExtraLib());
+	}
+
+	private _updateExtraLib() {
+		this._getClient().then(client => {
+			client.updateExtraLibs(this._defaults.getExtraLibs())
+		})
 	}
 
 	private _stopWorker(): void {
@@ -33,6 +41,7 @@ export class WorkerManager {
 	dispose(): void {
 		clearInterval(this._idleCheckInterval);
 		this._configChangeListener.dispose();
+		this._extraLibChangeListener.dispose();
 		this._stopWorker();
 	}
 
