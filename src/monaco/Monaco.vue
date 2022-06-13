@@ -69,8 +69,6 @@ onMounted(async () => {
   });
   editor.value = editorInstance
 
-  // const ls = await setupLs(editorInstance, documentModelMap)
-
   await loadGrammars(editorInstance);
 
   editorInstance.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS, () => {

@@ -132,9 +132,7 @@ export class VueWorker {
     }
 
     async doHover(...args: Args<LSType['doHover']>) {
-        console.log('doHover', args)
         const result = await this._ls.doHover(...args)
-        console.log(result);
         return result
     }
 

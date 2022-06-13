@@ -1,5 +1,4 @@
 import type { worker } from 'monaco-editor-core';
-// import { prepareServiceVirtualFiles } from './prepare';
 import * as ts from 'typescript/lib/tsserverlibrary';
 import {
     createLanguageService,

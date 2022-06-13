@@ -1,5 +1,5 @@
 import type * as mode from './vueMode';
-import { Emitter, type IEvent, languages, Uri } from 'monaco-editor-core';
+import { Emitter, type IEvent, languages } from 'monaco-editor-core';
 import { debounce } from '../utils';
 
 export interface ModeConfiguration {
@@ -63,7 +63,6 @@ class LanguageServiceDefaultsImpl implements LanguageServiceDefaults {
 
 	private fireExtraLibChangeSoon = debounce(() => {
 		this._onExtraLibChange.fire(this);
-		console.log('fire')
 	}, 300)
 }
 
