@@ -1,13 +1,13 @@
-import * as monaco from 'monaco-editor';
+import { Position, IRange, languages } from 'monaco-editor-core';
 import * as vscode from 'vscode-languageserver-protocol';
 
-export function asPosition(position: monaco.Position): vscode.Position {
+export function asPosition(position: Position): vscode.Position {
     return vscode.Position.create(
         position.lineNumber - 1, position.column - 1,
     );
 }
 
-export function asRange(range: monaco.IRange): vscode.Range {
+export function asRange(range: IRange): vscode.Range {
     return vscode.Range.create(
         range.startLineNumber - 1,
         range.startColumn - 1,
@@ -16,25 +16,25 @@ export function asRange(range: monaco.IRange): vscode.Range {
     );
 }
 
-export function asCompletionContext(context: monaco.languages.CompletionContext): vscode.CompletionContext {
+export function asCompletionContext(context: languages.CompletionContext): vscode.CompletionContext {
     return {
         triggerKind: asTriggerKind(context.triggerKind),
         triggerCharacter: context.triggerCharacter,
     };
 }
 
-export function asTriggerKind(kind: monaco.languages.CompletionTriggerKind): vscode.CompletionTriggerKind {
+export function asTriggerKind(kind: languages.CompletionTriggerKind): vscode.CompletionTriggerKind {
     switch (kind) {
-        case monaco.languages.CompletionTriggerKind.Invoke:
+        case languages.CompletionTriggerKind.Invoke:
             return vscode.CompletionTriggerKind.Invoked;
-        case monaco.languages.CompletionTriggerKind.TriggerCharacter:
+        case languages.CompletionTriggerKind.TriggerCharacter:
             return vscode.CompletionTriggerKind.TriggerCharacter;
-        case monaco.languages.CompletionTriggerKind.TriggerForIncompleteCompletions:
+        case languages.CompletionTriggerKind.TriggerForIncompleteCompletions:
             return vscode.CompletionTriggerKind.TriggerForIncompleteCompletions;
     }
 }
 
-export function asFormattingOptions(options: monaco.languages.FormattingOptions): vscode.FormattingOptions {
+export function asFormattingOptions(options: languages.FormattingOptions): vscode.FormattingOptions {
     return {
         tabSize: options.tabSize,
         insertSpaces: options.insertSpaces,

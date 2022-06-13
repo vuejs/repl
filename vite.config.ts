@@ -16,12 +16,17 @@ const genStub: Plugin = {
 export default defineConfig({
   plugins: [vue(), genStub],
   optimizeDeps: {
-    include: ['path-browserify'],
+    include: [
+      'path-browserify'
+    ],
   },
   resolve: {
     alias: {
       path: 'path-browserify',
     }
+  },
+  worker: {
+    format: 'es'
   },
   build: {
     target: 'esnext',
@@ -31,12 +36,17 @@ export default defineConfig({
       formats: ['es'],
       fileName: () => '[name].js'
     },
+    
     rollupOptions: {
       input: {
+        'main': './index.html',
         'vue-repl': './src/index.ts',
         'vue-repl-monaco-editor': './src/editor/MonacoEditor.vue',
       },
-      external: ['vue', 'vue/compiler-sfc']
-    }
+      external: ['vue', 'vue/compiler-sfc'],
+      output: {
+        format: 'amd'
+      }
+    },
   }
 })

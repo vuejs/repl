@@ -47,7 +47,6 @@ provide('clear-console', toRef(props, 'clearConsole'))
       <template #right>
         <Output
           :showCompileOutput="props.showCompileOutput"
-          :editor-component="editor"
           :ssr="!!props.ssr"
         />
       </template>

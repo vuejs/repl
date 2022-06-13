@@ -14,6 +14,7 @@ specifiers:
   codemirror: ^5.62.3
   hash-sum: ^2.0.0
   monaco-editor: ^0.33.0
+  monaco-editor-core: ^0.33.0
   monaco-editor-textmate: ^3.0.0
   monaco-textmate: ^3.0.1
   onigasm: ^2.2.5
@@ -46,6 +47,7 @@ devDependencies:
   '@vue/shared': 3.2.37
   codemirror: 5.65.5
   hash-sum: 2.0.0
+  monaco-editor-core: 0.33.0
   rimraf: 3.0.2
   sucrase: 3.21.0
   typescript: 4.7.3
@@ -969,6 +971,10 @@ packages:
     resolution: {integrity: sha512-J7p63hRiAjw1NDEww1W7i37+ByIrOWO5XQQAzZ3VOcL0PNybwpfmV/N05zFAzwQ9USyEcX6t3UO+K5aqBQOIHw==}
     dependencies:
       brace-expansion: 1.1.11
+    dev: true
+
+  /monaco-editor-core/0.33.0:
+    resolution: {integrity: sha512-Kzxak8jnMS8vI08DcseBuOfeQlcVPpGXO210D8M+QnaNR92s4IYzgUeiow/Hld9Gi5pGvjDbPsdUXkPewoTA5g==}
     dev: true
 
   /monaco-editor-textmate/3.0.0_nurowwtvogix47pnszh4m7lsnu:

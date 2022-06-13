@@ -1,71 +1,71 @@
-import * as monaco from 'monaco-editor';
+import { languages, IRange, IMarkdownString, Uri, editor, MarkerTag, MarkerSeverity, Position } from 'monaco-editor-core';
 import * as vscode from 'vscode-languageserver-protocol';
 
-export function asCompletionList(list: vscode.CompletionList): monaco.languages.CompletionList {
+export function asCompletionList(list: vscode.CompletionList): languages.CompletionList {
     return {
         incomplete: list.isIncomplete,
         suggestions: list.items.map(asCompletionItem),
     };
 }
 
-export function asCompletionItemKind(kind: vscode.CompletionItemKind | undefined): monaco.languages.CompletionItemKind {
+export function asCompletionItemKind(kind: vscode.CompletionItemKind | undefined): languages.CompletionItemKind {
     switch (kind) {
         case vscode.CompletionItemKind.Method:
-            return monaco.languages.CompletionItemKind.Method;
+            return languages.CompletionItemKind.Method;
         case vscode.CompletionItemKind.Function:
-            return monaco.languages.CompletionItemKind.Function;
+            return languages.CompletionItemKind.Function;
         case vscode.CompletionItemKind.Constructor:
-            return monaco.languages.CompletionItemKind.Constructor;
+            return languages.CompletionItemKind.Constructor;
         case vscode.CompletionItemKind.Field:
-            return monaco.languages.CompletionItemKind.Field;
+            return languages.CompletionItemKind.Field;
         case vscode.CompletionItemKind.Variable:
-            return monaco.languages.CompletionItemKind.Variable;
+            return languages.CompletionItemKind.Variable;
         case vscode.CompletionItemKind.Class:
-            return monaco.languages.CompletionItemKind.Class;
+            return languages.CompletionItemKind.Class;
         case vscode.CompletionItemKind.Interface:
-            return monaco.languages.CompletionItemKind.Interface;
+            return languages.CompletionItemKind.Interface;
         case vscode.CompletionItemKind.Module:
-            return monaco.languages.CompletionItemKind.Module;
+            return languages.CompletionItemKind.Module;
         case vscode.CompletionItemKind.Property:
-            return monaco.languages.CompletionItemKind.Property;
+            return languages.CompletionItemKind.Property;
         case vscode.CompletionItemKind.Unit:
-            return monaco.languages.CompletionItemKind.Unit;
+            return languages.CompletionItemKind.Unit;
         case vscode.CompletionItemKind.Value:
-            return monaco.languages.CompletionItemKind.Value;
+            return languages.CompletionItemKind.Value;
         case vscode.CompletionItemKind.Enum:
-            return monaco.languages.CompletionItemKind.Enum;
+            return languages.CompletionItemKind.Enum;
         case vscode.CompletionItemKind.Keyword:
-            return monaco.languages.CompletionItemKind.Keyword;
+            return languages.CompletionItemKind.Keyword;
         case vscode.CompletionItemKind.Snippet:
-            return monaco.languages.CompletionItemKind.Snippet;
+            return languages.CompletionItemKind.Snippet;
         case vscode.CompletionItemKind.Text:
-            return monaco.languages.CompletionItemKind.Text;
+            return languages.CompletionItemKind.Text;
         case vscode.CompletionItemKind.Color:
-            return monaco.languages.CompletionItemKind.Color;
+            return languages.CompletionItemKind.Color;
         case vscode.CompletionItemKind.File:
-            return monaco.languages.CompletionItemKind.File;
+            return languages.CompletionItemKind.File;
         case vscode.CompletionItemKind.Reference:
-            return monaco.languages.CompletionItemKind.Reference;
+            return languages.CompletionItemKind.Reference;
         case vscode.CompletionItemKind.Folder:
-            return monaco.languages.CompletionItemKind.Folder;
+            return languages.CompletionItemKind.Folder;
         case vscode.CompletionItemKind.EnumMember:
-            return monaco.languages.CompletionItemKind.EnumMember;
+            return languages.CompletionItemKind.EnumMember;
         case vscode.CompletionItemKind.Constant:
-            return monaco.languages.CompletionItemKind.Constant;
+            return languages.CompletionItemKind.Constant;
         case vscode.CompletionItemKind.Struct:
-            return monaco.languages.CompletionItemKind.Struct;
+            return languages.CompletionItemKind.Struct;
         case vscode.CompletionItemKind.Event:
-            return monaco.languages.CompletionItemKind.Event;
+            return languages.CompletionItemKind.Event;
         case vscode.CompletionItemKind.Operator:
-            return monaco.languages.CompletionItemKind.Operator;
+            return languages.CompletionItemKind.Operator;
         case vscode.CompletionItemKind.TypeParameter:
-            return monaco.languages.CompletionItemKind.TypeParameter;
+            return languages.CompletionItemKind.TypeParameter;
         default:
-            return monaco.languages.CompletionItemKind.Text;
+            return languages.CompletionItemKind.Text;
     }
 }
 
-export function asCompletionItem(item: vscode.CompletionItem): monaco.languages.CompletionItem {
+export function asCompletionItem(item: vscode.CompletionItem): languages.CompletionItem {
     return {
         label: item.label,
         kind: asCompletionItemKind(item.kind),
@@ -83,7 +83,7 @@ export function asCompletionItem(item: vscode.CompletionItem): monaco.languages.
     };
 }
 
-export function asCommand(command: vscode.Command): monaco.languages.Command {
+export function asCommand(command: vscode.Command): languages.Command {
     return {
         id: command.command,
         title: command.title,
@@ -91,16 +91,16 @@ export function asCommand(command: vscode.Command): monaco.languages.Command {
     };
 }
 
-export function asTextEdit(edit: vscode.TextEdit): monaco.languages.TextEdit {
+export function asTextEdit(edit: vscode.TextEdit): languages.TextEdit {
     return {
         range: asRange(edit.range),
         text: edit.newText,
     };
 }
 
-export function asCompletionItemRange(textEdit: vscode.CompletionItem['textEdit']): monaco.languages.CompletionItem['range'] {
+export function asCompletionItemRange(textEdit: vscode.CompletionItem['textEdit']): languages.CompletionItem['range'] {
     if (textEdit && vscode.InsertReplaceEdit.is(textEdit)) {
-        const result: monaco.languages.CompletionItemRanges = {
+        const result: languages.CompletionItemRanges = {
             insert: asRange(textEdit.insert),
             replace: asRange(textEdit.replace),
         };
@@ -113,7 +113,7 @@ export function asCompletionItemRange(textEdit: vscode.CompletionItem['textEdit'
     return undefined;
 }
 
-export function asRange(range: vscode.Range): monaco.IRange {
+export function asRange(range: vscode.Range): IRange {
     return {
         startLineNumber: range.start.line + 1,
         startColumn: range.start.character + 1,
@@ -122,14 +122,14 @@ export function asRange(range: vscode.Range): monaco.IRange {
     };
 }
 
-export function asHover(hover: vscode.Hover): monaco.languages.Hover {
+export function asHover(hover: vscode.Hover): languages.Hover {
     return {
         contents: asMarkdownString(hover.contents),
         range: hover.range ? asRange(hover.range) : undefined,
     };
 }
 
-export function asMarkdownString(markdownString: vscode.Hover['contents']): monaco.IMarkdownString[] {
+export function asMarkdownString(markdownString: vscode.Hover['contents']): IMarkdownString[] {
     if (typeof markdownString === 'string') {
         return [{ value: markdownString }]
     }
@@ -141,7 +141,7 @@ export function asMarkdownString(markdownString: vscode.Hover['contents']): mona
     }
 }
 
-export function asLocation(definition: vscode.LocationLink | vscode.Location): monaco.languages.Location {
+export function asLocation(definition: vscode.LocationLink | vscode.Location): languages.Location {
     if (vscode.LocationLink.is(definition)) {
         return {
             uri: asUri(definition.targetUri),
@@ -156,11 +156,11 @@ export function asLocation(definition: vscode.LocationLink | vscode.Location): m
     }
 }
 
-export function asUri(uri: vscode.URI): monaco.Uri {
-    return monaco.Uri.parse(uri);
+export function asUri(uri: vscode.URI): Uri {
+    return Uri.parse(uri);
 }
 
-export function asSignatureHelp(signatureHelp: vscode.SignatureHelp): monaco.languages.SignatureHelp {
+export function asSignatureHelp(signatureHelp: vscode.SignatureHelp): languages.SignatureHelp {
     return {
         signatures: signatureHelp.signatures.map(asSignatureInformation),
         activeSignature: signatureHelp.activeSignature ?? 0,
@@ -168,7 +168,7 @@ export function asSignatureHelp(signatureHelp: vscode.SignatureHelp): monaco.lan
     };
 }
 
-export function asSignatureInformation(signatureInformation: vscode.SignatureInformation): monaco.languages.SignatureInformation {
+export function asSignatureInformation(signatureInformation: vscode.SignatureInformation): languages.SignatureInformation {
     return {
         label: signatureInformation.label,
         documentation: signatureInformation.documentation,
@@ -177,14 +177,14 @@ export function asSignatureInformation(signatureInformation: vscode.SignatureInf
     };
 }
 
-export function asParameterInformation(parameterInformation: vscode.ParameterInformation): monaco.languages.ParameterInformation {
+export function asParameterInformation(parameterInformation: vscode.ParameterInformation): languages.ParameterInformation {
     return {
         label: parameterInformation.label,
         documentation: parameterInformation.documentation,
     };
 }
 
-export function asMarkerData(diagnostic: vscode.Diagnostic): monaco.editor.IMarkerData {
+export function asMarkerData(diagnostic: vscode.Diagnostic): editor.IMarkerData {
     return {
         code: diagnostic.code?.toString(),
         severity: asMarkerSeverity(diagnostic.severity),
@@ -196,16 +196,16 @@ export function asMarkerData(diagnostic: vscode.Diagnostic): monaco.editor.IMark
     };
 }
 
-export function asMarkerTag(tag: vscode.DiagnosticTag): monaco.MarkerTag {
+export function asMarkerTag(tag: vscode.DiagnosticTag): MarkerTag {
     switch (tag) {
         case vscode.DiagnosticTag.Unnecessary:
-            return monaco.MarkerTag.Unnecessary;
+            return MarkerTag.Unnecessary;
         case vscode.DiagnosticTag.Deprecated:
-            return monaco.MarkerTag.Deprecated;
+            return MarkerTag.Deprecated;
     }
 }
 
-export function asRelatedInformation(relatedInformation: vscode.DiagnosticRelatedInformation): monaco.editor.IRelatedInformation {
+export function asRelatedInformation(relatedInformation: vscode.DiagnosticRelatedInformation): editor.IRelatedInformation {
     return {
         resource: asUri(relatedInformation.location.uri),
         message: relatedInformation.message,
@@ -213,23 +213,23 @@ export function asRelatedInformation(relatedInformation: vscode.DiagnosticRelate
     };
 }
 
-export function asMarkerSeverity(severity: vscode.DiagnosticSeverity | undefined): monaco.MarkerSeverity {
+export function asMarkerSeverity(severity: vscode.DiagnosticSeverity | undefined): MarkerSeverity {
     switch (severity) {
         case vscode.DiagnosticSeverity.Error:
-            return monaco.MarkerSeverity.Error;
+            return MarkerSeverity.Error;
         case vscode.DiagnosticSeverity.Warning:
-            return monaco.MarkerSeverity.Warning;
+            return MarkerSeverity.Warning;
         case vscode.DiagnosticSeverity.Information:
-            return monaco.MarkerSeverity.Info;
+            return MarkerSeverity.Info;
         case vscode.DiagnosticSeverity.Hint:
-            return monaco.MarkerSeverity.Hint;
+            return MarkerSeverity.Hint;
         default:
-            return monaco.MarkerSeverity.Info;
+            return MarkerSeverity.Info;
     }
 }
 
-export function asWorkspaceEdit(workspaceEdit: vscode.WorkspaceEdit): monaco.languages.WorkspaceEdit {
-    const result: monaco.languages.WorkspaceEdit = {
+export function asWorkspaceEdit(workspaceEdit: vscode.WorkspaceEdit): languages.WorkspaceEdit {
+    const result: languages.WorkspaceEdit = {
         edits: [],
     };
     if (workspaceEdit.changes) {
@@ -286,7 +286,7 @@ export function asWorkspaceEdit(workspaceEdit: vscode.WorkspaceEdit): monaco.lan
     return result;
 }
 
-export function asDocumentSymbol(symbol: vscode.SymbolInformation): monaco.languages.DocumentSymbol {
+export function asDocumentSymbol(symbol: vscode.SymbolInformation): languages.DocumentSymbol {
     return {
         name: symbol.name,
         detail: '',
@@ -299,100 +299,100 @@ export function asDocumentSymbol(symbol: vscode.SymbolInformation): monaco.langu
     };
 }
 
-export function asSymbolTag(tag: vscode.SymbolTag): monaco.languages.SymbolTag {
+export function asSymbolTag(tag: vscode.SymbolTag): languages.SymbolTag {
     switch (tag) {
         case vscode.SymbolTag.Deprecated:
-            return monaco.languages.SymbolTag.Deprecated;
+            return languages.SymbolTag.Deprecated;
     }
 }
 
-export function asSymbolKind(kind: vscode.SymbolKind): monaco.languages.SymbolKind {
+export function asSymbolKind(kind: vscode.SymbolKind): languages.SymbolKind {
     switch (kind) {
         case vscode.SymbolKind.File:
-            return monaco.languages.SymbolKind.File;
+            return languages.SymbolKind.File;
         case vscode.SymbolKind.Module:
-            return monaco.languages.SymbolKind.Module;
+            return languages.SymbolKind.Module;
         case vscode.SymbolKind.Namespace:
-            return monaco.languages.SymbolKind.Namespace;
+            return languages.SymbolKind.Namespace;
         case vscode.SymbolKind.Package:
-            return monaco.languages.SymbolKind.Package;
+            return languages.SymbolKind.Package;
         case vscode.SymbolKind.Class:
-            return monaco.languages.SymbolKind.Class;
+            return languages.SymbolKind.Class;
         case vscode.SymbolKind.Method:
-            return monaco.languages.SymbolKind.Method;
+            return languages.SymbolKind.Method;
         case vscode.SymbolKind.Property:
-            return monaco.languages.SymbolKind.Property;
+            return languages.SymbolKind.Property;
         case vscode.SymbolKind.Field:
-            return monaco.languages.SymbolKind.Field;
+            return languages.SymbolKind.Field;
         case vscode.SymbolKind.Constructor:
-            return monaco.languages.SymbolKind.Constructor;
+            return languages.SymbolKind.Constructor;
         case vscode.SymbolKind.Enum:
-            return monaco.languages.SymbolKind.Enum;
+            return languages.SymbolKind.Enum;
         case vscode.SymbolKind.Interface:
-            return monaco.languages.SymbolKind.Interface;
+            return languages.SymbolKind.Interface;
         case vscode.SymbolKind.Function:
-            return monaco.languages.SymbolKind.Function;
+            return languages.SymbolKind.Function;
         case vscode.SymbolKind.Variable:
-            return monaco.languages.SymbolKind.Variable;
+            return languages.SymbolKind.Variable;
         case vscode.SymbolKind.Constant:
-            return monaco.languages.SymbolKind.Constant;
+            return languages.SymbolKind.Constant;
         case vscode.SymbolKind.String:
-            return monaco.languages.SymbolKind.String;
+            return languages.SymbolKind.String;
         case vscode.SymbolKind.Number:
-            return monaco.languages.SymbolKind.Number;
+            return languages.SymbolKind.Number;
         case vscode.SymbolKind.Boolean:
-            return monaco.languages.SymbolKind.Boolean;
+            return languages.SymbolKind.Boolean;
         case vscode.SymbolKind.Array:
-            return monaco.languages.SymbolKind.Array;
+            return languages.SymbolKind.Array;
         case vscode.SymbolKind.Object:
-            return monaco.languages.SymbolKind.Object;
+            return languages.SymbolKind.Object;
         case vscode.SymbolKind.Key:
-            return monaco.languages.SymbolKind.Key;
+            return languages.SymbolKind.Key;
         case vscode.SymbolKind.Null:
-            return monaco.languages.SymbolKind.Null;
+            return languages.SymbolKind.Null;
         case vscode.SymbolKind.EnumMember:
-            return monaco.languages.SymbolKind.EnumMember;
+            return languages.SymbolKind.EnumMember;
         case vscode.SymbolKind.Struct:
-            return monaco.languages.SymbolKind.Struct;
+            return languages.SymbolKind.Struct;
         case vscode.SymbolKind.Event:
-            return monaco.languages.SymbolKind.Event;
+            return languages.SymbolKind.Event;
         case vscode.SymbolKind.Operator:
-            return monaco.languages.SymbolKind.Operator;
+            return languages.SymbolKind.Operator;
         case vscode.SymbolKind.TypeParameter:
-            return monaco.languages.SymbolKind.TypeParameter;
+            return languages.SymbolKind.TypeParameter;
         default:
-            return monaco.languages.SymbolKind.File;
+            return languages.SymbolKind.File;
     }
 }
 
-export function asDocumentHighlight(highlight: vscode.DocumentHighlight): monaco.languages.DocumentHighlight {
+export function asDocumentHighlight(highlight: vscode.DocumentHighlight): languages.DocumentHighlight {
     return {
         range: asRange(highlight.range),
         kind: asDocumentHighlightKind(highlight.kind),
     };
 }
 
-export function asDocumentHighlightKind(kind: vscode.DocumentHighlightKind | undefined): monaco.languages.DocumentHighlightKind {
+export function asDocumentHighlightKind(kind: vscode.DocumentHighlightKind | undefined): languages.DocumentHighlightKind {
     switch (kind) {
         case vscode.DocumentHighlightKind.Text:
-            return monaco.languages.DocumentHighlightKind.Text;
+            return languages.DocumentHighlightKind.Text;
         case vscode.DocumentHighlightKind.Read:
-            return monaco.languages.DocumentHighlightKind.Read;
+            return languages.DocumentHighlightKind.Read;
         case vscode.DocumentHighlightKind.Write:
-            return monaco.languages.DocumentHighlightKind.Write;
+            return languages.DocumentHighlightKind.Write;
         default:
-            return monaco.languages.DocumentHighlightKind.Text;
+            return languages.DocumentHighlightKind.Text;
     }
 }
 
-export function asCodeLens(item: vscode.CodeLens): monaco.languages.CodeLens {
+export function asCodeLens(item: vscode.CodeLens): languages.CodeLens {
     return {
         range: asRange(item.range),
         command: item.command ? asCommand(item.command) : undefined,
     };
 }
 
-export function asCodeAction(item: vscode.CodeAction): monaco.languages.CodeAction {
+export function asCodeAction(item: vscode.CodeAction): languages.CodeAction {
     return {
         title: item.title,
         command: item.command ? asCommand(item.command) : undefined,
@@ -404,7 +404,7 @@ export function asCodeAction(item: vscode.CodeAction): monaco.languages.CodeActi
     };
 }
 
-export function asLink(item: vscode.DocumentLink): monaco.languages.ILink {
+export function asLink(item: vscode.DocumentLink): languages.ILink {
     return {
         range: asRange(item.range),
         url: item.target,
@@ -412,14 +412,14 @@ export function asLink(item: vscode.DocumentLink): monaco.languages.ILink {
     };
 }
 
-export function asColorInformation(item: vscode.ColorInformation): monaco.languages.IColorInformation {
+export function asColorInformation(item: vscode.ColorInformation): languages.IColorInformation {
     return {
         range: asRange(item.range),
         color: item.color,
     };
 }
 
-export function asColorPresentation(item: vscode.ColorPresentation): monaco.languages.IColorPresentation {
+export function asColorPresentation(item: vscode.ColorPresentation): languages.IColorPresentation {
     return {
         label: item.label,
         textEdit: item.textEdit ? asTextEdit(item.textEdit) : undefined,
@@ -427,7 +427,7 @@ export function asColorPresentation(item: vscode.ColorPresentation): monaco.lang
     };
 }
 
-export function asFoldingRange(item: vscode.FoldingRange): monaco.languages.FoldingRange {
+export function asFoldingRange(item: vscode.FoldingRange): languages.FoldingRange {
     return {
         start: item.startLine,
         end: item.endLine,
@@ -437,13 +437,13 @@ export function asFoldingRange(item: vscode.FoldingRange): monaco.languages.Fold
     };
 }
 
-export function asSelectionRange(item: vscode.SelectionRange): monaco.languages.SelectionRange {
+export function asSelectionRange(item: vscode.SelectionRange): languages.SelectionRange {
     return {
         range: asRange(item.range),
     };
 }
 
-export function asInlayHint(item: vscode.InlayHint): monaco.languages.InlayHint {
+export function asInlayHint(item: vscode.InlayHint): languages.InlayHint {
     return {
         label: asInlayHintLabel(item.label),
         tooltip: item.tooltip,
@@ -455,16 +455,16 @@ export function asInlayHint(item: vscode.InlayHint): monaco.languages.InlayHint 
     };
 }
 
-export function asInlayHintKind(kind: vscode.InlayHintKind): monaco.languages.InlayHintKind {
+export function asInlayHintKind(kind: vscode.InlayHintKind): languages.InlayHintKind {
     switch (kind) {
         case vscode.InlayHintKind.Parameter:
-            return monaco.languages.InlayHintKind.Parameter;
+            return languages.InlayHintKind.Parameter;
         case vscode.InlayHintKind.Type:
-            return monaco.languages.InlayHintKind.Type;
+            return languages.InlayHintKind.Type;
     }
 }
 
-export function asInlayHintLabel(label: vscode.InlayHint['label']): monaco.languages.InlayHint['label'] {
+export function asInlayHintLabel(label: vscode.InlayHint['label']): languages.InlayHint['label'] {
     if (typeof label === 'string') {
         return label;
     }
@@ -473,7 +473,7 @@ export function asInlayHintLabel(label: vscode.InlayHint['label']): monaco.langu
     }
 }
 
-export function asInlayHintLabelPart(part: vscode.InlayHintLabelPart): monaco.languages.InlayHintLabelPart {
+export function asInlayHintLabelPart(part: vscode.InlayHintLabelPart): languages.InlayHintLabelPart {
     return {
         label: part.value,
         tooltip: part.tooltip,
@@ -482,9 +482,9 @@ export function asInlayHintLabelPart(part: vscode.InlayHintLabelPart): monaco.la
     };
 }
 
-export function asPosition(position: vscode.Position): monaco.Position {
+export function asPosition(position: vscode.Position): Position {
     return {
         lineNumber: position.line + 1,
         column: position.character + 1,
-    } as unknown as monaco.Position;
+    } as unknown as Position;
 }

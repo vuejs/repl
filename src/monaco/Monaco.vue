@@ -1,13 +1,14 @@
 <script lang="ts">
-import { setupMonacoEnv } from './utils';
+import { setupMonacoEnv } from './env';
 setupMonacoEnv();
+import './monaco.contribution'
 </script>
 <script lang="ts" setup>
 import { onMounted, onBeforeUnmount, ref, shallowRef, nextTick, watchEffect } from 'vue';
 import { loadGrammars } from './grammars';
-import * as monaco from 'monaco-editor';
-import { setupThemePromise } from './utils';
-import { setupLs, getOrCreateModel, setupValidate } from './ls';
+import * as monaco from 'monaco-editor-core';
+import { setupThemePromise, getOrCreateModel } from './utils';
+// import { setupLs, setupValidate } from './ls';
 
 const props = withDefaults(defineProps<{
   value?: string
@@ -35,7 +36,9 @@ const currentModel = shallowRef<monaco.editor.ITextModel>(
   )
 )
 
-const documentModelMap = shallowRef(new Map([[currentModel.value.uri.fsPath, currentModel.value]]))
+// const documentModelMap = shallowRef(new Map([[
+//   currentModel.value.uri.fsPath, currentModel.value
+// ]]))
 
 watchEffect(() => {
   if (currentModel.value.getValue() !== props.value) {
@@ -63,11 +66,11 @@ onMounted(async () => {
     },
     inlineSuggest: {
       enabled: false,
-    },
+    }
   });
   editor.value = editorInstance
 
-  const ls = await setupLs(editorInstance, documentModelMap)
+  // const ls = await setupLs(editorInstance, documentModelMap)
 
   await loadGrammars(editorInstance);
 
@@ -79,7 +82,9 @@ onMounted(async () => {
     emits('change', editorInstance.getValue());
   });
 
-  setupValidate(editorInstance, ls);
+
+
+  // setupValidate(editorInstance, ls);
 });
 
 onBeforeUnmount(() => {
