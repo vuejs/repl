@@ -15,16 +15,35 @@ const genStub: Plugin = {
 
 export default defineConfig({
   plugins: [vue(), genStub],
+  optimizeDeps: {
+    include: [
+      'path-browserify',
+      'onigasm'
+    ],
+  },
+  resolve: {
+    alias: {
+      path: 'path-browserify',
+    }
+  },
+  worker: {
+    format: 'es'
+  },
   build: {
     target: 'esnext',
     minify: false,
     lib: {
       entry: './src/index.ts',
       formats: ['es'],
-      fileName: () => 'vue-repl.js'
+      fileName: () => '[name].js'
     },
+    
     rollupOptions: {
+      input: {
+        'vue-repl': './src/index.ts',
+        'vue-repl-monaco-editor': './src/editor/MonacoEditor.vue',
+      },
       external: ['vue', 'vue/compiler-sfc']
-    }
+    },
   }
 })

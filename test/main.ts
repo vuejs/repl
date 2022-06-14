@@ -1,5 +1,7 @@
 import { createApp, h, watchEffect } from 'vue'
 import { Repl, ReplStore } from '../src'
+import MonacoEditor from '../src/editor/MonacoEditor.vue'
+
 ;(window as any).process = { env: {} }
 
 const App = {
@@ -37,6 +39,7 @@ const App = {
     return () =>
       h(Repl, {
         store,
+        editor: MonacoEditor,
         // layout: 'vertical',
         ssr: true,
         sfcOptions: {

@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import SplitPane from './SplitPane.vue'
-import Editor from './editor/Editor.vue'
 import Output from './output/Output.vue'
 import { Store, ReplStore, SFCOptions } from './store'
 import { provide, toRef } from 'vue'
+import { EditorComponentType } from './types';
+import EditorContainer from './editor/EditorContainer.vue';
+import CodeMirrorEditor from './editor/CodeMirrorEditor.vue';
 
 export interface Props {
   store?: Store
@@ -14,6 +16,7 @@ export interface Props {
   sfcOptions?: SFCOptions
   layout?: string
   ssr?: boolean
+  editor?: EditorComponentType
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -22,7 +25,8 @@ const props = withDefaults(defineProps<Props>(), {
   showCompileOutput: true,
   showImportMap: true,
   clearConsole: true,
-  ssr: false
+  ssr: false,
+  editor: CodeMirrorEditor
 })
 
 props.store.options = props.sfcOptions
@@ -38,7 +42,7 @@ provide('clear-console', toRef(props, 'clearConsole'))
   <div class="vue-repl">
     <SplitPane :layout="layout">
       <template #left>
-        <Editor />
+        <EditorContainer :editor-component="editor" />
       </template>
       <template #right>
         <Output

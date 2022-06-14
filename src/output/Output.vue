@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import Preview from './Preview.vue'
-import CodeMirror from '../codemirror/CodeMirror.vue'
 import { Store } from '../store'
 import { inject, ref, computed } from 'vue'
 import type { OutputModes } from './types'
+import CodeMirror from '../codemirror/CodeMirror.vue'
 
 const props = defineProps<{
   showCompileOutput?: boolean
@@ -36,7 +36,7 @@ const mode = ref<OutputModes>(
   </div>
 
   <div class="output-container">
-    <Preview :show="mode === 'preview'" :ssr="ssr" />
+    <Preview :show="mode === 'preview'" :ssr="ssr"/>
     <CodeMirror
       v-if="mode !== 'preview'"
       readonly

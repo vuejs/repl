@@ -17,7 +17,9 @@
     "lib": ["esnext", "dom"],
     "rootDir": ".",
     "declaration": true,
-    "emitDeclarationOnly": true
+    "skipLibCheck": true,
+    "emitDeclarationOnly": true,
+    "jsx": "preserve",
   },
   "include": ["src"]
 }

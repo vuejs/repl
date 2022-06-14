@@ -17,8 +17,11 @@
     <script type="module">
       import { createApp } from 'vue'
       import { Repl } from './dist/vue-repl'
+      import Monaco from './dist/vue-repl-monaco-editor'
       import './dist/style.css'
-      createApp(Repl).mount('#app')
+      createApp(Repl, {
+        editor: Monaco
+      }).mount('#app')
     </script>
   </head>
   <body>
