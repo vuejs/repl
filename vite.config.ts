@@ -17,7 +17,8 @@ export default defineConfig({
   plugins: [vue(), genStub],
   optimizeDeps: {
     include: [
-      'path-browserify'
+      'path-browserify',
+      'onigasm'
     ],
   },
   resolve: {
@@ -42,10 +43,7 @@ export default defineConfig({
         'vue-repl': './src/index.ts',
         'vue-repl-monaco-editor': './src/editor/MonacoEditor.vue',
       },
-      external: ['vue', 'vue/compiler-sfc'],
-      output: {
-        format: 'amd'
-      }
+      external: ['vue', 'vue/compiler-sfc']
     },
   }
 })

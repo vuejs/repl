@@ -1,15 +1,15 @@
 <script lang="ts">
-import { setupMonacoEnv } from './env';
-setupMonacoEnv();
-import './monaco.contribution'
-
+import { loadMonacoEnv, loadWasm } from './env';
+import { prepareVirtualFiles } from 'monaco-volar'
+loadMonacoEnv();
+loadWasm();
+prepareVirtualFiles();
 </script>
 <script lang="ts" setup>
 import { onMounted, onBeforeUnmount, ref, shallowRef, nextTick, watchEffect } from 'vue';
-import { loadGrammars } from './grammars';
 import * as monaco from 'monaco-editor-core';
-import { prepareServiceVirtualFiles } from './prepare';
 import { setupThemePromise, getOrCreateModel } from './utils';
+import { loadGrammars, loadTheme } from 'monaco-volar'
 
 const props = withDefaults(defineProps<{
   value?: string
@@ -37,8 +37,6 @@ const currentModel = shallowRef<monaco.editor.ITextModel>(
   )
 )
 
-prepareServiceVirtualFiles()
-
 watchEffect(() => {
   if (currentModel.value.getValue() !== props.value) {
     currentModel.value.setValue(props.value)
@@ -46,7 +44,7 @@ watchEffect(() => {
 })
 
 onMounted(async () => {
-  const theme = await setupThemePromise;
+  const theme = await loadTheme();
   ready.value = true;
   await nextTick();
 
