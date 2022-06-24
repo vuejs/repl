@@ -1,4 +1,4 @@
-import { deflate, inflate } from 'pako'
+import { zlibSync, unzlibSync, strToU8, strFromU8 } from 'fflate'
 
 export function debounce(fn: Function, n = 100) {
   let handle: any
@@ -11,19 +11,23 @@ export function debounce(fn: Function, n = 100) {
 }
 
 export function utoa(data: string): string {
-  const zipped = deflate(data, { level: 9 })
-  const b = Array.from(zipped, v => String.fromCharCode(v)).join('')
-  return btoa(b)
+  const buffer = strToU8(data)
+  const zipped = zlibSync(buffer, { level: 9 })
+  const binary = strFromU8(zipped, true)
+  return btoa(binary)
 }
 
 export function atou(base64: string): string {
-  const b = atob(base64)
-  if (b.startsWith('\x78\xDA')) {
-    const buffer = Uint8Array.from(b, (_, i) => b.charCodeAt(i))
-    return inflate(buffer, { to: 'string' })
+  const binary = atob(base64)
+
+  // zlib header (x78), level 9 (xDA)
+  if (binary.startsWith('\x78\xDA')) {
+    const buffer = strToU8(binary, true)
+    const unzipped = unzlibSync(buffer)
+    return strFromU8(unzipped)
   }
 
   // old unicode hacks for backward compatibility
   // https://base64.guru/developers/javascript/examples/unicode-strings
-  return decodeURIComponent(escape(b))
+  return decodeURIComponent(escape(binary))
 }

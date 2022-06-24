@@ -5,11 +5,10 @@ specifiers:
   '@microsoft/api-extractor': ^7.19.2
   '@types/codemirror': ^5.60.2
   '@types/node': ^16.11.12
-  '@types/pako': ^2.0.0
   '@vitejs/plugin-vue': ^1.9.0
   codemirror: ^5.62.3
+  fflate: ^0.7.3
   hash-sum: ^2.0.0
-  pako: ^2.0.4
   rimraf: ^3.0.2
   sucrase: ^3.20.1
   typescript: ^4.5.4
@@ -18,14 +17,13 @@ specifiers:
   vue-tsc: ^0.34.15
 
 dependencies:
-  pako: 2.0.4
+  fflate: 0.7.3
 
 devDependencies:
   '@babel/types': 7.17.12
   '@microsoft/api-extractor': 7.24.0
   '@types/codemirror': 5.60.5
   '@types/node': 16.11.36
-  '@types/pako': 2.0.0
   '@vitejs/plugin-vue': 1.10.2_vite@2.9.9
   codemirror: 5.65.3
   hash-sum: 2.0.0
@@ -148,10 +146,6 @@ packages:
 
   /@types/node/16.11.36:
     resolution: {integrity: sha512-FR5QJe+TaoZ2GsMHkjuwoNabr+UrJNRr2HNOo+r/7vhcuntM6Ee/pRPOnRhhL2XE9OOvX9VLEq+BcXl3VjNoWA==}
-    dev: true
-
-  /@types/pako/2.0.0:
-    resolution: {integrity: sha512-10+iaz93qR5WYxTo+PMifD5TSxiOtdRaxBf7INGGXMQgTCu8Z/7GYWYFUOS3q/G0nE5boj1r4FEB+WSy7s5gbA==}
     dev: true
 
   /@types/tern/0.23.4:
@@ -618,6 +612,10 @@ packages:
     resolution: {integrity: sha512-lhd/wF+Lk98HZoTCtlVraHtfh5XYijIjalXck7saUtuanSDyLMxnHhSXEDJqHxD7msR8D0uCmqlkwjCV8xvwHw==}
     dev: true
 
+  /fflate/0.7.3:
+    resolution: {integrity: sha512-0Zz1jOzJWERhyhsimS54VTqOteCNwRtIlh8isdL0AXLo0g7xNTfTL7oWrkmCnPhZGocKIkWHBistBrrpoNH3aw==}
+    dev: false
+
   /fs-extra/7.0.1:
     resolution: {integrity: sha512-YJDaCJZEnBmcbw13fvdAM9AwNOJwOzrE4pqMqBq5nFiEqXUqHwlK4B+3pUw6JNvfSPtX05xFHtYy/1ni01eGCw==}
     engines: {node: '>=6 <7 || >=8'}
@@ -775,10 +773,6 @@ packages:
     dependencies:
       wrappy: 1.0.2
     dev: true
-
-  /pako/2.0.4:
-    resolution: {integrity: sha512-v8tweI900AUkZN6heMU/4Uy4cXRc2AYNRggVmTR+dEncawDJgCdLMximOVA2p4qO57WMynangsfGRb5WD6L1Bg==}
-    dev: false
 
   /path-is-absolute/1.0.1:
     resolution: {integrity: sha1-F0uSaHNVNP+8es5r9TpanhtcX18=}
