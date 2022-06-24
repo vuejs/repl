@@ -5,6 +5,7 @@ specifiers:
   '@microsoft/api-extractor': ^7.19.2
   '@types/codemirror': ^5.60.2
   '@types/node': ^16.11.12
+  '@types/pako': ^2.0.0
   '@vitejs/plugin-vue': ^1.9.0
   codemirror: ^5.62.3
   hash-sum: ^2.0.0
@@ -24,6 +25,7 @@ devDependencies:
   '@microsoft/api-extractor': 7.24.0
   '@types/codemirror': 5.60.5
   '@types/node': 16.11.36
+  '@types/pako': 2.0.0
   '@vitejs/plugin-vue': 1.10.2_vite@2.9.9
   codemirror: 5.65.3
   hash-sum: 2.0.0
@@ -146,6 +148,10 @@ packages:
 
   /@types/node/16.11.36:
     resolution: {integrity: sha512-FR5QJe+TaoZ2GsMHkjuwoNabr+UrJNRr2HNOo+r/7vhcuntM6Ee/pRPOnRhhL2XE9OOvX9VLEq+BcXl3VjNoWA==}
+    dev: true
+
+  /@types/pako/2.0.0:
+    resolution: {integrity: sha512-10+iaz93qR5WYxTo+PMifD5TSxiOtdRaxBf7INGGXMQgTCu8Z/7GYWYFUOS3q/G0nE5boj1r4FEB+WSy7s5gbA==}
     dev: true
 
   /@types/tern/0.23.4:

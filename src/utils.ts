@@ -11,7 +11,7 @@ export function debounce(fn: Function, n = 100) {
 }
 
 export function utoa(data: string): string {
-  const zipped: Uint8Array = deflate(data, { level: 9 })
+  const zipped = deflate(data, { level: 9 })
   const b = Array.from(zipped, v => String.fromCharCode(v)).join('')
   return btoa(b)
 }

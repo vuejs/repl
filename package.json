@@ -38,6 +38,7 @@
     "@microsoft/api-extractor": "^7.19.2",
     "@types/codemirror": "^5.60.2",
     "@types/node": "^16.11.12",
+    "@types/pako": "^2.0.0",
     "@vitejs/plugin-vue": "^1.9.0",
     "codemirror": "^5.62.3",
     "hash-sum": "^2.0.0",
