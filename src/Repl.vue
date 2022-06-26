@@ -14,9 +14,14 @@ export interface Props {
   sfcOptions?: SFCOptions
   layout?: string
   ssr?: boolean
-  customImportStatements?: string[]
-  customAppUsageCodes?: string[]
-  customHeadTags?: string[]
+  previewOptions?: {
+    headHTML?: string
+    bodyHTML?: string
+    customCode?: {
+      importCode?: string
+      useCode?: string
+    }
+  }
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -26,9 +31,14 @@ const props = withDefaults(defineProps<Props>(), {
   showImportMap: true,
   clearConsole: true,
   ssr: false,
-  customImportStatements: () => [],
-  customAppUsageCodes: () => [],
-  customHeadTags: () => []
+  previewOptions: () => ({
+    headHTML: '',
+    bodyHTML: '',
+    customCode: {
+      importCode: '',
+      useCode: '',
+    },
+  }),
 })
 
 props.store.options = props.sfcOptions
@@ -38,9 +48,7 @@ provide('store', props.store)
 provide('autoresize', props.autoResize)
 provide('import-map', toRef(props, 'showImportMap'))
 provide('clear-console', toRef(props, 'clearConsole'))
-provide('custom-import-statements', props.customImportStatements)
-provide('custom-app-usage-codes', props.customAppUsageCodes)
-provide('custom-head-tags', props.customHeadTags)
+provide('preview-options', props.previewOptions)
 </script>
 
 <template>
