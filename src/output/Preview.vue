@@ -172,7 +172,7 @@ async function updatePreview() {
     if (parseInt(minor, 10) < 2 || parseInt(patch, 10) < 27) {
       alert(
         `The selected version of Vue (${store.vueVersion}) does not support in-browser SSR.` +
-          ` Rendering in client mode instead.`
+        ` Rendering in client mode instead.`
       )
       isSSR = false
     }
@@ -198,9 +198,9 @@ async function updatePreview() {
          app.config.unwrapInjectedRef = true
          app.config.warnHandler = () => {}
          window.__ssr_promise__ = _renderToString(app).then(html => {
-           document.body.innerHTML = '<div id="app">' + html + '</div> + \`${
+           document.body.innerHTML = '<div id="app">' + html + '</div>' + \`${
              previewOptions?.bodyHTML || ''
-           }\`'
+           }\`
          }).catch(err => {
            console.error("SSR Error", err)
          })
