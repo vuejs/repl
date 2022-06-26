@@ -16,9 +16,6 @@ specifiers:
   vue: ^3.2.36
   vue-tsc: ^0.34.15
 
-dependencies:
-  fflate: 0.7.3
-
 devDependencies:
   '@babel/types': 7.17.12
   '@microsoft/api-extractor': 7.24.0
@@ -26,6 +23,7 @@ devDependencies:
   '@types/node': 16.11.36
   '@vitejs/plugin-vue': 1.10.2_vite@2.9.9
   codemirror: 5.65.3
+  fflate: 0.7.3
   hash-sum: 2.0.0
   rimraf: 3.0.2
   sucrase: 3.21.0
@@ -614,7 +612,7 @@ packages:
 
   /fflate/0.7.3:
     resolution: {integrity: sha512-0Zz1jOzJWERhyhsimS54VTqOteCNwRtIlh8isdL0AXLo0g7xNTfTL7oWrkmCnPhZGocKIkWHBistBrrpoNH3aw==}
-    dev: false
+    dev: true
 
   /fs-extra/7.0.1:
     resolution: {integrity: sha512-YJDaCJZEnBmcbw13fvdAM9AwNOJwOzrE4pqMqBq5nFiEqXUqHwlK4B+3pUw6JNvfSPtX05xFHtYy/1ni01eGCw==}
