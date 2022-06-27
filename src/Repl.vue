@@ -14,6 +14,14 @@ export interface Props {
   sfcOptions?: SFCOptions
   layout?: string
   ssr?: boolean
+  previewOptions?: {
+    headHTML?: string
+    bodyHTML?: string
+    customCode?: {
+      importCode?: string
+      useCode?: string
+    }
+  }
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -22,7 +30,15 @@ const props = withDefaults(defineProps<Props>(), {
   showCompileOutput: true,
   showImportMap: true,
   clearConsole: true,
-  ssr: false
+  ssr: false,
+  previewOptions: () => ({
+    headHTML: '',
+    bodyHTML: '',
+    customCode: {
+      importCode: '',
+      useCode: '',
+    },
+  }),
 })
 
 props.store.options = props.sfcOptions
@@ -32,6 +48,7 @@ provide('store', props.store)
 provide('autoresize', props.autoResize)
 provide('import-map', toRef(props, 'showImportMap'))
 provide('clear-console', toRef(props, 'clearConsole'))
+provide('preview-options', props.previewOptions)
 </script>
 
 <template>
