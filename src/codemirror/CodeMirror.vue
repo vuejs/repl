@@ -29,7 +29,8 @@ onMounted(() => {
     autoCloseBrackets: true,
     autoCloseTags: true,
     foldGutter: true,
-    gutters: ['CodeMirror-linenumbers', 'CodeMirror-foldgutter']
+    gutters: ['CodeMirror-linenumbers', 'CodeMirror-foldgutter'],
+    keyMap: "sublime",
   }
 
   const editor = CodeMirror(el.value!, {
