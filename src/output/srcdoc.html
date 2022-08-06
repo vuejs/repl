@@ -52,7 +52,9 @@
 								// send ok in the module script to ensure sequential evaluation
 								// of multiple proxy.eval() calls
 								const done = new Promise((resolve) => {
-									window.__next__ = resolve
+									window.__next__ = () => {
+                                        setTimeout(() => resolve(), 0)
+                                    }
 								})
 								scriptEl.innerHTML = script + `\nwindow.__next__()`
 								document.head.appendChild(scriptEl)
