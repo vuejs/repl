@@ -149,7 +149,8 @@ function createSandbox() {
 
   sandbox.addEventListener('load', () => {
     proxy.handle_links()
-    stopUpdateWatcher = watchEffect(updatePreview)
+    // stopUpdateWatcher = watchEffect(updatePreview,{ flush: 'sync' })
+    stopUpdateWatcher = watch(() => store.state, updatePreview, { deep: true, immediate: true })
   })
 }
 
