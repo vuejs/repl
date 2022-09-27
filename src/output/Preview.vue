@@ -105,7 +105,7 @@ function createSandbox() {
       ) {
         runtimeError.value =
           msg.replace(/\. Relative references must.*$/, '') +
-          `.\nTip: add an "import-map.json" file to specify import paths for dependencies.`
+          `.\nTip: edit the "Import Map" tab to specify import paths for dependencies.`
       } else {
         runtimeError.value = event.value
       }
@@ -166,7 +166,7 @@ async function updatePreview() {
     if (parseInt(minor, 10) < 2 || parseInt(patch, 10) < 27) {
       alert(
         `The selected version of Vue (${store.vueVersion}) does not support in-browser SSR.` +
-        ` Rendering in client mode instead.`
+          ` Rendering in client mode instead.`
       )
       isSSR = false
     }
