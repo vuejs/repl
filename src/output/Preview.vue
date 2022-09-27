@@ -49,7 +49,7 @@ watch(
 )
 
 // reset sandbox when version changes
-watch(() => store.state.vueRuntimeURL, createSandbox)
+watch(() => store.state.resetFlip, createSandbox)
 
 onUnmounted(() => {
   proxy.destroy()
@@ -202,11 +202,15 @@ async function updatePreview() {
 
     // compile code to simulated module system
     const modules = compileModulesForPreview(store)
-    console.log(`[@vue/repl] successfully compiled ${modules.length} modules.`)
+    console.log(
+      `[@vue/repl] successfully compiled ${modules.length} module${
+        modules.length > 1 ? `s` : ``
+      }.`
+    )
 
     const codeToEval = [
-      `window.__modules__ = {};window.__css__ = '';` +
-        `if (window.__app__) window.__app__.unmount();` +
+      `window.__modules__ = {}\nwindow.__css__ = ''\n` +
+        `if (window.__app__) window.__app__.unmount()\n` +
         (isSSR ? `` : `document.body.innerHTML = '<div id="app"></div>'`),
       ...modules,
       `document.getElementById('__sfc-styles').innerHTML = window.__css__`
