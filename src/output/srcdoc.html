@@ -115,7 +115,7 @@
 				}
 
 				window.addEventListener("unhandledrejection", event => {
-					if (event.reason.message.includes('Cross-origin')) {
+					if (event.reason.message && event.reason.message.includes('Cross-origin')) {
 						event.preventDefault()
 						return
 					}
