@@ -56,6 +56,6 @@ store.setVueVersion('3.2.8')
 </script>
 
 <template>
-  <Repl :store="store" :showCompileOutput="true" />
+  <Repl :store="store" :show-compile-output="true" />
 </template>
 ```
