@@ -18,18 +18,34 @@ async function transformTS(src: string) {
   }).code
 }
 
-export async function compileFile(
-  store: Store,
-  { filename, code, compiled }: File
-) {
+export async function compileFile(store: Store, file: File) {
+  function withTransformer(
+    code: string,
+    filename: string,
+    stage: 'pre' | 'post',
+    ssr = false
+  ) {
+    if (!store.transformer) return code
+    try {
+      return store.transformer({ code, filename, file, stage, ssr }) || code
+    } catch (err: any) {
+      store.state.errors.push(err)
+    }
+    return code
+  }
+
+  store.state.errors = []
+
+  let { code } = file
+  const { filename, compiled } = file
   if (!code.trim()) {
-    store.state.errors = []
     return
   }
 
+  code = withTransformer(code, filename, 'pre')
+
   if (filename.endsWith('.css')) {
-    compiled.css = code
-    store.state.errors = []
+    compiled.css = withTransformer(code, filename, 'post')
     return
   }
 
@@ -40,13 +56,13 @@ export async function compileFile(
     if (filename.endsWith('.ts')) {
       code = await transformTS(code)
     }
-    compiled.js = compiled.ssr = code
-    store.state.errors = []
+    compiled.js = withTransformer(code, filename, 'post')
+    compiled.ssr = withTransformer(code, filename, 'post', true)
     return
   }
 
   if (!filename.endsWith('.vue')) {
-    store.state.errors = []
+    compiled.js = withTransformer(code, filename, 'post')
     return
   }
 
@@ -60,14 +76,24 @@ export async function compileFile(
     return
   }
 
+  const unsupportedStyle = descriptor.styles.find(
+    (s) => s.lang && !store.supportedLanguages.includes(s.lang)
+  )
+  if (unsupportedStyle) {
+    store.state.errors.push(
+      `lang="${unsupportedStyle.lang}" pre-processors for <style> are not supported.`
+    )
+    return
+  }
+
   if (
-    descriptor.styles.some((s) => s.lang) ||
-    (descriptor.template && descriptor.template.lang)
+    descriptor.template &&
+    descriptor.template.lang &&
+    !store.supportedLanguages.includes(descriptor.template.lang)
   ) {
-    store.state.errors = [
-      `lang="x" pre-processors for <template> or <style> are currently not ` +
-        `supported.`
-    ]
+    store.state.errors.push(
+      `lang="${descriptor.template.lang}" pre-processors for <template> are not supported.`
+    )
     return
   }
 
@@ -76,7 +102,7 @@ export async function compileFile(
     (descriptor.scriptSetup && descriptor.scriptSetup.lang)
   const isTS = scriptLang === 'ts'
   if (scriptLang && !isTS) {
-    store.state.errors = [`Only lang="ts" is supported for <script> blocks.`]
+    store.state.errors.push(`Only lang="ts" is supported for <script> blocks.`)
     return
   }
 
@@ -128,26 +154,47 @@ export async function compileFile(
     descriptor.template &&
     (!descriptor.scriptSetup || store.options?.script?.inlineTemplate === false)
   ) {
-    const clientTemplateResult = await doCompileTemplate(
+    const templateFilename = `${filename}.template.${
+      descriptor.template.lang || 'html'
+    }`
+    const source = withTransformer(
+      descriptor.template!.content,
+      templateFilename,
+      'pre'
+    )
+    let clientTemplateResult = await doCompileTemplate(
       store,
       descriptor,
+      source,
       id,
       bindings,
       false,
       isTS
+    )
+    clientTemplateResult = withTransformer(
+      clientTemplateResult || '',
+      templateFilename,
+      'post'
     )
     if (!clientTemplateResult) {
       return
     }
     clientCode += clientTemplateResult
 
-    const ssrTemplateResult = await doCompileTemplate(
+    let ssrTemplateResult = await doCompileTemplate(
       store,
       descriptor,
+      source,
       id,
       bindings,
       true,
       isTS
+    )
+    ssrTemplateResult = withTransformer(
+      ssrTemplateResult || '',
+      templateFilename,
+      'post',
+      true
     )
     if (ssrTemplateResult) {
       // ssr compile failure is fine
@@ -174,17 +221,19 @@ export async function compileFile(
 
   // styles
   let css = ''
-  for (const style of descriptor.styles) {
+  for (const [i, style] of descriptor.styles.entries()) {
     if (style.module) {
-      store.state.errors = [
+      store.state.errors.push(
         `<style module> is not supported in the playground.`
-      ]
+      )
       return
     }
 
+    const styleFilename = `${filename}.${i}.${style.lang || 'css'}`
+    const source = withTransformer(style.content, styleFilename, 'pre')
     const styleResult = await store.compiler.compileStyleAsync({
       ...store.options?.style,
-      source: style.content,
+      source,
       filename,
       id,
       scoped: style.scoped,
@@ -198,7 +247,7 @@ export async function compileFile(
       }
       // proceed even if css compile errors
     } else {
-      css += styleResult.code + '\n'
+      css += withTransformer(styleResult.code + '\n', styleFilename, 'post')
     }
   }
   if (css) {
@@ -207,8 +256,9 @@ export async function compileFile(
     compiled.css = '/* No <style> tags present */'
   }
 
-  // clear errors
-  store.state.errors = []
+  compiled.js = withTransformer(compiled.js, filename, 'post')
+  compiled.ssr = withTransformer(compiled.ssr, filename, 'post', true)
+  compiled.css = withTransformer(compiled.css, filename + '.css', 'post')
 }
 
 async function doCompileScript(
@@ -270,6 +320,7 @@ async function doCompileScript(
 async function doCompileTemplate(
   store: Store,
   descriptor: SFCDescriptor,
+  source: string,
   id: string,
   bindingMetadata: BindingMetadata | undefined,
   ssr: boolean,
@@ -277,7 +328,7 @@ async function doCompileTemplate(
 ) {
   const templateResult = store.compiler.compileTemplate({
     ...store.options?.template,
-    source: descriptor.template!.content,
+    source,
     filename: descriptor.filename,
     id,
     scoped: descriptor.styles.some((s) => s.scoped),

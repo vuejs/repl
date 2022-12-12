@@ -48,9 +48,9 @@ function doneAddFile() {
   if (!pending.value) return
   const filename = pendingFilename.value
 
-  if (!/\.(vue|js|ts|css)$/.test(filename)) {
+  if (!store.supportedLanguages.some((ext) => filename.endsWith(ext))) {
     store.state.errors = [
-      `Playground only supports *.vue, *.js, *.ts, *.css files.`
+      `Playground only supports ${store.supportedLanguages.join(', ')} files.`
     ]
     return
   }

@@ -58,6 +58,14 @@ export interface SFCOptions {
   template?: SFCTemplateCompileOptions
 }
 
+export interface TransformerOptions {
+  code: string
+  filename: string
+  file: File
+  stage: 'pre' | 'post'
+  ssr: boolean
+}
+
 export interface Store {
   state: StoreState
   options?: SFCOptions
@@ -70,6 +78,8 @@ export interface Store {
   getImportMap: () => any
   initialShowOutput: boolean
   initialOutputMode: OutputModes
+  supportedLanguages: string[]
+  transformer?(options: TransformerOptions): undefined | string
 }
 
 export interface StoreOptions {
@@ -88,6 +98,7 @@ export class ReplStore implements Store {
   options?: SFCOptions
   initialShowOutput: boolean
   initialOutputMode: OutputModes
+  supportedLanguages = ['vue', 'js', 'ts', 'css', 'pug']
 
   private defaultVueRuntimeURL: string
   private defaultVueServerRendererURL: string
