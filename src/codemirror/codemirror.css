@@ -538,3 +538,7 @@ div.CodeMirror-dragcursors {
 span.CodeMirror-selectedtext {
   background: none;
 }
+
+.CodeMirror-dialog{
+  background-color: var(--bg);
+}
