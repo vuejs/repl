@@ -6,15 +6,26 @@ import {
   transformRef,
   CompilerOptions
 } from 'vue/compiler-sfc'
-import { transform } from 'sucrase'
+import { transform } from './babel'
 // @ts-ignore
 import hashId from 'hash-sum'
 
 export const COMP_IDENTIFIER = `__sfc__`
 
+function testTs(lang: string | null | undefined) {
+  return ['ts', 'tsx'].includes(lang!)
+}
+
 async function transformTS(src: string) {
   return transform(src, {
-    transforms: ['typescript']
+    filename: 'code.tsx',
+    presets: [
+      'react',
+      'typescript'
+    ],
+    plugins: [
+      '@vue/babel-plugin-jsx'
+    ],
   }).code
 }
 
@@ -74,7 +85,7 @@ export async function compileFile(
   const scriptLang =
     (descriptor.script && descriptor.script.lang) ||
     (descriptor.scriptSetup && descriptor.scriptSetup.lang)
-  const isTS = scriptLang === 'ts'
+  const isTS = testTs(scriptLang)
   if (scriptLang && !isTS) {
     store.state.errors = [`Only lang="ts" is supported for <script> blocks.`]
     return
@@ -253,7 +264,7 @@ async function doCompileScript(
           expressionPlugins
         )
 
-      if ((descriptor.script || descriptor.scriptSetup)!.lang === 'ts') {
+      if (testTs((descriptor.script || descriptor.scriptSetup)!.lang)) {
         code = await transformTS(code)
       }
 
@@ -304,7 +315,7 @@ async function doCompileTemplate(
       `$1 ${fnName}`
     )}` + `\n${COMP_IDENTIFIER}.${fnName} = ${fnName}`
 
-  if ((descriptor.script || descriptor.scriptSetup)?.lang === 'ts') {
+  if (testTs((descriptor.script || descriptor.scriptSetup)?.lang)) {
     code = await transformTS(code)
   }
 

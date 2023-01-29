@@ -14,6 +14,10 @@ const genStub: Plugin = {
 }
 
 export default defineConfig({
+  define: {
+    global: 'globalThis',
+    'process.env': process.env,
+  },
   plugins: [vue(), genStub],
   build: {
     target: 'esnext',
