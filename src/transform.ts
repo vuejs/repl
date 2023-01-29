@@ -6,7 +6,7 @@ import {
   transformRef,
   CompilerOptions
 } from 'vue/compiler-sfc'
-import { transform } from 'sucrase'
+import { transform } from './babel'
 // @ts-ignore
 import hashId from 'hash-sum'
 
@@ -18,9 +18,14 @@ function testTs(lang: string | null | undefined) {
 
 async function transformTS(src: string) {
   return transform(src, {
-    transforms: ['jsx', 'typescript'],
-    jsxPragma: 'h',
-    jsxFragmentPragma: 'Fragment'
+    filename: 'code.tsx',
+    presets: [
+      'react',
+      'typescript'
+    ],
+    plugins: [
+      '@vue/babel-plugin-jsx'
+    ],
   }).code
 }
 
