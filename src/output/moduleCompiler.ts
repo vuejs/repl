@@ -179,6 +179,9 @@ function processModule(store: Store, src: string, filename: string) {
       } else if (source.endsWith('.json')) {
         // import data from 'foo/data.json' --> const data = await (await fetch(import.meta.resolve('foo/data.json'))).json()
         s.overwrite(node.start!, node.end!, `const ${node.specifiers[0].local.name} = await (await fetch(${source.startsWith('http') ? `'${source}'` : `import.meta.resolve('${source}'))`})).json()`)
+      } else if (source.match(/\.(ttf|otf|woff2?|eot|jpe?g|png|jfif|pjpeg|pjp|gif|svg|ico|webp|avif|mp4|webm|ogg|mp3|wav|flac|aac)$/)) {
+        // import font from 'foo/dont.ttf' --> const font = import.meta.resolve('foo/dont.ttf')
+        s.overwrite(node.start!, node.end!, `const ${node.specifiers[0].local.name} = ${source.startsWith('http') ? `'${source}'` : `import.meta.resolve('${source}')`}`)
       } else if (source.startsWith('./')) {
         const importId = defineImport(node, node.source.value)
         for (const spec of node.specifiers) {
