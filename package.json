@@ -14,6 +14,11 @@
       "require": "./dist/ssr-stub.js",
       "types": "./dist/repl.d.ts"
     },
+    "./monaco-editor": {
+      "import": "./dist/vue-repl-monaco-editor.js",
+      "require": null,
+      "types": "./dist/src/editor/MonacoEditor.vue.d.ts"
+    },
     "./style.css": "./dist/style.css",
     "./dist/style.css": "./dist/style.css"
   },
@@ -49,7 +54,11 @@
     "vue": "^3.2.39",
     "vue-tsc": "^0.40.13"
   },
-  "peerDependencies": {
+  "dependencies": {
+    "monaco-editor-core": "^0.33.0",
+    "monaco-volar": "^0.0.1",
+    "onigasm": "^2.2.5",
+    "path-browserify": "^1.0.1",
     "vue": "^3.2.13"
   }
 }
