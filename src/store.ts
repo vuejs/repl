@@ -48,6 +48,8 @@ export interface StoreState {
   errors: (string | Error)[]
   vueRuntimeURL: string
   vueServerRendererURL: string
+  // used to force reset the sandbox
+  resetFlip: boolean
 }
 
 export interface SFCOptions {
@@ -126,7 +128,8 @@ export class ReplStore implements Store {
       activeFile: files[mainFile],
       errors: [],
       vueRuntimeURL: this.defaultVueRuntimeURL,
-      vueServerRendererURL: this.defaultVueServerRendererURL
+      vueServerRendererURL: this.defaultVueServerRendererURL,
+      resetFlip: true
     })
 
     this.initImportMap()
@@ -191,6 +194,11 @@ export class ReplStore implements Store {
     this.state.files = files
     this.initImportMap()
     this.setActive(mainFile)
+    this.forceSandboxReset()
+  }
+
+  private forceSandboxReset() {
+    this.state.resetFlip = !this.state.resetFlip
   }
 
   private initImportMap() {
@@ -256,6 +264,7 @@ export class ReplStore implements Store {
     imports.vue = runtimeUrl
     imports['vue/server-renderer'] = ssrUrl
     this.setImportMap(importMap)
+    this.forceSandboxReset()
     console.info(`[@vue/repl] Now using Vue version: ${version}`)
   }
 
@@ -269,6 +278,7 @@ export class ReplStore implements Store {
     imports.vue = this.defaultVueRuntimeURL
     imports['vue/server-renderer'] = this.defaultVueServerRendererURL
     this.setImportMap(importMap)
+    this.forceSandboxReset()
     console.info(`[@vue/repl] Now using default Vue version`)
   }
 }
