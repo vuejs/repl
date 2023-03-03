@@ -1,14 +1,12 @@
 <script lang="ts">
 import { loadMonacoEnv, loadWasm } from './env';
-import { prepareVirtualFiles } from 'monaco-volar'
 loadMonacoEnv();
 loadWasm();
-prepareVirtualFiles();
 </script>
 <script lang="ts" setup>
 import { onMounted, onBeforeUnmount, ref, shallowRef, nextTick, watchEffect } from 'vue';
 import * as monaco from 'monaco-editor-core';
-import { setupThemePromise, getOrCreateModel } from './utils';
+import { getOrCreateModel } from './utils';
 import { loadGrammars, loadTheme } from 'monaco-volar'
 
 const props = withDefaults(defineProps<{
