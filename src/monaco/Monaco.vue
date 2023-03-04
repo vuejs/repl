@@ -1,7 +1,7 @@
 <script lang="ts">
 import { loadMonacoEnv, loadWasm } from './env';
-loadMonacoEnv();
-loadWasm();
+
+let init = false;
 </script>
 
 <script lang="ts" setup>
@@ -20,13 +20,18 @@ const props = withDefaults(defineProps<{
 
 const emits = defineEmits<{
   (e: 'change', value: string): void,
-  (e: 'save', value: string): void
 }>()
 
 const containerRef = ref<HTMLDivElement | null>();
 const ready = ref(false);
 const editor = shallowRef<monaco.editor.IStandaloneCodeEditor | undefined>(undefined);
 const store = inject('store') as Store;
+
+if (!init) {
+  init = true;
+  loadMonacoEnv(store);
+  loadWasm();
+}
 
 watchEffect(() => {
   // create a model for each file in the store
@@ -86,6 +91,10 @@ onMounted(async () => {
   }, { immediate: true });
 
   await loadGrammars(editorInstance);
+
+  editorInstance.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS, () => {
+    // ignore save event
+  });
 
   editorInstance.onDidChangeModelContent(() => {
     emits('change', editorInstance.getValue());

@@ -6,7 +6,7 @@ specifiers:
   '@types/codemirror': ^5.60.2
   '@types/node': ^16.11.12
   '@vitejs/plugin-vue': ^3.0.0
-  '@volar/monaco': 1.3.0-alpha.3
+  '@volar/monaco': 1.3.0-alpha.3-patch.2
   '@volar/vue-language-service': 1.2.2-alpha.0
   codemirror: ^5.62.3
   fflate: ^0.7.3
@@ -39,7 +39,7 @@ devDependencies:
   '@types/codemirror': 5.60.5
   '@types/node': 16.11.36
   '@vitejs/plugin-vue': 3.1.0_vite@3.1.3+vue@3.2.39
-  '@volar/monaco': 1.3.0-alpha.3
+  '@volar/monaco': 1.3.0-alpha.3-patch.2
   '@volar/vue-language-service': 1.2.2-alpha.0
   codemirror: 5.65.3
   fflate: 0.7.3
@@ -352,8 +352,8 @@ packages:
       vscode-uri: 3.0.7
     dev: true
 
-  /@volar/monaco/1.3.0-alpha.3:
-    resolution: {integrity: sha512-Z1uVKGZc8ugRgecuTcz6ykvhi357iGBcyxYR9xi7+oj5BKFqyLE9nScx9mHGWkPUM9+0ke16lif03twpHcEwyQ==}
+  /@volar/monaco/1.3.0-alpha.3-patch.2:
+    resolution: {integrity: sha512-01fmplJllEikiz3SAKaQSUqoPb9J0BKKLAPhudOfb/vvgTW68hWdRUXQdVsmgPusx0wXXgg98AqTNa00j6NY+w==}
     dependencies:
       '@volar/language-service': 1.3.0-alpha.3
       axios: 1.3.4
