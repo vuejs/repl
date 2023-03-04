@@ -50,6 +50,8 @@ watchEffect(() => {
   for (const model of monaco.editor.getModels()) {
     if (store.state.files[model.uri.toString().substring('file:///'.length)])
       continue;
+    if (model.uri.toString().startsWith('file:///node_modules/'))
+      continue;
     model.dispose();
   }
 });
