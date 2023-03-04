@@ -39,6 +39,22 @@ export class File {
     this.code = code
     this.hidden = hidden
   }
+
+  get language() {
+    if (this.filename.endsWith('.vue')) {
+      return 'vue'
+    }
+    if (this.filename.endsWith('.html')) {
+      return 'html'
+    }
+    if (this.filename.endsWith('.css')) {
+      return 'css'
+    }
+    if (this.filename.endsWith('.ts')) {
+      return 'typescript'
+    }
+    return 'javascript'
+  }
 }
 
 export interface StoreState {
