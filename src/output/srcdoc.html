@@ -103,8 +103,14 @@
 				window.addEventListener('message', handle_message, false);
 
 				window.onerror = function (msg, url, lineNo, columnNo, error) {
+					// ignore errors from import map polyfill - these are necessary for
+					// it to detect browser support
 					if (msg.includes('module specifier “vue”')) {
 						// firefox only error, ignore
+						return false
+					}
+					if (msg.includes('Module specifier, \'vue')) {
+						// Safari only
 						return false
 					}
 					try {
