@@ -8,7 +8,7 @@ import { debounce } from '../utils'
 import CodeMirror from './codemirror'
 
 export interface Props {
-  mode?: string
+  mode?: string | { name: string, json: boolean }
   value?: string
   readonly?: boolean
 }

@@ -18,6 +18,8 @@ const activeMode = computed(() => {
     ? 'htmlmixed'
     : filename.endsWith('.css')
     ? 'css'
+    : filename.endsWith('.json')
+    ? { name: 'javascript', json: true }
     : 'javascript'
 })
 </script>
