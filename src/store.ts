@@ -221,12 +221,17 @@ export class ReplStore implements Store {
         const json = JSON.parse(map.code)
         if (!json.imports.vue) {
           json.imports.vue = this.defaultVueRuntimeURL
-          map.code = JSON.stringify(json, null, 2)
+        } else {
+          json.imports.vue = fixURL(json.imports.vue)
         }
         if (!json.imports['vue/server-renderer']) {
           json.imports['vue/server-renderer'] = this.defaultVueServerRendererURL
-          map.code = JSON.stringify(json, null, 2)
+        } else {
+          json.imports['vue/server-renderer'] = fixURL(
+            json.imports['vue/server-renderer']
+          )
         }
+        map.code = JSON.stringify(json, null, 2)
       } catch (e) {}
     }
   }
@@ -281,4 +286,8 @@ export class ReplStore implements Store {
     this.forceSandboxReset()
     console.info(`[@vue/repl] Now using default Vue version`)
   }
+}
+
+function fixURL(url: string) {
+  return url.replace('https://sfc.vuejs', 'https://play.vuejs')
 }
