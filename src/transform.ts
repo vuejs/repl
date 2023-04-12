@@ -277,6 +277,7 @@ async function doCompileTemplate(
   isTS: boolean
 ) {
   const templateResult = store.compiler.compileTemplate({
+    isProd: false,
     ...store.options?.template,
     source: descriptor.template!.content,
     filename: descriptor.filename,
