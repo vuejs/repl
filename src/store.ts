@@ -53,9 +53,9 @@ export interface StoreState {
 }
 
 export interface SFCOptions {
-  script?: Omit<SFCScriptCompileOptions, 'id'>
-  style?: SFCAsyncStyleCompileOptions
-  template?: SFCTemplateCompileOptions
+  script?: Partial<SFCScriptCompileOptions>
+  style?: Partial<SFCAsyncStyleCompileOptions>
+  template?: Partial<SFCTemplateCompileOptions>
 }
 
 export interface Store {
