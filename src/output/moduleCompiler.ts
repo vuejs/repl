@@ -67,7 +67,7 @@ function processFile(
   )
   // append css
   if (!isSSR && file.compiled.css) {
-    js += `\nwindow.__css__ += ${JSON.stringify(file.compiled.css)}`
+    js += `\nwindow.__css__ = ${JSON.stringify(file.compiled.css)} + window.__css__`
   }
   // crawl child imports
   if (importedFiles.size) {
