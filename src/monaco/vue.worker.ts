@@ -18,13 +18,7 @@ self.onmessage = () => {
 
     return createLanguageService({
       workerContext: ctx,
-      config: resolveConfig(
-        {},
-        compilerOptions,
-        undefined,
-        undefined,
-        ts as any,
-      ),
+      config: resolveConfig({}, compilerOptions, {}, ts as any),
       typescript: {
         module: ts as any,
         compilerOptions,
