@@ -17,8 +17,8 @@ devDependencies:
     specifier: ^3.0.0
     version: 3.1.0(vite@3.1.3)(vue@3.3.0)
   '@volar/monaco':
-    specifier: 1.6.5-patch.1
-    version: 1.6.5-patch.1
+    specifier: 1.6.5-patch.2
+    version: 1.6.5-patch.2
   '@vue/language-service':
     specifier: 1.7.4
     version: 1.7.4(typescript@4.6.4)
@@ -32,8 +32,8 @@ devDependencies:
     specifier: ^2.0.0
     version: 2.0.0
   monaco-editor-core:
-    specifier: ^0.36.1
-    version: 0.36.1
+    specifier: ^0.38.0
+    version: 0.38.0
   monaco-editor-textmate:
     specifier: ^4.0.0
     version: 4.0.0(monaco-editor@0.38.0)(monaco-textmate@3.0.1)
@@ -42,7 +42,7 @@ devDependencies:
     version: 3.0.1(onigasm@2.2.5)
   monaco-volar:
     specifier: ^0.1.1
-    version: 0.1.1(monaco-editor-core@0.36.1)(onigasm@2.2.5)
+    version: 0.1.1(monaco-editor-core@0.38.0)(onigasm@2.2.5)
   onigasm:
     specifier: ^2.2.5
     version: 2.2.5
@@ -260,12 +260,10 @@ packages:
       vscode-uri: 3.0.7
     dev: true
 
-  /@volar/monaco@1.6.5-patch.1:
-    resolution: {integrity: sha512-5PBvuzu+5ouaXWReafhUHZ7+FryZYeooE+KKssbuOpN1WZihAfOY0aMOFCNO/FizRtxlSPsBvGuNSIKi3GL+Gw==}
+  /@volar/monaco@1.6.5-patch.2:
+    resolution: {integrity: sha512-6RLRUujDQ5LIfJN0zCxGZJCGl80PMFpijjKhTRrCnTnr25XIUZd4W0DWhRoOzYxxF5jpUyjd1Oi7zn6UnBBV4Q==}
     dependencies:
       '@volar/language-service': 1.6.5
-      monaco-editor-core: 0.36.1
-      vscode-languageserver-protocol: 3.17.3
       vscode-uri: 3.0.7
     dev: true
 
@@ -966,8 +964,8 @@ packages:
       brace-expansion: 2.0.1
     dev: true
 
-  /monaco-editor-core@0.36.1:
-    resolution: {integrity: sha512-r2XIW2N/uVDa0WhJSnK5hI3ghJADfbX7KqbVEvZGt6kNkKCC1+6evQdpY/6zCehZt8g1C/jTvFMLXvWrLXUxDA==}
+  /monaco-editor-core@0.38.0:
+    resolution: {integrity: sha512-xMYhffdnz+sKcA9OTxsSh4s1Wul3WocjIKZqX47ULgC5m8Fprwn6CrD+CQG663xQd3pjjoh9xEggy/wN7iqcWA==}
     dev: true
 
   /monaco-editor-textmate@4.0.0(monaco-editor@0.38.0)(monaco-textmate@3.0.1):
@@ -993,13 +991,13 @@ packages:
       onigasm: 2.2.5
     dev: true
 
-  /monaco-volar@0.1.1(monaco-editor-core@0.36.1)(onigasm@2.2.5):
+  /monaco-volar@0.1.1(monaco-editor-core@0.38.0)(onigasm@2.2.5):
     resolution: {integrity: sha512-/5j0S0M0y1FlTrCehDbvC7m6+93dIdxaiXrjyDT2vGeR3Ai5UcgJj1syBuU9pfH9C0LpGMgW5/jeWfZzj74cOw==}
     peerDependencies:
       monaco-editor-core: ^0.36.0
       onigasm: ^2.2.5
     dependencies:
-      monaco-editor-core: 0.36.1
+      monaco-editor-core: 0.38.0
       onigasm: 2.2.5
       vscode-uri: 3.0.7
     dev: true
