@@ -76,7 +76,7 @@
     "@volar/monaco": {
       "optional": true
     },
-    "@volar/vue-language-service": {
+    "@vue/language-service": {
       "optional": true
     },
     "monaco-editor-core": {
