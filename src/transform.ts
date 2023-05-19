@@ -2,8 +2,6 @@ import { Store, File } from './store'
 import {
   SFCDescriptor,
   BindingMetadata,
-  shouldTransformRef,
-  transformRef,
   CompilerOptions
 } from 'vue/compiler-sfc'
 import { transform } from 'sucrase'
@@ -34,9 +32,6 @@ export async function compileFile(
   }
 
   if (filename.endsWith('.js') || filename.endsWith('.ts')) {
-    if (shouldTransformRef(code)) {
-      code = transformRef(code, { filename }).code
-    }
     if (filename.endsWith('.ts')) {
       code = await transformTS(code)
     }
@@ -61,7 +56,7 @@ export async function compileFile(
   }
 
   if (
-    descriptor.styles.some((s) => s.lang) ||
+    descriptor.styles.some(s => s.lang) ||
     (descriptor.template && descriptor.template.lang)
   ) {
     store.state.errors = [
@@ -80,7 +75,7 @@ export async function compileFile(
     return
   }
 
-  const hasScoped = descriptor.styles.some((s) => s.scoped)
+  const hasScoped = descriptor.styles.some(s => s.scoped)
   let clientCode = ''
   let ssrCode = ''
 
@@ -280,7 +275,7 @@ async function doCompileTemplate(
     source: descriptor.template!.content,
     filename: descriptor.filename,
     id,
-    scoped: descriptor.styles.some((s) => s.scoped),
+    scoped: descriptor.styles.some(s => s.scoped),
     slotted: descriptor.slotted,
     ssr,
     ssrCssVars: descriptor.cssVars,
