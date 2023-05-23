@@ -2,6 +2,7 @@
 import SplitPane from './SplitPane.vue'
 import Editor from './editor/Editor.vue'
 import Output from './output/Output.vue'
+import Dependencies from './components/Dependencies/index.vue'
 import { Store, ReplStore, SFCOptions } from './store'
 import { provide, toRef } from 'vue'
 
@@ -53,6 +54,9 @@ provide('clear-console', toRef(props, 'clearConsole'))
 <template>
   <div class="vue-repl">
     <SplitPane :layout="layout">
+      <template #sidebar>
+          <Dependencies></Dependencies>
+      </template>
       <template #left>
         <Editor />
       </template>
@@ -76,7 +80,7 @@ provide('clear-console', toRef(props, 'clearConsole'))
   --color-branding: #42b883;
   --color-branding-dark: #416f9c;
   --header-height: 38px;
-
+  --color-active: #dde1e3;
   font-size: 13px;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
     Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
@@ -92,6 +96,7 @@ provide('clear-console', toRef(props, 'clearConsole'))
   --text-light: #aaa;
   --color-branding: #42d392;
   --color-branding-dark: #89ddff;
+    --color-active: #2d2d2d;
 }
 
 :deep(button) {
