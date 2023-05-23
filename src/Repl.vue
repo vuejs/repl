@@ -14,6 +14,13 @@ export interface Props {
   sfcOptions?: SFCOptions
   layout?: string
   ssr?: boolean
+  previewOptions: {
+    headHTML?: string
+    customCode?: {
+      import: string,
+      useCode: string,
+    }
+  }
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -48,6 +55,7 @@ provide('store', store)
 provide('autoresize', props.autoResize)
 provide('import-map', toRef(props, 'showImportMap'))
 provide('clear-console', toRef(props, 'clearConsole'))
+provide('preview-options', toRef(props, 'previewOptions'))
 </script>
 
 <template>
@@ -57,10 +65,8 @@ provide('clear-console', toRef(props, 'clearConsole'))
         <Editor />
       </template>
       <template #right>
-        <Output
-          :showCompileOutput="props.showCompileOutput"
-          :ssr="!!props.ssr"
-        />
+        <Output :showCompileOutput="props.showCompileOutput"
+          :ssr="!!props.ssr" />
       </template>
     </SplitPane>
   </div>

@@ -14,6 +14,7 @@ import srcdoc from './srcdoc.html?raw'
 import { PreviewProxy } from './PreviewProxy'
 import { compileModulesForPreview } from './moduleCompiler'
 import { Store } from '../store'
+import { Props } from '../Repl.vue'
 
 const props = defineProps<{ show: boolean; ssr: boolean }>()
 
@@ -22,6 +23,10 @@ const clearConsole = inject('clear-console') as Ref<boolean>
 const container = ref()
 const runtimeError = ref()
 const runtimeWarning = ref()
+const previewOptions = inject('preview-options') as Ref<Props['previewOptions']>
+
+console.log("outside previewOptions");
+
 
 let sandbox: HTMLIFrameElement
 let proxy: PreviewProxy
@@ -85,10 +90,12 @@ function createSandbox() {
   if (!importMap.imports.vue) {
     importMap.imports.vue = store.state.vueRuntimeURL
   }
-  const sandboxSrc = srcdoc.replace(
-    /<!--IMPORT_MAP-->/,
-    JSON.stringify(importMap)
-  )
+  const sandboxSrc = srcdoc
+    .replace(/<!--IMPORT_MAP-->/, JSON.stringify(importMap))
+    .replace(
+      /<!-- PREVIEW-OPTIONS-HEAD-HTML -->/,
+      previewOptions.value?.headHTML || ''
+    )
   sandbox.srcdoc = sandboxSrc
   container.value.appendChild(sandbox)
 
@@ -168,7 +175,7 @@ async function updatePreview() {
     if (major === 3 && (minor < 2 || (minor === 2 && patch < 27))) {
       alert(
         `The selected version of Vue (${store.vueVersion}) does not support in-browser SSR.` +
-          ` Rendering in client mode instead.`
+        ` Rendering in client mode instead.`
       )
       isSSR = false
     }
@@ -207,33 +214,42 @@ async function updatePreview() {
     // compile code to simulated module system
     const modules = compileModulesForPreview(store)
     console.log(
-      `[@vue/repl] successfully compiled ${modules.length} module${
-        modules.length > 1 ? `s` : ``
+      `[@vue/repl] successfully compiled ${modules.length} module${modules.length > 1 ? `s` : ``
       }.`
     )
 
     const codeToEval = [
       `window.__modules__ = {}\nwindow.__css__ = ''\n` +
-        `if (window.__app__) window.__app__.unmount()\n` +
-        (isSSR ? `` : `document.body.innerHTML = '<div id="app"></div>'`),
+      `if (window.__app__) window.__app__.unmount()\n` +
+      (isSSR ? `` : `document.body.innerHTML = '<div id="app"></div>'`),
       ...modules,
       `document.getElementById('__sfc-styles').innerHTML = window.__css__`
     ]
 
+    console.log("inside previewOptions", previewOptions);
+    console.log("inside previewOptions", previewOptions.value.customCode);
+
+
+    // console.log(previewOptions.customCode);
+
     // if main file is a vue file, mount it.
     if (mainFile.endsWith('.vue')) {
       codeToEval.push(
-        `import { ${
-          isSSR ? `createSSRApp` : `createApp`
-        } as _createApp } from "vue"
+        `import { ${isSSR ? `createSSRApp` : `createApp`
+        } as _createApp } from "vue";
+        ${previewOptions.value?.customCode?.import || ''}
         const _mount = () => {
           const AppComponent = __modules__["${mainFile}"].default
+        
+
           AppComponent.name = 'Repl'
           const app = window.__app__ = _createApp(AppComponent)
           if (!app.config.hasOwnProperty('unwrapInjectedRef')) {
             app.config.unwrapInjectedRef = true
           }
           app.config.errorHandler = e => console.error(e)
+
+          ${previewOptions.value?.customCode?.useCode || ''}
           app.mount('#app')
         }
         if (window.__ssr_promise__) {
@@ -253,9 +269,12 @@ async function updatePreview() {
 </script>
 
 <template>
-  <div class="iframe-container" v-show="show" ref="container"></div>
+  <div class="iframe-container"
+    v-show="show"
+    ref="container"></div>
   <Message :err="runtimeError" />
-  <Message v-if="!runtimeError" :warn="runtimeWarning" />
+  <Message v-if="!runtimeError"
+    :warn="runtimeWarning" />
 </template>
 
 <style scoped>

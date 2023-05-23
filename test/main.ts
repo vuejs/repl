@@ -1,23 +1,33 @@
-import { createApp, h, watchEffect } from 'vue'
-import { Repl, ReplStore } from '../src'
-;(window as any).process = { env: {} }
+import { createApp, h, watchEffect } from "vue";
+import { Repl, ReplStore } from "../src";
+(window as any).process = { env: {} };
 
 const App = {
   setup() {
-    const query = new URLSearchParams(location.search)
+    const query = new URLSearchParams(location.search);
     const store = new ReplStore({
       serializedState: location.hash.slice(1),
-      showOutput: query.has('so'),
-      outputMode: query.get('om') || 'preview',
-      defaultVueRuntimeURL: import.meta.env.PROD
-        ? undefined
-        : `${location.origin}/src/vue-dev-proxy`,
-      defaultVueServerRendererURL: import.meta.env.PROD
-        ? undefined
-        : `${location.origin}/src/vue-server-renderer-dev-proxy`
-    })
+      showOutput: query.has("so"),
+      outputMode: query.get("om") || "preview",
+      // defaultVueRuntimeURL: import.meta.env.PROD
+      //   ? undefined
+      //   : `${location.origin}/src/vue-dev-proxy`,
+      // defaultVueServerRendererURL: import.meta.env.PROD
+      //   ? undefined
+      //   : `${location.origin}/src/vue-server-renderer-dev-proxy`,
+    });
+    // const maps = store.getImportMap();
 
-    watchEffect(() => history.replaceState({}, '', store.serialize()))
+    console.log(store.getImportMap());
+
+    // store.setImportMap({
+    //   imports: {
+    //     "casual-ui-vue":
+    //       "https://unpkg.com/casual-ui-vue/dist/casual-ui-vue.es.js",
+    //   },
+    // });
+
+    watchEffect(() => history.replaceState({}, "", store.serialize()));
 
     // setTimeout(() => {
     // store.setFiles(
@@ -38,16 +48,23 @@ const App = {
       h(Repl, {
         store,
         // layout: 'vertical',
-        ssr: true,
         sfcOptions: {
           script: {
             // inlineTemplate: false
-          }
-        }
+          },
+        },
+        previewOptions: {
+          headHTML:
+            '<link rel="stylesheet" href="https://unpkg.com/casual-ui-vue/dist/style.css">',
+          customCode: {
+            import: `import CUI from 'casual-ui-vue'; `,
+            useCode: `app.use(CUI);`,
+          },
+        },
         // showCompileOutput: false,
         // showImportMap: false
-      })
-  }
-}
+      });
+  },
+};
 
-createApp(App).mount('#app')
+createApp(App).mount("#app");
