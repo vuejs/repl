@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { computed } from "vue";
+import IconClose from "../Icon/IconClose.vue";
 
 interface Props {
     modelValue: boolean
@@ -30,9 +31,9 @@ const visible = computed({
 <template>
   <div v-if="visible" class="dialog-overlay">
       <div class="dialog-container" :style="{ width: `${width}px` }">
-          <div class="dialog-header" @click="visible = false">
+          <div class="dialog-header">
               <div>{{title}}</div>
-              <div>+++</div>
+              <div class="close" @click="visible = false"><IconClose/></div>
           </div>
           <div class="dialog-body" >
               <slot class="">121212121</slot>
@@ -55,6 +56,7 @@ const visible = computed({
   flex-direction: column;
   align-items: center;
   justify-content: center;
+    color: var(--text-light);
 }
 .dialog-header{
     display: flex;
@@ -64,6 +66,9 @@ const visible = computed({
     justify-content: space-between;
     align-items: center;
 
+}
+.dialog-header .close{
+    cursor: pointer;
 }
 .dialog-container{
     background-color: var(--bg-soft);
