@@ -33,7 +33,7 @@ const store = new ReplStore({
   showOutput: query.has('showOutput'),
   // starts on a different tab on the output pane if the URL has a outputMode query
   // and default to the "preview" tab
-  outputMode: (query.get('outputMode') || 'preview')
+  outputMode: (query.get('outputMode') || 'preview'),
 
   // specify the default URL to import Vue runtime from in the sandbox
   // default is the CDN link from unpkg.com with version matching Vue's version

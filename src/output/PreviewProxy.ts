@@ -18,7 +18,7 @@ export class PreviewProxy {
 
     this.pending_cmds = new Map()
 
-    this.handle_event = e => this.handle_repl_message(e)
+    this.handle_event = (e) => this.handle_repl_message(e)
     window.addEventListener('message', this.handle_event, false)
   }
 
@@ -53,7 +53,7 @@ export class PreviewProxy {
       if (action === 'cmd_ok') {
         handler.resolve(cmd_data.args)
       }
-    } else {
+    } else if (action !== 'cmd_error' && action !== 'cmd_ok') {
       console.error('command not found', id, cmd_data, [
         ...this.pending_cmds.keys()
       ])

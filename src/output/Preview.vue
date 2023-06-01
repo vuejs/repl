@@ -37,7 +37,7 @@ onMounted(createSandbox)
 // reset sandbox when import map changes
 watch(
   () => store.state.files['import-map.json'].code,
-  (raw) => {
+  raw => {
     try {
       const map = JSON.parse(raw)
       if (!map.imports) {
@@ -53,7 +53,7 @@ watch(
 )
 
 // reset sandbox when version changes
-watch(() => store.state.vueRuntimeURL, createSandbox)
+watch(() => store.state.resetFlip, createSandbox)
 
 onUnmounted(() => {
   proxy.destroy()
@@ -111,7 +111,7 @@ function createSandbox() {
       ) {
         runtimeError.value =
           msg.replace(/\. Relative references must.*$/, '') +
-          `.\nTip: add an "import-map.json" file to specify import paths for dependencies.`
+          `.\nTip: edit the "Import Map" tab to specify import paths for dependencies.`
       } else {
         runtimeError.value = event.value
       }
@@ -168,11 +168,13 @@ async function updatePreview() {
 
   let isSSR = props.ssr
   if (store.vueVersion) {
-    const [_, minor, patch] = store.vueVersion.split('.')
-    if (parseInt(minor, 10) < 2 || parseInt(patch, 10) < 27) {
+    const [major, minor, patch] = store.vueVersion
+      .split('.')
+      .map(v => parseInt(v, 10))
+    if (major === 3 && (minor < 2 || (minor === 2 && patch < 27))) {
       alert(
         `The selected version of Vue (${store.vueVersion}) does not support in-browser SSR.` +
-        ` Rendering in client mode instead.`
+          ` Rendering in client mode instead.`
       )
       isSSR = false
     }
@@ -195,7 +197,9 @@ async function updatePreview() {
          const AppComponent = __modules__["${mainFile}"].default
          AppComponent.name = 'Repl'
          const app = _createApp(AppComponent)
-         app.config.unwrapInjectedRef = true
+         if (!app.config.hasOwnProperty('unwrapInjectedRef')) {
+           app.config.unwrapInjectedRef = true
+         }
          app.config.warnHandler = () => {}
          window.__ssr_promise__ = _renderToString(app).then(html => {
            document.body.innerHTML = '<div id="app">' + html + '</div>' + \`${
@@ -210,7 +214,11 @@ async function updatePreview() {
 
     // compile code to simulated module system
     const modules = compileModulesForPreview(store)
-    console.log(`[@vue/repl] successfully compiled ${modules.length} modules.`)
+    console.log(
+      `[@vue/repl] successfully compiled ${modules.length} module${
+        modules.length > 1 ? `s` : ``
+      }.`
+    )
 
     const codeToEval = [
       `window.__modules__ = {};window.__css__ = '';` +
@@ -235,7 +243,9 @@ async function updatePreview() {
           const AppComponent = __modules__["${mainFile}"].default
           AppComponent.name = 'Repl'
           const app = window.__app__ = _createApp(AppComponent)
-          app.config.unwrapInjectedRef = true
+          if (!app.config.hasOwnProperty('unwrapInjectedRef')) {
+            app.config.unwrapInjectedRef = true
+          }
           app.config.errorHandler = e => console.error(e)
           ${previewOptions?.customCode?.useCode || ''}
           app.mount('#app')
