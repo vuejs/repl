@@ -17,13 +17,6 @@ const App = {
         : `${location.origin}/src/vue-server-renderer-dev-proxy`
     })
 
-    store.setImportMap({
-      imports: {
-        "casual-ui-vue":
-          "https://unpkg.com/casual-ui-vue/dist/casual-ui-vue.es.js",
-      },
-    });
-
     watchEffect(() => history.replaceState({}, '', store.serialize()))
 
     // setTimeout(() => {
@@ -45,22 +38,15 @@ const App = {
       h(Repl, {
         store,
         // layout: 'vertical',
+        ssr: true,
         sfcOptions: {
           script: {
             // inlineTemplate: false
-          },
-        },
-        previewOptions: {
-          headHTML:
-            '<link rel="stylesheet" href="https://unpkg.com/casual-ui-vue/dist/style.css">',
-          customCode: {
-            importCode: `import CUI from 'casual-ui-vue'`,
-            useCode: 'app.use(CUI)'
           }
-        },
+        }
         // showCompileOutput: false,
         // showImportMap: false
-      });
+      })
   }
 }
 
