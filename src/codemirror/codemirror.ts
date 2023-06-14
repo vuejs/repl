@@ -16,4 +16,7 @@ import 'codemirror/addon/fold/brace-fold.js'
 import 'codemirror/addon/fold/indent-fold.js'
 import 'codemirror/addon/fold/comment-fold.js'
 
+// keymap
+import 'codemirror/keymap/sublime.js'
+
 export default CodeMirror

@@ -14,11 +14,15 @@ import srcdoc from './srcdoc.html?raw'
 import { PreviewProxy } from './PreviewProxy'
 import { compileModulesForPreview } from './moduleCompiler'
 import { Store, importMapFile } from '../store'
+import { Props } from '../Repl.vue'
 
 const props = defineProps<{ show: boolean; ssr: boolean }>()
 
 const store = inject('store') as Store
 const clearConsole = inject('clear-console') as Ref<boolean>
+
+const previewOptions = inject('preview-options') as Props['previewOptions']
+
 const container = ref()
 const runtimeError = ref()
 const runtimeWarning = ref()
@@ -33,7 +37,7 @@ onMounted(createSandbox)
 // reset sandbox when import map changes
 watch(
   () => store.state.files[importMapFile].code,
-  (raw) => {
+  raw => {
     try {
       const map = JSON.parse(raw)
       if (!map.imports) {
@@ -85,10 +89,12 @@ function createSandbox() {
   if (!importMap.imports.vue) {
     importMap.imports.vue = store.state.vueRuntimeURL
   }
-  const sandboxSrc = srcdoc.replace(
-    /<!--IMPORT_MAP-->/,
-    JSON.stringify(importMap)
-  )
+  const sandboxSrc = srcdoc
+    .replace(/<!--IMPORT_MAP-->/, JSON.stringify(importMap))
+    .replace(
+      /<!-- PREVIEW-OPTIONS-HEAD-HTML -->/,
+      previewOptions?.headHTML || ''
+    )
   sandbox.srcdoc = sandboxSrc
   container.value.appendChild(sandbox)
 
@@ -162,8 +168,10 @@ async function updatePreview() {
 
   let isSSR = props.ssr
   if (store.vueVersion) {
-    const [_, minor, patch] = store.vueVersion.split('.')
-    if (parseInt(minor, 10) < 2 || parseInt(patch, 10) < 27) {
+    const [major, minor, patch] = store.vueVersion
+      .split('.')
+      .map(v => parseInt(v, 10))
+    if (major === 3 && (minor < 2 || (minor === 2 && patch < 27))) {
       alert(
         `The selected version of Vue (${store.vueVersion}) does not support in-browser SSR.` +
           ` Rendering in client mode instead.`
@@ -189,10 +197,14 @@ async function updatePreview() {
          const AppComponent = __modules__["${mainFile}"].default
          AppComponent.name = 'Repl'
          const app = _createApp(AppComponent)
-         app.config.unwrapInjectedRef = true
+         if (!app.config.hasOwnProperty('unwrapInjectedRef')) {
+           app.config.unwrapInjectedRef = true
+         }
          app.config.warnHandler = () => {}
          window.__ssr_promise__ = _renderToString(app).then(html => {
-           document.body.innerHTML = '<div id="app">' + html + '</div>'
+           document.body.innerHTML = '<div id="app">' + html + '</div>' + \`${
+             previewOptions?.bodyHTML || ''
+           }\`
          }).catch(err => {
            console.error("SSR Error", err)
          })
@@ -209,9 +221,13 @@ async function updatePreview() {
     )
 
     const codeToEval = [
-      `window.__modules__ = {}\nwindow.__css__ = ''\n` +
-        `if (window.__app__) window.__app__.unmount()\n` +
-        (isSSR ? `` : `document.body.innerHTML = '<div id="app"></div>'`),
+      `window.__modules__ = {};window.__css__ = '';` +
+        `if (window.__app__) window.__app__.unmount();` +
+        (isSSR
+          ? ``
+          : `document.body.innerHTML = '<div id="app"></div>' + \`${
+              previewOptions?.bodyHTML || ''
+            }\``),
       ...modules,
       `document.getElementById('__sfc-styles').innerHTML = window.__css__`
     ]
@@ -222,12 +238,16 @@ async function updatePreview() {
         `import { ${
           isSSR ? `createSSRApp` : `createApp`
         } as _createApp } from "vue"
+        ${previewOptions?.customCode?.importCode || ''}
         const _mount = () => {
           const AppComponent = __modules__["${mainFile}"].default
           AppComponent.name = 'Repl'
           const app = window.__app__ = _createApp(AppComponent)
-          app.config.unwrapInjectedRef = true
+          if (!app.config.hasOwnProperty('unwrapInjectedRef')) {
+            app.config.unwrapInjectedRef = true
+          }
           app.config.errorHandler = e => console.error(e)
+          ${previewOptions?.customCode?.useCode || ''}
           app.mount('#app')
         }
         if (window.__ssr_promise__) {

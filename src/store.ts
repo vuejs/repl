@@ -55,9 +55,9 @@ export interface StoreState {
 }
 
 export interface SFCOptions {
-  script?: Omit<SFCScriptCompileOptions, 'id'>
-  style?: SFCAsyncStyleCompileOptions
-  template?: SFCTemplateCompileOptions
+  script?: Partial<SFCScriptCompileOptions>
+  style?: Partial<SFCAsyncStyleCompileOptions>
+  template?: Partial<SFCTemplateCompileOptions>
 }
 
 export interface Store {
@@ -69,6 +69,7 @@ export interface Store {
   setActive: (filename: string) => void
   addFile: (filename: string | File) => void
   deleteFile: (filename: string) => void
+  renameFile: (oldFilename: string, newFilename: string) => void
   getImportMap: () => any
   initialShowOutput: boolean
   initialOutputMode: OutputModes
@@ -167,6 +168,42 @@ export class ReplStore implements Store {
       }
       delete this.state.files[filename]
     }
+  }
+
+  renameFile(oldFilename: string, newFilename: string) {
+    const { files } = this.state
+    const file = files[oldFilename]
+
+    if (!file) {
+      this.state.errors = [`Could not rename "${oldFilename}", file not found`]
+      return
+    }
+
+    if (!newFilename || oldFilename === newFilename) {
+      this.state.errors = [`Cannot rename "${oldFilename}" to "${newFilename}"`]
+      return
+    }
+
+    file.filename = newFilename
+
+    const newFiles: Record<string, File> = {}
+
+    // Preserve iteration order for files
+    for (const name in files) {
+      if (name === oldFilename) {
+        newFiles[newFilename] = file
+      } else {
+        newFiles[name] = files[name]
+      }
+    }
+
+    this.state.files = newFiles
+
+    if (this.state.mainFile === oldFilename) {
+      this.state.mainFile = newFilename
+    }
+
+    compileFile(this, file)
   }
 
   serialize() {

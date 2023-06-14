@@ -2,8 +2,6 @@ import { Store, File } from './store'
 import {
   SFCDescriptor,
   BindingMetadata,
-  shouldTransformRef,
-  transformRef,
   CompilerOptions
 } from 'vue/compiler-sfc'
 import { transform } from 'sucrase'
@@ -34,13 +32,24 @@ export async function compileFile(
   }
 
   if (filename.endsWith('.js') || filename.endsWith('.ts')) {
-    if (shouldTransformRef(code)) {
-      code = transformRef(code, { filename }).code
-    }
     if (filename.endsWith('.ts')) {
       code = await transformTS(code)
     }
     compiled.js = compiled.ssr = code
+    store.state.errors = []
+    return
+  }
+
+  if (filename.endsWith('.json')) {
+    let parsed
+    try {
+      parsed = JSON.parse(code)
+    } catch (err: any) {
+      console.error(`Error parsing ${filename}`, err.message)
+      store.state.errors = [err.message]
+      return
+    }
+    compiled.js = compiled.ssr = `export default ${JSON.stringify(parsed)}`
     store.state.errors = []
     return
   }
@@ -61,7 +70,7 @@ export async function compileFile(
   }
 
   if (
-    descriptor.styles.some((s) => s.lang) ||
+    descriptor.styles.some(s => s.lang) ||
     (descriptor.template && descriptor.template.lang)
   ) {
     store.state.errors = [
@@ -80,7 +89,7 @@ export async function compileFile(
     return
   }
 
-  const hasScoped = descriptor.styles.some((s) => s.scoped)
+  const hasScoped = descriptor.styles.some(s => s.scoped)
   let clientCode = ''
   let ssrCode = ''
 
@@ -139,7 +148,7 @@ export async function compileFile(
     if (!clientTemplateResult) {
       return
     }
-    clientCode += clientTemplateResult
+    clientCode += `;${clientTemplateResult}`
 
     const ssrTemplateResult = await doCompileTemplate(
       store,
@@ -151,7 +160,7 @@ export async function compileFile(
     )
     if (ssrTemplateResult) {
       // ssr compile failure is fine
-      ssrCode += ssrTemplateResult
+      ssrCode += `;${ssrTemplateResult}`
     } else {
       ssrCode = `/* SSR compile error: ${store.state.errors[0]} */`
     }
@@ -280,7 +289,7 @@ async function doCompileTemplate(
     source: descriptor.template!.content,
     filename: descriptor.filename,
     id,
-    scoped: descriptor.styles.some((s) => s.scoped),
+    scoped: descriptor.styles.some(s => s.scoped),
     slotted: descriptor.slotted,
     ssr,
     ssrCssVars: descriptor.cssVars,
