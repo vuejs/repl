@@ -2,8 +2,9 @@
 import * as worker from 'monaco-editor-core/esm/vs/editor/editor.worker';
 import type * as monaco from 'monaco-editor-core';
 import * as ts from 'typescript';
-import { resolveConfig } from '@vue/language-service';
+import { Config, resolveConfig } from '@vue/language-service';
 import { createLanguageService } from '@volar/monaco/worker';
+import createTypeScriptService from 'volar-service-typescript';
 
 self.onmessage = () => {
   worker.initialize((ctx: monaco.worker.IWorkerContext) => {
@@ -15,15 +16,19 @@ self.onmessage = () => {
       module: ts.ModuleKind.ESNext,
       moduleResolution: ts.ModuleResolutionKind.NodeJs,
     };
+    const baseConfig: Config = {
+      services: {
+        typescript: createTypeScriptService({ dtsHost: ctx.host }),
+      },
+    };
 
     return createLanguageService({
       workerContext: ctx,
-      config: resolveConfig({}, compilerOptions, {}, ts as any),
+      config: resolveConfig(baseConfig, compilerOptions, {}, ts as any),
       typescript: {
         module: ts as any,
         compilerOptions,
       },
-      dtsHost: ctx.host,
     });
   });
 };

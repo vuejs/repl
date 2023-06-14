@@ -5,7 +5,7 @@ import onigasmWasm from "onigasm/lib/onigasm.wasm?url";
 import { editor, languages, Uri } from 'monaco-editor-core';
 import * as volar from '@volar/monaco';
 import { Store } from '../store';
-import { createJsDelivrDtsHost } from '@volar/monaco/worker';
+import { createJsDelivrDtsHost } from 'volar-service-typescript';
 import { getOrCreateModel } from './utils';
 
 export function loadWasm() {
