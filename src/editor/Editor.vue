@@ -31,7 +31,6 @@ const onChange = debounce((code: string) => {
 
 const activeMode = computed(() => {
   const { filename } = store.state.activeFile
-
   const mode = modes[filename.split('.').pop()!]
 
   return filename.lastIndexOf('.') !== -1 && mode

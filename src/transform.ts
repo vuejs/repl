@@ -40,6 +40,20 @@ export async function compileFile(
     return
   }
 
+  if (filename.endsWith('.json')) {
+    let parsed
+    try {
+      parsed = JSON.parse(code)
+    } catch (err: any) {
+      console.error(`Error parsing ${filename}`, err.message)
+      store.state.errors = [err.message]
+      return
+    }
+    compiled.js = compiled.ssr = `export default ${JSON.stringify(parsed)}`
+    store.state.errors = []
+    return
+  }
+
   if (!filename.endsWith('.vue')) {
     store.state.errors = []
     return
