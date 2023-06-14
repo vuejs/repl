@@ -80,7 +80,7 @@
 								while (el && el.nodeName !== 'A') el = el.parentNode;
 								if (!el || el.nodeName !== 'A') return;
 
-								if (el.hasAttribute('download') || el.getAttribute('rel') === 'external' || el.target) return;
+								if (el.hasAttribute('download') || el.getAttribute('rel') === 'external' || el.target || el.href.startsWith('javascript:')) return;
 
 								event.preventDefault();
 
