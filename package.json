@@ -21,6 +21,7 @@
     "dev": "vite",
     "build": "vite build",
     "build-types": "vue-tsc -p tsconfig.build.json && api-extractor run -c api-extractor.json && rimraf dist/src",
+    "changelog": "conventional-changelog -p angular -i CHANGELOG.md -s",
     "prepublishOnly": "npm run build && npm run build-types"
   },
   "repository": {
@@ -40,6 +41,7 @@
     "@types/node": "^18.15.3",
     "@vitejs/plugin-vue": "^4.1.0",
     "codemirror": "^5.62.3",
+    "conventional-changelog-cli": "^3.0.0",
     "fflate": "^0.7.3",
     "hash-sum": "^2.0.0",
     "rimraf": "^3.0.2",
