@@ -25,10 +25,26 @@ const props = withDefaults(defineProps<Props>(), {
   ssr: false
 })
 
-props.store.options = props.sfcOptions
-props.store.init()
+const { store } = props
+const sfcOptions = (store.options = props.sfcOptions || {})
+if (!sfcOptions.script) {
+  sfcOptions.script = {}
+}
+// @ts-ignore only needed in 3.3
+sfcOptions.script.fs = {
+  fileExists(file: string) {
+    if (file.startsWith('/')) file = file.slice(1)
+    return !!store.state.files[file]
+  },
+  readFile(file: string) {
+    if (file.startsWith('/')) file = file.slice(1)
+    return store.state.files[file].code
+  }
+}
 
-provide('store', props.store)
+store.init()
+
+provide('store', store)
 provide('autoresize', props.autoResize)
 provide('import-map', toRef(props, 'showImportMap'))
 provide('clear-console', toRef(props, 'clearConsole'))

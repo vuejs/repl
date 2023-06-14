@@ -3,12 +3,13 @@
 </template>
 
 <script setup lang="ts">
+import type { ModeSpec, ModeSpecOptions } from 'codemirror'
 import { ref, onMounted, watchEffect, inject } from 'vue'
 import { debounce } from '../utils'
 import CodeMirror from './codemirror'
 
 export interface Props {
-  mode?: string | { name: string, json: boolean }
+  mode?: string | ModeSpec<ModeSpecOptions>
   value?: string
   readonly?: boolean
 }

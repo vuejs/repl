@@ -33,7 +33,7 @@ onMounted(createSandbox)
 // reset sandbox when import map changes
 watch(
   () => store.state.files['import-map.json'].code,
-  (raw) => {
+  raw => {
     try {
       const map = JSON.parse(raw)
       if (!map.imports) {
@@ -162,8 +162,10 @@ async function updatePreview() {
 
   let isSSR = props.ssr
   if (store.vueVersion) {
-    const [_, minor, patch] = store.vueVersion.split('.')
-    if (parseInt(minor, 10) < 2 || parseInt(patch, 10) < 27) {
+    const [major, minor, patch] = store.vueVersion
+      .split('.')
+      .map(v => parseInt(v, 10))
+    if (major === 3 && (minor < 2 || (minor === 2 && patch < 27))) {
       alert(
         `The selected version of Vue (${store.vueVersion}) does not support in-browser SSR.` +
           ` Rendering in client mode instead.`
@@ -189,7 +191,9 @@ async function updatePreview() {
          const AppComponent = __modules__["${mainFile}"].default
          AppComponent.name = 'Repl'
          const app = _createApp(AppComponent)
-         app.config.unwrapInjectedRef = true
+         if (!app.config.hasOwnProperty('unwrapInjectedRef')) {
+           app.config.unwrapInjectedRef = true
+         }
          app.config.warnHandler = () => {}
          window.__ssr_promise__ = _renderToString(app).then(html => {
            document.body.innerHTML = '<div id="app">' + html + '</div>'
@@ -226,7 +230,9 @@ async function updatePreview() {
           const AppComponent = __modules__["${mainFile}"].default
           AppComponent.name = 'Repl'
           const app = window.__app__ = _createApp(AppComponent)
-          app.config.unwrapInjectedRef = true
+          if (!app.config.hasOwnProperty('unwrapInjectedRef')) {
+            app.config.unwrapInjectedRef = true
+          }
           app.config.errorHandler = e => console.error(e)
           app.mount('#app')
         }
