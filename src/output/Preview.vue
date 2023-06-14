@@ -229,7 +229,7 @@ async function updatePreview() {
               previewOptions?.bodyHTML || ''
             }\``),
       ...modules,
-      `document.getElementById('__sfc-styles').innerHTML = window.__css__`
+        `setTimeout(()=> document.getElementById('__sfc-styles').innerHTML = window.__css__,1)`,
     ]
 
     // if main file is a vue file, mount it.
