@@ -51,7 +51,6 @@ function processFile(
   seen: Set<File>,
   isSSR: boolean
 ) {
-  console.log(file.filename, isSSR)
   if (seen.has(file)) {
     return []
   }
