@@ -62,7 +62,7 @@
     "vite": "^3.1.0",
     "volar-service-typescript": "0.0.7",
     "vue": "^3.3.0",
-    "vue-tsc": "1.7.12"
+    "vue-tsc": "1.6.5"
   },
   "peerDependencies": {
     "@volar/monaco": "1.7.4",
