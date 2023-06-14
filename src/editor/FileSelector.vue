@@ -108,7 +108,7 @@ function horizontalScroll(e: WheelEvent) {
         @blur="doneAddFile"
         @keyup.enter="doneAddFile"
         @keyup.esc="cancelAddFile"
-        @vnodeMounted="focus"
+        @vue:mounted="focus"
       />
     </div>
     <button class="add" @click="startAddFile">+</button>
