@@ -148,7 +148,7 @@ export async function compileFile(
     if (!clientTemplateResult) {
       return
     }
-    clientCode += clientTemplateResult
+    clientCode += `;${clientTemplateResult}`
 
     const ssrTemplateResult = await doCompileTemplate(
       store,
@@ -160,7 +160,7 @@ export async function compileFile(
     )
     if (ssrTemplateResult) {
       // ssr compile failure is fine
-      ssrCode += ssrTemplateResult
+      ssrCode += `;${ssrTemplateResult}`
     } else {
       ssrCode = `/* SSR compile error: ${store.state.errors[0]} */`
     }
