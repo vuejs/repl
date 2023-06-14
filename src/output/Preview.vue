@@ -14,11 +14,15 @@ import srcdoc from './srcdoc.html?raw'
 import { PreviewProxy } from './PreviewProxy'
 import { compileModulesForPreview } from './moduleCompiler'
 import { Store } from '../store'
+import { Props } from '../Repl.vue'
 
 const props = defineProps<{ show: boolean; ssr: boolean }>()
 
 const store = inject('store') as Store
 const clearConsole = inject('clear-console') as Ref<boolean>
+
+const previewOptions = inject('preview-options') as Props['previewOptions']
+
 const container = ref()
 const runtimeError = ref()
 const runtimeWarning = ref()
@@ -85,10 +89,12 @@ function createSandbox() {
   if (!importMap.imports.vue) {
     importMap.imports.vue = store.state.vueRuntimeURL
   }
-  const sandboxSrc = srcdoc.replace(
-    /<!--IMPORT_MAP-->/,
-    JSON.stringify(importMap)
-  )
+  const sandboxSrc = srcdoc
+    .replace(/<!--IMPORT_MAP-->/, JSON.stringify(importMap))
+    .replace(
+      /<!-- PREVIEW-OPTIONS-HEAD-HTML -->/,
+      previewOptions?.headHTML || ''
+    )
   sandbox.srcdoc = sandboxSrc
   container.value.appendChild(sandbox)
 
@@ -196,7 +202,9 @@ async function updatePreview() {
          }
          app.config.warnHandler = () => {}
          window.__ssr_promise__ = _renderToString(app).then(html => {
-           document.body.innerHTML = '<div id="app">' + html + '</div>'
+           document.body.innerHTML = '<div id="app">' + html + '</div>' + \`${
+             previewOptions?.bodyHTML || ''
+           }\`
          }).catch(err => {
            console.error("SSR Error", err)
          })
@@ -213,9 +221,13 @@ async function updatePreview() {
     )
 
     const codeToEval = [
-      `window.__modules__ = {}\nwindow.__css__ = ''\n` +
-        `if (window.__app__) window.__app__.unmount()\n` +
-        (isSSR ? `` : `document.body.innerHTML = '<div id="app"></div>'`),
+      `window.__modules__ = {};window.__css__ = '';` +
+        `if (window.__app__) window.__app__.unmount();` +
+        (isSSR
+          ? ``
+          : `document.body.innerHTML = '<div id="app"></div>' + \`${
+              previewOptions?.bodyHTML || ''
+            }\``),
       ...modules,
       `document.getElementById('__sfc-styles').innerHTML = window.__css__`
     ]
@@ -226,6 +238,7 @@ async function updatePreview() {
         `import { ${
           isSSR ? `createSSRApp` : `createApp`
         } as _createApp } from "vue"
+        ${previewOptions?.customCode?.importCode || ''}
         const _mount = () => {
           const AppComponent = __modules__["${mainFile}"].default
           AppComponent.name = 'Repl'
@@ -234,6 +247,7 @@ async function updatePreview() {
             app.config.unwrapInjectedRef = true
           }
           app.config.errorHandler = e => console.error(e)
+          ${previewOptions?.customCode?.useCode || ''}
           app.mount('#app')
         }
         if (window.__ssr_promise__) {
