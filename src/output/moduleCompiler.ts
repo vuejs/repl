@@ -51,6 +51,7 @@ function processFile(
   seen: Set<File>,
   isSSR: boolean
 ) {
+  console.log(file.filename, isSSR)
   if (seen.has(file)) {
     return []
   }
@@ -78,7 +79,7 @@ function processFile(
     isSSR
   )
   // append css
-  if (!isSSR && file.compiled.css) {
+  if (file.compiled.css && !isSSR) {
     js += `\nwindow.__css__ += ${JSON.stringify(file.compiled.css)}`
   }
 
