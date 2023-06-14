@@ -49,9 +49,9 @@ function doneNameFile() {
   const filename = pendingFilename.value
   const oldFilename = pending.value === true ? '' : pending.value
 
-  if (!/\.(vue|js|ts|css)$/.test(filename)) {
+  if (!/\.(vue|js|ts|css|json)$/.test(filename)) {
     store.state.errors = [
-      `Playground only supports *.vue, *.js, *.ts, *.css files.`
+      `Playground only supports *.vue, *.js, *.ts, *.css, *.json files.`
     ]
     return
   }
@@ -125,7 +125,7 @@ function horizontalScroll(e: WheelEvent) {
           @blur="doneNameFile"
           @keyup.enter="doneNameFile"
           @keyup.esc="cancelNameFile"
-          @vnodeMounted="focus"
+          @vue:mounted="focus"
         />
       </div>
     </template>

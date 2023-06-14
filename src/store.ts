@@ -53,9 +53,9 @@ export interface StoreState {
 }
 
 export interface SFCOptions {
-  script?: Omit<SFCScriptCompileOptions, 'id'>
-  style?: SFCAsyncStyleCompileOptions
-  template?: SFCTemplateCompileOptions
+  script?: Partial<SFCScriptCompileOptions>
+  style?: Partial<SFCAsyncStyleCompileOptions>
+  template?: Partial<SFCTemplateCompileOptions>
 }
 
 export interface Store {
@@ -205,7 +205,23 @@ export class ReplStore implements Store {
   }
 
   serialize() {
-    return '#' + utoa(JSON.stringify(this.getFiles()))
+    const files = this.getFiles()
+    const importMap = files['import-map.json']
+    if (importMap) {
+      const { imports } = JSON.parse(importMap)
+      if (imports['vue'] === this.defaultVueRuntimeURL) {
+        delete imports['vue']
+      }
+      if (imports['vue/server-renderer'] === this.defaultVueServerRendererURL) {
+        delete imports['vue/server-renderer']
+      }
+      if (!Object.keys(imports).length) {
+        delete files['import-map.json']
+      } else {
+        files['import-map.json'] = JSON.stringify({ imports }, null, 2)
+      }
+    }
+    return '#' + utoa(JSON.stringify(files))
   }
 
   getFiles() {
@@ -246,7 +262,8 @@ export class ReplStore implements Store {
         JSON.stringify(
           {
             imports: {
-              vue: this.defaultVueRuntimeURL
+              vue: this.defaultVueRuntimeURL,
+              'vue/server-renderer': this.defaultVueServerRendererURL
             }
           },
           null,
@@ -258,12 +275,17 @@ export class ReplStore implements Store {
         const json = JSON.parse(map.code)
         if (!json.imports.vue) {
           json.imports.vue = this.defaultVueRuntimeURL
-          map.code = JSON.stringify(json, null, 2)
+        } else {
+          json.imports.vue = fixURL(json.imports.vue)
         }
         if (!json.imports['vue/server-renderer']) {
           json.imports['vue/server-renderer'] = this.defaultVueServerRendererURL
-          map.code = JSON.stringify(json, null, 2)
+        } else {
+          json.imports['vue/server-renderer'] = fixURL(
+            json.imports['vue/server-renderer']
+          )
         }
+        map.code = JSON.stringify(json, null, 2)
       } catch (e) {}
     }
   }
@@ -318,4 +340,8 @@ export class ReplStore implements Store {
     this.forceSandboxReset()
     console.info(`[@vue/repl] Now using default Vue version`)
   }
+}
+
+function fixURL(url: string) {
+  return url.replace('https://sfc.vuejs', 'https://play.vuejs')
 }

@@ -262,7 +262,7 @@
   color: var(--string);
 }
 .cm-s-default .cm-type {
-  color: #085;
+  color: rgb(255, 208, 0);
 }
 .cm-s-default .cm-meta {
   color: #555;

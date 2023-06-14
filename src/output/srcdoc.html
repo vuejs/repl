@@ -7,6 +7,7 @@
 				Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
 			}
 		</style>
+		<!-- PREVIEW-OPTIONS-HEAD-HTML -->
 		<style id="__sfc-styles"></style>
 		<script>
 			(() => {
@@ -103,8 +104,14 @@
 				window.addEventListener('message', handle_message, false);
 
 				window.onerror = function (msg, url, lineNo, columnNo, error) {
+					// ignore errors from import map polyfill - these are necessary for
+					// it to detect browser support
 					if (msg.includes('module specifier “vue”')) {
 						// firefox only error, ignore
+						return false
+					}
+					if (msg.includes('Module specifier, \'vue')) {
+						// Safari only
 						return false
 					}
 					try {
@@ -115,7 +122,7 @@
 				}
 
 				window.addEventListener("unhandledrejection", event => {
-					if (event.reason.message.includes('Cross-origin')) {
+					if (event.reason.message && event.reason.message.includes('Cross-origin')) {
 						event.preventDefault()
 						return
 					}
