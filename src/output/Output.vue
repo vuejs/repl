@@ -29,6 +29,7 @@ const mode = ref<OutputModes>(
     <button
       v-for="m of modes"
       :class="{ active: mode === m }"
+      :key="m"
       @click="mode = m"
     >
       <span>{{ m }}</span>

@@ -99,7 +99,7 @@ function horizontalScroll(e: WheelEvent) {
     @wheel="horizontalScroll"
     ref="fileSel"
   >
-    <template v-for="(file, i) in files">
+    <template v-for="(file, i) in files" :key="file">
       <div
         v-if="pending !== file"
         class="file"
