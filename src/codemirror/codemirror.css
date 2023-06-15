@@ -262,7 +262,7 @@
   color: var(--string);
 }
 .cm-s-default .cm-type {
-  color: #085;
+  color: rgb(255, 208, 0);
 }
 .cm-s-default .cm-meta {
   color: #555;
@@ -537,4 +537,8 @@ div.CodeMirror-dragcursors {
 /* Help users use markselection to safely style text background */
 span.CodeMirror-selectedtext {
   background: none;
+}
+
+.CodeMirror-dialog{
+  background-color: var(--bg);
 }

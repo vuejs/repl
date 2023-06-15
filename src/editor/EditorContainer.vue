@@ -7,7 +7,7 @@ import { Store } from '../store'
 import { EditorComponentType } from '../types'
 
 const props = defineProps<{
-    editorComponent: EditorComponentType
+  editorComponent: EditorComponentType
 }>()
 
 const EditorComponent = toRef(props, 'editorComponent')
@@ -17,7 +17,6 @@ const store = inject('store') as Store
 const onChange = debounce((code: string) => {
   store.state.activeFile.code = code
 }, 250)
-
 </script>
 
 <template>

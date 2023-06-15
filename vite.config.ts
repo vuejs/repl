@@ -16,9 +16,15 @@ const genStub: Plugin = {
 export default defineConfig({
   plugins: [vue(), genStub],
   optimizeDeps: {
+    // avoid late discovered deps
     include: [
       'path-browserify',
-      'onigasm'
+      'onigasm',
+      'typescript',
+      '@vue/language-service',
+      'monaco-editor-core/esm/vs/editor/editor.worker',
+      '@volar/monaco/worker',
+      'vue/server-renderer'
     ],
   },
   resolve: {
@@ -37,7 +43,7 @@ export default defineConfig({
       formats: ['es'],
       fileName: () => '[name].js'
     },
-    
+
     rollupOptions: {
       input: {
         'vue-repl': './src/index.ts',

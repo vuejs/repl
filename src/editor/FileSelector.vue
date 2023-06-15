@@ -1,12 +1,11 @@
 <script setup lang="ts">
-import { Store } from '../store'
+import { Store, importMapFile } from '../store'
 import { computed, inject, ref, VNode, Ref } from 'vue'
 
 const store = inject('store') as Store
 
-const pending = ref(false)
+const pending = ref<boolean | string>(false)
 const pendingFilename = ref('Comp.vue')
-const importMapFile = 'import-map.json'
 const showImportMap = inject('import-map') as Ref<boolean>
 const files = computed(() =>
   Object.entries(store.state.files)
@@ -36,7 +35,7 @@ function startAddFile() {
   pending.value = true
 }
 
-function cancelAddFile() {
+function cancelNameFile() {
   pending.value = false
 }
 
@@ -44,25 +43,40 @@ function focus({ el }: VNode) {
   ;(el as HTMLInputElement).focus()
 }
 
-function doneAddFile() {
+function doneNameFile() {
   if (!pending.value) return
   const filename = pendingFilename.value
+  const oldFilename = pending.value === true ? '' : pending.value
 
-  if (!/\.(vue|js|ts|css)$/.test(filename)) {
+  if (!/\.(vue|js|ts|css|json)$/.test(filename)) {
     store.state.errors = [
-      `Playground only supports *.vue, *.js, *.ts, *.css files.`
+      `Playground only supports *.vue, *.js, *.ts, *.css, *.json files.`
     ]
     return
   }
 
-  if (filename in store.state.files) {
+  if (filename !== oldFilename && filename in store.state.files) {
     store.state.errors = [`File "${filename}" already exists.`]
     return
   }
 
   store.state.errors = []
-  cancelAddFile()
-  store.addFile(filename)
+  cancelNameFile()
+
+  if (filename === oldFilename) {
+    return
+  }
+
+  if (oldFilename) {
+    store.renameFile(oldFilename, filename)
+  } else {
+    store.addFile(filename)
+  }
+}
+
+function editFileName(file: string) {
+  pendingFilename.value = file
+  pending.value = file
 }
 
 const fileSel = ref(null)
@@ -85,32 +99,35 @@ function horizontalScroll(e: WheelEvent) {
     @wheel="horizontalScroll"
     ref="fileSel"
   >
-    <div
-      v-for="(file, i) in files"
-      class="file"
-      :class="{ active: store.state.activeFile.filename === file }"
-      @click="store.setActive(file)"
-    >
-      <span class="label">{{
-        file === importMapFile ? 'Import Map' : file
-      }}</span>
-      <span v-if="i > 0" class="remove" @click.stop="store.deleteFile(file)">
-        <svg class="icon" width="12" height="12" viewBox="0 0 24 24">
-          <line stroke="#999" x1="18" y1="6" x2="6" y2="18"></line>
-          <line stroke="#999" x1="6" y1="6" x2="18" y2="18"></line>
-        </svg>
-      </span>
-    </div>
-    <div v-if="pending" class="file pending">
-      <input
-        v-model="pendingFilename"
-        spellcheck="false"
-        @blur="doneAddFile"
-        @keyup.enter="doneAddFile"
-        @keyup.esc="cancelAddFile"
-        @vnodeMounted="focus"
-      />
-    </div>
+    <template v-for="(file, i) in files">
+      <div
+        v-if="pending !== file"
+        class="file"
+        :class="{ active: store.state.activeFile.filename === file }"
+        @click="store.setActive(file)"
+        @dblclick="i > 0 && editFileName(file)"
+      >
+        <span class="label">{{
+          file === importMapFile ? 'Import Map' : file
+        }}</span>
+        <span v-if="i > 0" class="remove" @click.stop="store.deleteFile(file)">
+          <svg class="icon" width="12" height="12" viewBox="0 0 24 24">
+            <line stroke="#999" x1="18" y1="6" x2="6" y2="18"></line>
+            <line stroke="#999" x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </span>
+      </div>
+      <div v-if="(pending === true && i === files.length - 1) || (pending === file)" class="file pending">
+        <input
+          v-model="pendingFilename"
+          spellcheck="false"
+          @blur="doneNameFile"
+          @keyup.enter="doneNameFile"
+          @keyup.esc="cancelNameFile"
+          @vue:mounted="focus"
+        />
+      </div>
+    </template>
     <button class="add" @click="startAddFile">+</button>
 
     <div v-if="showImportMap" class="import-map-wrapper">

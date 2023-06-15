@@ -3,9 +3,9 @@ import SplitPane from './SplitPane.vue'
 import Output from './output/Output.vue'
 import { Store, ReplStore, SFCOptions } from './store'
 import { provide, toRef } from 'vue'
-import { EditorComponentType } from './types';
-import EditorContainer from './editor/EditorContainer.vue';
-import CodeMirrorEditor from './editor/CodeMirrorEditor.vue';
+import { EditorComponentType } from './types'
+import EditorContainer from './editor/EditorContainer.vue'
+import CodeMirrorEditor from './editor/CodeMirrorEditor.vue'
 
 export interface Props {
   store?: Store
@@ -17,6 +17,14 @@ export interface Props {
   layout?: string
   ssr?: boolean
   editor?: EditorComponentType
+  previewOptions?: {
+    headHTML?: string
+    bodyHTML?: string
+    customCode?: {
+      importCode?: string
+      useCode?: string
+    }
+  }
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -26,16 +34,41 @@ const props = withDefaults(defineProps<Props>(), {
   showImportMap: true,
   clearConsole: true,
   ssr: false,
-  editor: CodeMirrorEditor
+  editor: CodeMirrorEditor,
+  previewOptions: () => ({
+    headHTML: '',
+    bodyHTML: '',
+    customCode: {
+      importCode: '',
+      useCode: ''
+    }
+  })
 })
 
-props.store.options = props.sfcOptions
-props.store.init()
+const { store } = props
+const sfcOptions = (store.options = props.sfcOptions || {})
+if (!sfcOptions.script) {
+  sfcOptions.script = {}
+}
+// @ts-ignore only needed in 3.3
+sfcOptions.script.fs = {
+  fileExists(file: string) {
+    if (file.startsWith('/')) file = file.slice(1)
+    return !!store.state.files[file]
+  },
+  readFile(file: string) {
+    if (file.startsWith('/')) file = file.slice(1)
+    return store.state.files[file].code
+  }
+}
 
-provide('store', props.store)
+store.init()
+
+provide('store', store)
 provide('autoresize', props.autoResize)
 provide('import-map', toRef(props, 'showImportMap'))
 provide('clear-console', toRef(props, 'clearConsole'))
+provide('preview-options', props.previewOptions)
 </script>
 
 <template>

@@ -7,6 +7,7 @@
 				Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
 			}
 		</style>
+		<!-- PREVIEW-OPTIONS-HEAD-HTML -->
 		<style id="__sfc-styles"></style>
 		<script>
 			(() => {
@@ -79,7 +80,7 @@
 								while (el && el.nodeName !== 'A') el = el.parentNode;
 								if (!el || el.nodeName !== 'A') return;
 
-								if (el.hasAttribute('download') || el.getAttribute('rel') === 'external' || el.target) return;
+								if (el.hasAttribute('download') || el.getAttribute('rel') === 'external' || el.target || el.href.startsWith('javascript:')) return;
 
 								event.preventDefault();
 
@@ -103,8 +104,14 @@
 				window.addEventListener('message', handle_message, false);
 
 				window.onerror = function (msg, url, lineNo, columnNo, error) {
+					// ignore errors from import map polyfill - these are necessary for
+					// it to detect browser support
 					if (msg.includes('module specifier “vue”')) {
 						// firefox only error, ignore
+						return false
+					}
+					if (msg.includes('Module specifier, \'vue')) {
+						// Safari only
 						return false
 					}
 					try {
@@ -115,7 +122,7 @@
 				}
 
 				window.addEventListener("unhandledrejection", event => {
-					if (event.reason.message.includes('Cross-origin')) {
+					if (event.reason.message && event.reason.message.includes('Cross-origin')) {
 						event.preventDefault()
 						return
 					}
@@ -131,13 +138,18 @@
 				['clear', 'log', 'info', 'dir', 'warn', 'error', 'table'].forEach((level) => {
 					const original = console[level];
 					console[level] = (...args) => {
-						const msg = String(args[0])
-						if (
-							msg.includes('You are running a development build of Vue') ||
-							msg.includes('You are running the esm-bundler build of Vue')
-						) {
-							return
+						const msg = args[0]
+						if (typeof msg === 'string') {
+							if (
+								msg.includes('You are running a development build of Vue') ||
+								msg.includes('You are running the esm-bundler build of Vue')
+							) {
+								return
+							}
 						}
+
+						original(...args);
+
 						const stringifiedArgs = stringify(args);
 						if (
 							previous.level === level &&
@@ -151,13 +163,9 @@
 							try {
 								parent.postMessage({ action: 'console', level, args }, '*');
 							} catch (err) {
-								parent.postMessage({ action: 'console', level, args: args.map(a => {
-									return a instanceof Error ? a.message : String(a)
-								}) }, '*');
+								parent.postMessage({ action: 'console', level, args: args.map(toString) }, '*');
 							}
 						}
-
-						original(...args);
 					}
 				});
 
@@ -239,9 +247,26 @@
 					original_trace(...args);
 				};
 
+				function toString(value) {
+					if (value instanceof Error) {
+						return value.message;
+					}
+					for (const fn of [String, v => Object.prototype.toString.call(v), v => typeof v]) {
+						try {
+							return fn(value);
+						} catch (err) {}
+					}
+				}
+
+				function isComponentProxy(value) {
+					return value && typeof value === 'object' && value.__v_skip === true && typeof value.$nextTick === 'function' && value.$ && value._;
+				}
+
 				function stringify(args) {
 					try {
-						return JSON.stringify(args);
+						return JSON.stringify(args, (key, value) => {
+							return isComponentProxy(value) ? '{component proxy}' : value;
+						});
 					} catch (error) {
 						return null;
 					}
