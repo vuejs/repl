@@ -20,5 +20,6 @@ const onChange = (code: string) => {
   <Monaco
     @change="onChange"
     :filename="filename"
+    :readonly="readonly"
   />
 </template>

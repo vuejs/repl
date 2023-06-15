@@ -47,7 +47,11 @@ export default defineConfig({
     rollupOptions: {
       input: {
         'vue-repl': './src/index.ts',
-        'vue-repl-monaco-editor': './src/editor/MonacoEditor.vue',
+        'monaco-editor': './src/editor/MonacoEditor.vue',
+        'codemirror-editor': './src/editor/CodeMirrorEditor.vue'
+      },
+      output: {
+        chunkFileNames: 'chunks/[name]-[hash].js'
       },
       external: ['vue', 'vue/compiler-sfc']
     },

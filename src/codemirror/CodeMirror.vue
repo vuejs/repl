@@ -26,7 +26,7 @@ const el = ref()
 const needAutoResize = inject('autoresize')
 
 onMounted(() => {
-  const addonOptions = {
+  const addonOptions = props.readonly ? {} : {
     autoCloseBrackets: true,
     autoCloseTags: true,
     foldGutter: true,

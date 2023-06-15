@@ -5,9 +5,9 @@ import { Store, ReplStore, SFCOptions } from './store'
 import { provide, toRef } from 'vue'
 import { EditorComponentType } from './types'
 import EditorContainer from './editor/EditorContainer.vue'
-import CodeMirrorEditor from './editor/CodeMirrorEditor.vue'
 
 export interface Props {
+  editor: EditorComponentType
   store?: Store
   autoResize?: boolean
   showCompileOutput?: boolean
@@ -16,7 +16,6 @@ export interface Props {
   sfcOptions?: SFCOptions
   layout?: string
   ssr?: boolean
-  editor?: EditorComponentType
   previewOptions?: {
     headHTML?: string
     bodyHTML?: string
@@ -34,7 +33,6 @@ const props = withDefaults(defineProps<Props>(), {
   showImportMap: true,
   clearConsole: true,
   ssr: false,
-  editor: CodeMirrorEditor,
   previewOptions: () => ({
     headHTML: '',
     bodyHTML: '',
