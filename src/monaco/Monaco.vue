@@ -1,115 +1,154 @@
 <script lang="ts">
-import { loadMonacoEnv, loadWasm } from './env';
+import { loadMonacoEnv, loadWasm } from './env'
 
-let init = false;
+let init = false
 </script>
 
 <script lang="ts" setup>
-import { onMounted, onBeforeUnmount, ref, shallowRef, nextTick, watchEffect, inject, watch } from 'vue';
-import * as monaco from 'monaco-editor-core';
-import { getOrCreateModel } from './utils';
+import {
+  onMounted,
+  onBeforeUnmount,
+  ref,
+  shallowRef,
+  nextTick,
+  watchEffect,
+  inject,
+  watch,
+  computed
+} from 'vue'
+import * as monaco from 'monaco-editor-core'
+import { getOrCreateModel } from './utils'
 import { loadGrammars, loadTheme } from 'monaco-volar'
-import { Store } from '../store';
+import { Store } from '../store'
+import type { PreviewMode } from '../types'
 
-const props = withDefaults(defineProps<{
-  filename: string;
-  readonly?: boolean;
-}>(), {
-  readonly: false
-})
+const props = withDefaults(
+  defineProps<{
+    filename: string
+    value?: string
+    readonly?: boolean
+    mode?: PreviewMode
+  }>(),
+  {
+    readonly: false
+  }
+)
 
 const emits = defineEmits<{
-  (e: 'change', value: string): void,
+  (e: 'change', value: string): void
 }>()
 
-const containerRef = ref<HTMLDivElement | null>();
-const ready = ref(false);
-const editor = shallowRef<monaco.editor.IStandaloneCodeEditor | undefined>(undefined);
-const store = inject('store') as Store;
+const containerRef = ref<HTMLDivElement | null>()
+const ready = ref(false)
+const editor = shallowRef<monaco.editor.IStandaloneCodeEditor | undefined>(
+  undefined
+)
+const store = inject('store') as Store
 
 if (!init) {
-  init = true;
-  loadMonacoEnv(store);
-  loadWasm();
+  init = true
+  loadMonacoEnv(store)
+  loadWasm()
 }
 
-watchEffect(() => {
-  // create a model for each file in the store
-  for (const filename in store.state.files) {
-    const file = store.state.files[filename];
-    if (monaco.editor.getModel(monaco.Uri.parse(`file:///${filename}`)))
-      continue;
-    getOrCreateModel(
-      monaco.Uri.parse(`file:///${filename}`),
-      file.language,
-      file.code
-    );
-  }
+if (!props.readonly) {
+  watchEffect(() => {
+    // create a model for each file in the store
+    for (const filename in store.state.files) {
+      const file = store.state.files[filename]
+      if (monaco.editor.getModel(monaco.Uri.parse(`file:///${filename}`)))
+        continue
+      getOrCreateModel(
+        monaco.Uri.parse(`file:///${filename}`),
+        file.language,
+        file.code
+      )
+    }
 
-  // dispose of any models that are not in the store
-  for (const model of monaco.editor.getModels()) {
-    if (store.state.files[model.uri.toString().substring('file:///'.length)])
-      continue;
-    if (model.uri.toString().startsWith('file:///node_modules/'))
-      continue;
-    model.dispose();
-  }
-});
+    // dispose of any models that are not in the store
+    for (const model of monaco.editor.getModels()) {
+      if (store.state.files[model.uri.toString().substring('file:///'.length)])
+        continue
+      if (model.uri.toString().startsWith('file:///node_modules/')) continue
+      model.dispose()
+    }
+  })
+}
+
+const lang = computed(() => (props.mode === 'css' ? 'css' : 'javascript'))
 
 onMounted(async () => {
-  const theme = await loadTheme();
-  ready.value = true;
-  await nextTick();
+  const theme = await loadTheme()
+  ready.value = true
+  await nextTick()
 
   if (!containerRef.value) {
-    throw new Error("Cannot find containerRef");
+    throw new Error('Cannot find containerRef')
   }
 
   const editorInstance = monaco.editor.create(containerRef.value, {
+    ...(props.readonly
+      ? { value: props.value, language: lang.value }
+      : { model: null }),
     theme,
-    model: null,
     readOnly: props.readonly,
     automaticLayout: true,
     scrollBeyondLastLine: false,
     minimap: {
-      enabled: false,
+      enabled: false
     },
     inlineSuggest: {
-      enabled: false,
+      enabled: false
     }
-  });
+  })
   editor.value = editorInstance
 
-  watch(() => props.filename, () => {
-    if (!editorInstance) return;
-    const file = store.state.files[props.filename];
-    if (!file) return null;
-    const model = getOrCreateModel(
-      monaco.Uri.parse(`file:///${props.filename}`),
-      file.language,
-      file.code
-    );
-    editorInstance.setModel(model);
-  }, { immediate: true });
+  if (props.readonly) {
+    watch(
+      () => props.value,
+      value => {
+        editorInstance.setValue(value || '')
+        monaco.editor.setModelLanguage(editorInstance.getModel()!, lang.value)
+      }
+    )
+  } else {
+    watch(
+      () => props.filename,
+      () => {
+        if (!editorInstance) return
+        const file = store.state.files[props.filename]
+        if (!file) return null
+        const model = getOrCreateModel(
+          monaco.Uri.parse(`file:///${props.filename}`),
+          file.language,
+          file.code
+        )
+        editorInstance.setModel(model)
+      },
+      { immediate: true }
+    )
+  }
 
-  await loadGrammars(editorInstance);
+  await loadGrammars(editorInstance)
 
   editorInstance.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS, () => {
     // ignore save event
-  });
+  })
 
   editorInstance.onDidChangeModelContent(() => {
-    emits('change', editorInstance.getValue());
-  });
-});
+    emits('change', editorInstance.getValue())
+  })
+})
 
 onBeforeUnmount(() => {
-  editor.value?.dispose();
-});
+  editor.value?.dispose()
+})
 </script>
+
 <template>
   <div class="editor" ref="containerRef"></div>
 </template>
+
 <style>
 .editor {
   position: relative;

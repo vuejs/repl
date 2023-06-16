@@ -73,10 +73,11 @@ provide('preview-options', props.previewOptions)
   <div class="vue-repl">
     <SplitPane :layout="layout">
       <template #left>
-        <EditorContainer :editor-component="editor" />
+        <EditorContainer :editorComponent="editor" />
       </template>
       <template #right>
         <Output
+          :editorComponent="editor"
           :showCompileOutput="props.showCompileOutput"
           :ssr="!!props.ssr"
         />
