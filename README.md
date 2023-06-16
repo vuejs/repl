@@ -36,7 +36,7 @@ const store = new ReplStore({
   outputMode: (query.get('outputMode') || 'preview'),
 
   // specify the default URL to import Vue runtime from in the sandbox
-  // default is the CDN link from unpkg.com with version matching Vue's version
+  // default is the CDN link from jsdelivr.com with version matching Vue's version
   // from peerDependency
   defaultVueRuntimeURL: 'cdn link to vue.runtime.esm-browser.js'
 })
