@@ -78,7 +78,7 @@ if (!props.readonly) {
 const lang = computed(() => (props.mode === 'css' ? 'css' : 'javascript'))
 
 onMounted(async () => {
-  const theme = await loadTheme()
+  const theme = await loadTheme(monaco.editor)
   ready.value = true
   await nextTick()
 
@@ -129,7 +129,7 @@ onMounted(async () => {
     )
   }
 
-  await loadGrammars(editorInstance)
+  await loadGrammars(monaco, editorInstance)
 
   editorInstance.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS, () => {
     // ignore save event

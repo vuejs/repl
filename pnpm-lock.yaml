@@ -54,8 +54,8 @@ devDependencies:
     specifier: ^3.0.1
     version: 3.0.1(onigasm@2.2.5)
   monaco-volar:
-    specifier: ^0.1.1
-    version: 0.1.1(monaco-editor-core@0.38.0)(onigasm@2.2.5)
+    specifier: ^0.2.0
+    version: 0.2.0(monaco-editor-core@0.38.0)(monaco-editor@0.39.0)
   onigasm:
     specifier: ^2.2.5
     version: 2.2.5
@@ -1641,12 +1641,18 @@ packages:
       onigasm: 2.2.5
     dev: true
 
-  /monaco-volar@0.1.1(monaco-editor-core@0.38.0)(onigasm@2.2.5):
-    resolution: {integrity: sha512-/5j0S0M0y1FlTrCehDbvC7m6+93dIdxaiXrjyDT2vGeR3Ai5UcgJj1syBuU9pfH9C0LpGMgW5/jeWfZzj74cOw==}
+  /monaco-volar@0.2.0(monaco-editor-core@0.38.0)(monaco-editor@0.39.0):
+    resolution: {integrity: sha512-VhAeAoSoJc9TEaEI3gLqmsGhtCHnPgoBGBmYH0yGajVQx54HhYaE6HGZOJEU0IC2GZZeJkqsFoA3cfZSRWw+vQ==}
     peerDependencies:
-      monaco-editor-core: ^0.36.0
-      onigasm: ^2.2.5
+      monaco-editor: '*'
+      monaco-editor-core: '*'
+    peerDependenciesMeta:
+      monaco-editor:
+        optional: true
+      monaco-editor-core:
+        optional: true
     dependencies:
+      monaco-editor: 0.39.0
       monaco-editor-core: 0.38.0
       onigasm: 2.2.5
       vscode-uri: 3.0.7
