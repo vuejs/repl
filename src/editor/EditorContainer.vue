@@ -2,15 +2,13 @@
 import FileSelector from './FileSelector.vue'
 import Message from '../Message.vue'
 import { debounce } from '../utils'
-import { inject, toRef } from 'vue'
+import { inject } from 'vue'
 import { Store } from '../store'
 import { EditorComponentType } from '../types'
 
 const props = defineProps<{
   editorComponent: EditorComponentType
 }>()
-
-const EditorComponent = toRef(props, 'editorComponent')
 
 const store = inject('store') as Store
 
@@ -22,12 +20,15 @@ const onChange = debounce((code: string) => {
 <template>
   <FileSelector />
   <div class="editor-container">
-    <EditorComponent
+    <props.editorComponent
       @change="onChange"
       :value="store.state.activeFile.code"
       :filename="store.state.activeFile.filename"
     />
-    <Message :err="store.state.errors[0]" />
+    <Message
+      v-if="props.editorComponent.editorType !== 'monaco'"
+      :err="store.state.errors[0]"
+    />
   </div>
 </template>
 

@@ -1,3 +1,9 @@
+<script lang="ts">
+export default {
+  editorType: 'monaco'
+}
+</script>
+
 <script setup lang="ts">
 import Monaco from '../monaco/Monaco.vue'
 
