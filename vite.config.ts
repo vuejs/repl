@@ -1,5 +1,6 @@
 import { defineConfig, Plugin } from 'vite'
 import vue from '@vitejs/plugin-vue'
+import replace from '@rollup/plugin-replace'
 
 const genStub: Plugin = {
   name: 'gen-stub',
@@ -25,35 +26,39 @@ export default defineConfig({
       'monaco-editor-core/esm/vs/editor/editor.worker',
       '@volar/monaco/worker',
       'vue/server-renderer'
-    ],
+    ]
   },
   resolve: {
     alias: {
-      path: 'path-browserify',
+      path: 'path-browserify'
     }
   },
   worker: {
-    format: 'es'
+    format: 'es',
+    plugins: [
+      replace({
+        'process.env.NODE_ENV': JSON.stringify('production')
+      })
+    ]
   },
+  base: './',
   build: {
     target: 'esnext',
     minify: false,
     lib: {
-      entry: './src/index.ts',
-      formats: ['es'],
-      fileName: () => '[name].js'
-    },
-
-    rollupOptions: {
-      input: {
+      entry: {
         'vue-repl': './src/index.ts',
         'monaco-editor': './src/editor/MonacoEditor.vue',
         'codemirror-editor': './src/editor/CodeMirrorEditor.vue'
       },
+      formats: ['es'],
+      fileName: () => '[name].js'
+    },
+    rollupOptions: {
       output: {
         chunkFileNames: 'chunks/[name]-[hash].js'
       },
       external: ['vue', 'vue/compiler-sfc']
-    },
+    }
   }
 })
