@@ -22,6 +22,8 @@ export function loadMonacoEnv(store: Store) {
     },
   };
   languages.register({ id: 'vue', extensions: ['.vue'] })
+  languages.register({ id: 'javascript', extensions: ['.js'] })
+  languages.register({ id: 'typescript', extensions: ['.ts'] })
   languages.onLanguage('vue', async () => {
     const worker = editor.createWebWorker<any>({
       moduleId: 'vs/language/vue/vueWorker',
@@ -40,7 +42,7 @@ export function loadMonacoEnv(store: Store) {
         getOrCreateModel(Uri.file(filename), undefined, text);
       }),
     });
-    const languageId = ['vue'];
+    const languageId = ['vue', 'javascript', 'typescript'];
     const getSyncUris = () => Object.keys(store.state.files).map(filename => Uri.parse(`file:///${filename}`));
     volar.editor.activateMarkers(worker, languageId, 'vue', getSyncUris, editor);
     volar.editor.activateAutoInsertion(worker, languageId, getSyncUris, editor);
