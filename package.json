@@ -63,7 +63,7 @@
     "monaco-editor-core": "^0.38.0",
     "monaco-editor-textmate": "^4.0.0",
     "monaco-textmate": "^3.0.1",
-    "monaco-volar": "^0.2.0",
+    "monaco-volar": "^0.3.0",
     "onigasm": "^2.2.5",
     "path-browserify": "^1.0.1",
     "rimraf": "^3.0.2",
@@ -73,38 +73,5 @@
     "volar-service-typescript": "0.0.7",
     "vue": "^3.3.4",
     "vue-tsc": "1.7.13"
-  },
-  "peerDependencies": {
-    "@volar/monaco": "1.7.5",
-    "@vue/language-service": "1.7.13",
-    "monaco-editor-core": "^0.38.0",
-    "monaco-editor-textmate": "^4.0.0",
-    "monaco-textmate": "^3.0.1",
-    "monaco-volar": "^0.2.0",
-    "onigasm": "^2.2.5",
-    "vue": "^3.3.0"
-  },
-  "peerDependenciesMeta": {
-    "@volar/monaco": {
-      "optional": true
-    },
-    "@vue/language-service": {
-      "optional": true
-    },
-    "monaco-editor-core": {
-      "optional": true
-    },
-    "monaco-editor-textmate": {
-      "optional": true
-    },
-    "monaco-textmate": {
-      "optional": true
-    },
-    "monaco-volar": {
-      "optional": true
-    },
-    "onigasm": {
-      "optional": true
-    }
   }
 }
