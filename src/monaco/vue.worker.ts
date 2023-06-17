@@ -12,9 +12,10 @@ self.onmessage = () => {
     const compilerOptions: ts.CompilerOptions = {
       ...ts.getDefaultCompilerOptions(),
       allowJs: true,
+      checkJs: true,
       jsx: ts.JsxEmit.Preserve,
       module: ts.ModuleKind.ESNext,
-      moduleResolution: ts.ModuleResolutionKind.NodeJs,
+      moduleResolution: ts.ModuleResolutionKind.Bundler,
     };
     const baseConfig: Config = {
       services: {
