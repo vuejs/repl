@@ -16,6 +16,7 @@ self.onmessage = () => {
       jsx: ts.JsxEmit.Preserve,
       module: ts.ModuleKind.ESNext,
       moduleResolution: ts.ModuleResolutionKind.Bundler,
+      allowImportingTsExtensions: true
     };
     const baseConfig: Config = {
       services: {
