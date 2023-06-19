@@ -19,7 +19,7 @@ const state = reactive({
 const boundSplit = computed(()=>{
   const { split } = state
   return split < 20 ? 20 : split > 80 ? 80 : split
-}) 
+})
 
 let startPosition = 0
 let startSplit = 0

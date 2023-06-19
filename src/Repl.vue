@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import SplitPane from './SplitPane.vue'
-import Editor from './editor/Editor.vue'
 import Output from './output/Output.vue'
 import { Store, ReplStore, SFCOptions } from './store'
 import { provide, toRef } from 'vue'
+import { EditorComponentType } from './types'
+import EditorContainer from './editor/EditorContainer.vue'
 
 export interface Props {
+  editor: EditorComponentType
   store?: Store
   autoResize?: boolean
   showCompileOutput?: boolean
@@ -36,9 +38,9 @@ const props = withDefaults(defineProps<Props>(), {
     bodyHTML: '',
     customCode: {
       importCode: '',
-      useCode: '',
-    },
-  }),
+      useCode: ''
+    }
+  })
 })
 
 const { store } = props
@@ -71,10 +73,11 @@ provide('preview-options', props.previewOptions)
   <div class="vue-repl">
     <SplitPane :layout="layout">
       <template #left>
-        <Editor />
+        <EditorContainer :editorComponent="editor" />
       </template>
       <template #right>
         <Output
+          :editorComponent="editor"
           :showCompileOutput="props.showCompileOutput"
           :ssr="!!props.ssr"
         />

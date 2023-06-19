@@ -121,9 +121,19 @@ function processModule(store: Store, src: string, filename: string) {
   const importedFiles = new Set<string>()
   const importToIdMap = new Map<string, string>()
 
+  function resolveImport(raw: string): string | undefined {
+    const files = store.state.files
+    let resolved = raw
+    const file =
+      files[resolved] ||
+      files[(resolved = raw + '.ts')] ||
+      files[(resolved = raw + '.js')]
+    return file ? resolved : undefined
+  }
+
   function defineImport(node: Node, source: string) {
-    const filename = source.replace(/^\.\/+/, '')
-    if (!(filename in store.state.files)) {
+    const filename = resolveImport(source.replace(/^\.\/+/, ''))
+    if (!filename) {
       throw new Error(`File "${filename}" does not exist.`)
     }
     if (importedFiles.has(filename)) {
