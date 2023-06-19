@@ -3,7 +3,7 @@ import FileSelector from './FileSelector.vue'
 import CodeMirror, { type Props } from '../codemirror/CodeMirror.vue'
 import Message from '../Message.vue'
 import { debounce } from '../utils'
-import { computed, inject } from 'vue'
+import { Ref, computed, inject } from 'vue'
 import { Store } from '../store'
 
 const store = inject('store') as Store
@@ -37,6 +37,8 @@ const activeMode = computed(() => {
     ? mode
     : modes.js
 })
+
+const showMessage = inject('showMessage') as Ref<boolean>
 </script>
 
 <template>
@@ -47,7 +49,7 @@ const activeMode = computed(() => {
       :value="store.state.activeFile.code"
       :mode="activeMode"
     />
-    <Message :err="store.state.errors[0]" />
+    <Message v-if="showMessage" :err="store.state.errors[0]" />
   </div>
 </template>
 

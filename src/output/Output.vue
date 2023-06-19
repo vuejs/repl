@@ -2,8 +2,9 @@
 import Preview from './Preview.vue'
 import CodeMirror from '../codemirror/CodeMirror.vue'
 import { Store } from '../store'
-import { inject, ref, computed } from 'vue'
+import { inject, ref, computed, Ref } from 'vue'
 import type { OutputModes } from './types'
+import Toggle from './Toggle.vue'
 
 const props = defineProps<{
   showCompileOutput?: boolean
@@ -22,17 +23,26 @@ const mode = ref<OutputModes>(
     ? store.initialOutputMode as OutputModes
     : 'preview'
 )
+
+const showMessage = inject('showMessage') as Ref<boolean>
+
 </script>
 
 <template>
-  <div class="tab-buttons">
-    <button
-      v-for="m of modes"
-      :class="{ active: mode === m }"
-      @click="mode = m"
-    >
-      <span>{{ m }}</span>
-    </button>
+  <div class="top-panel">
+    <div class="tab-buttons">
+      <button
+        v-for="m of modes"
+        :class="{ active: mode === m }"
+        @click="mode = m"
+      >
+        <span>{{ m }}</span>
+      </button>
+    </div>
+    <div class="message-toggle">
+      Message
+      <Toggle v-model="showMessage" />
+    </div>
   </div>
 
   <div class="output-container">
@@ -47,6 +57,20 @@ const mode = ref<OutputModes>(
 </template>
 
 <style scoped>
+.top-panel {
+  background-color: var(--bg);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.message-toggle {
+  color: var(--text-light);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
 .output-container {
   height: calc(100% - var(--header-height));
   overflow: hidden;
@@ -56,7 +80,6 @@ const mode = ref<OutputModes>(
 .tab-buttons {
   box-sizing: border-box;
   border-bottom: 1px solid var(--border);
-  background-color: var(--bg);
   height: var(--header-height);
   overflow: hidden;
 }
