@@ -26,12 +26,12 @@ const el = ref()
 const needAutoResize = inject('autoresize')
 
 onMounted(() => {
-  const addonOptions = {
+  const addonOptions = props.readonly ? {} : {
     autoCloseBrackets: true,
     autoCloseTags: true,
     foldGutter: true,
     gutters: ['CodeMirror-linenumbers', 'CodeMirror-foldgutter'],
-    keyMap: "sublime",
+    keyMap: 'sublime'
   }
 
   const editor = CodeMirror(el.value!, {

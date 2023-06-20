@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import Preview from './Preview.vue'
-import CodeMirror from '../codemirror/CodeMirror.vue'
 import { Store } from '../store'
 import { inject, ref, computed, Ref } from 'vue'
 import type { OutputModes } from './types'
 import Toggle from './Toggle.vue'
+import { EditorComponentType } from '../types'
 
 const props = defineProps<{
+  editorComponent: EditorComponentType
   showCompileOutput?: boolean
   ssr: boolean
 }>()
@@ -25,7 +26,6 @@ const mode = ref<OutputModes>(
 )
 
 const showMessage = inject('showMessage') as Ref<boolean>
-
 </script>
 
 <template>
@@ -39,19 +39,20 @@ const showMessage = inject('showMessage') as Ref<boolean>
         <span>{{ m }}</span>
       </button>
     </div>
-    <div class="message-toggle">
+    <div v-if="editorComponent.editorType !== 'monaco'" class="message-toggle">
       Message
       <Toggle v-model="showMessage" />
     </div>
   </div>
 
   <div class="output-container">
-    <Preview :show="mode === 'preview'" :ssr="ssr" />
-    <CodeMirror
+    <Preview :show="mode === 'preview'" :ssr="ssr"/>
+    <props.editorComponent
       v-if="mode !== 'preview'"
       readonly
-      :mode="mode === 'css' ? 'css' : 'javascript'"
+      :filename="store.state.activeFile.filename"
       :value="store.state.activeFile.compiled[mode]"
+      :mode="mode"
     />
   </div>
 </template>
