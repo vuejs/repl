@@ -105,26 +105,26 @@ onMounted(async () => {
   editor.value = editorInstance
 
   // Support for semantic highlighting
-  const t = (editorInstance as any)._themeService._theme;
+  const t = (editorInstance as any)._themeService._theme
   t.getTokenStyleMetadata = (
     type: string,
     modifiers: string[],
     _language: string
   ) => {
-    const _readonly = modifiers.includes('readonly');
+    const _readonly = modifiers.includes('readonly')
     switch (type) {
       case 'function':
       case 'method':
-        return { foreground: 12 };
+        return { foreground: 12 }
       case 'class':
-        return { foreground: 11 };
+        return { foreground: 11 }
       case 'variable':
       case 'property':
-        return { foreground: _readonly ? 21 : 9 };
+        return { foreground: _readonly ? 21 : 9 }
       default:
-        return { foreground: 0 };
+        return { foreground: 0 }
     }
-  };
+  }
 
   if (props.readonly) {
     watch(
@@ -147,6 +147,11 @@ onMounted(async () => {
           file.code
         )
         editorInstance.setModel(model)
+
+        if (file.selection) {
+          editorInstance.setSelection(file.selection)
+          editorInstance.focus()
+        }
       },
       { immediate: true }
     )
@@ -160,6 +165,14 @@ onMounted(async () => {
 
   editorInstance.onDidChangeModelContent(() => {
     emits('change', editorInstance.getValue())
+  })
+
+  editorInstance.onDidChangeCursorSelection(e => {
+    const selection = e.selection
+    const file = store.state.files[props.filename]
+    if (file) {
+      file.selection = selection
+    }
   })
 })
 
