@@ -104,27 +104,41 @@ onMounted(async () => {
   })
   editor.value = editorInstance
 
+  // Support for go to definition
+  monaco.editor.registerEditorOpener({
+    openCodeEditor(_, resource) {
+      const path = resource.path
+      if (/^\//.test(path) && !/^\/node_modules/.test(path)) {
+        const fileName = resource.path.replace('/', '')
+        store.setActive(fileName)
+        return true
+      }
+
+      return false
+    }
+  })
+
   // Support for semantic highlighting
-  const t = (editorInstance as any)._themeService._theme;
+  const t = (editorInstance as any)._themeService._theme
   t.getTokenStyleMetadata = (
     type: string,
     modifiers: string[],
     _language: string
   ) => {
-    const _readonly = modifiers.includes('readonly');
+    const _readonly = modifiers.includes('readonly')
     switch (type) {
       case 'function':
       case 'method':
-        return { foreground: 12 };
+        return { foreground: 12 }
       case 'class':
-        return { foreground: 11 };
+        return { foreground: 11 }
       case 'variable':
       case 'property':
-        return { foreground: _readonly ? 21 : 9 };
+        return { foreground: _readonly ? 21 : 9 }
       default:
-        return { foreground: 0 };
+        return { foreground: 0 }
     }
-  };
+  }
 
   if (props.readonly) {
     watch(
