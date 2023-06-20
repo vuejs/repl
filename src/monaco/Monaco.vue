@@ -90,6 +90,7 @@ onMounted(async () => {
     ...(props.readonly
       ? { value: props.value, language: lang.value }
       : { model: null }),
+    fontSize: 13,
     theme,
     readOnly: props.readonly,
     automaticLayout: true,
