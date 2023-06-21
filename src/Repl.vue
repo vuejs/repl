@@ -71,6 +71,18 @@ provide('autoresize', props.autoResize)
 provide('import-map', toRef(props, 'showImportMap'))
 provide('clear-console', toRef(props, 'clearConsole'))
 provide('preview-options', props.previewOptions)
+
+/**
+ * Reload the preview iframe
+ */
+function reload() {
+  const sandbox = document.querySelector('iframe[sandbox]') as HTMLIFrameElement
+  if (sandbox) {
+    sandbox.contentWindow?.location.reload()
+  }
+}
+
+defineExpose({ reload })
 </script>
 
 <template>
