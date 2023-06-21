@@ -1,9 +1,3 @@
-<script lang="ts">
-import { loadMonacoEnv, loadWasm } from './env'
-
-let init = false
-</script>
-
 <script lang="ts" setup>
 import {
   onMounted,
@@ -21,6 +15,7 @@ import { getOrCreateModel } from './utils'
 import { loadGrammars, loadTheme } from 'monaco-volar'
 import { Store } from '../store'
 import type { PreviewMode } from '../types'
+import { loadMonacoEnv, loadWasm } from './env'
 
 const props = withDefaults(
   defineProps<{
@@ -38,6 +33,7 @@ const emits = defineEmits<{
   (e: 'change', value: string): void
 }>()
 
+let init = false
 const containerRef = ref<HTMLDivElement | null>()
 const ready = ref(false)
 const editor = shallowRef<monaco.editor.IStandaloneCodeEditor | undefined>(
