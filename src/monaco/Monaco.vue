@@ -109,9 +109,11 @@ onMounted(async () => {
     openCodeEditor(_, resource) {
       const path = resource.path
       if (/^\//.test(path) && !/^\/node_modules/.test(path)) {
-        const fileName = resource.path.replace('/', '')
-        store.setActive(fileName)
-        return true
+        const fileName = path.replace('/', '')
+        if (fileName !== store.state.activeFile.filename) {
+          store.setActive(fileName)
+          return true
+        }
       }
 
       return false
