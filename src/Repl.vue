@@ -43,6 +43,10 @@ const props = withDefaults(defineProps<Props>(), {
   })
 })
 
+if (!props.editor) {
+  throw new Error('The "editor" prop is now required.')
+}
+
 const { store } = props
 const sfcOptions = (store.options = props.sfcOptions || {})
 if (!sfcOptions.script) {
