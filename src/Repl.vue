@@ -3,7 +3,7 @@ import SplitPane from './SplitPane.vue'
 import Output from './output/Output.vue'
 import { Store, ReplStore, SFCOptions } from './store'
 import { provide, toRef } from 'vue'
-import { EditorComponentType } from './types'
+import { EditorComponentType } from './editor/types'
 import EditorContainer from './editor/EditorContainer.vue'
 
 export interface Props {
@@ -42,6 +42,10 @@ const props = withDefaults(defineProps<Props>(), {
     }
   })
 })
+
+if (!props.editor) {
+  throw new Error('The "editor" prop is now required.')
+}
 
 const { store } = props
 const sfcOptions = (store.options = props.sfcOptions || {})

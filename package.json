@@ -1,6 +1,6 @@
 {
   "name": "@vue/repl",
-  "version": "1.5.0",
+  "version": "2.1.1",
   "description": "Vue component for editing Vue components",
   "type": "module",
   "main": "dist/ssr-stub.js",
@@ -31,7 +31,6 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "t": "vue-tsc -p tsconfig.build.json",
     "build-types": "vue-tsc -p tsconfig.build.json && api-extractor run -c api-extractor.json && node scripts/cleanup.js",
     "changelog": "conventional-changelog -p angular -i CHANGELOG.md -s",
     "prepublishOnly": "npm run build && npm run build-types"

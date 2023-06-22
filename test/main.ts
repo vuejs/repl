@@ -2,13 +2,12 @@ import { createApp, h, watchEffect } from 'vue'
 import { Repl, ReplStore } from '../src'
 import MonacoEditor from '../src/editor/MonacoEditor.vue'
 // import CodeMirrorEditor from '../src/editor/CodeMirrorEditor.vue'
-
 ;(window as any).process = { env: {} }
 
 const App = {
   setup() {
     const query = new URLSearchParams(location.search)
-    const store = new ReplStore({
+    const store = ((window as any).store = new ReplStore({
       serializedState: location.hash.slice(1),
       showOutput: query.has('so'),
       outputMode: query.get('om') || 'preview',
@@ -18,7 +17,7 @@ const App = {
       defaultVueServerRendererURL: import.meta.env.PROD
         ? undefined
         : `${location.origin}/src/vue-server-renderer-dev-proxy`
-    })
+    }))
 
     watchEffect(() => history.replaceState({}, '', store.serialize()))
 
@@ -38,6 +37,7 @@ const App = {
     // store.setVueVersion('3.2.8')
 
     return () =>
+      //@ts-ignore
       h(Repl, {
         store,
         editor: MonacoEditor,

@@ -8,6 +8,7 @@ import {
   SFCTemplateCompileOptions
 } from 'vue/compiler-sfc'
 import { OutputModes } from './output/types'
+import { Selection } from 'monaco-editor-core'
 
 const defaultMainFile = 'App.vue'
 
@@ -35,6 +36,7 @@ export class File {
     css: '',
     ssr: ''
   }
+  selection: Selection | null = null
 
   constructor(filename: string, code = '', hidden = false) {
     this.filename = filename
@@ -119,17 +121,15 @@ export class ReplStore implements Store {
     showOutput = false,
     outputMode = 'preview'
   }: StoreOptions = {}) {
-    let files: StoreState['files'] = {}
+    const files: StoreState['files'] = {}
 
     if (serializedState) {
       const saved = JSON.parse(atou(serializedState))
       for (const filename in saved) {
-        files[filename] = new File(filename, saved[filename])
+        setFile(files, filename, saved[filename])
       }
     } else {
-      files = {
-        [defaultMainFile]: new File(defaultMainFile, welcomeCode)
-      }
+      setFile(files, defaultMainFile, welcomeCode)
     }
 
     this.defaultVueRuntimeURL = defaultVueRuntimeURL
@@ -245,7 +245,9 @@ export class ReplStore implements Store {
   getFiles() {
     const exported: Record<string, string> = {}
     for (const filename in this.state.files) {
-      exported[filename] = this.state.files[filename].code
+      const normalized =
+        filename === importMapFile ? filename : filename.replace(/^src\//, '')
+      exported[normalized] = this.state.files[filename].code
     }
     return exported
   }
@@ -253,10 +255,10 @@ export class ReplStore implements Store {
   async setFiles(newFiles: Record<string, string>, mainFile = defaultMainFile) {
     const files: Record<string, File> = {}
     if (mainFile === defaultMainFile && !newFiles[mainFile]) {
-      files[mainFile] = new File(mainFile, welcomeCode)
+      setFile(files, mainFile, welcomeCode)
     }
     for (const filename in newFiles) {
-      files[filename] = new File(filename, newFiles[filename])
+      setFile(files, filename, newFiles[filename])
     }
     for (const file in files) {
       await compileFile(this, files[file])
@@ -358,6 +360,20 @@ export class ReplStore implements Store {
     this.forceSandboxReset()
     console.info(`[@vue/repl] Now using default Vue version`)
   }
+}
+
+function setFile(
+  files: Record<string, File>,
+  filename: string,
+  content: string
+) {
+  // prefix user files with src/
+  // for cleaner Volar path completion when using Monaco editor
+  const normalized =
+    filename !== importMapFile && !filename.startsWith('src/')
+      ? `src/${filename}`
+      : filename
+  files[normalized] = new File(normalized, content)
 }
 
 function fixURL(url: string) {

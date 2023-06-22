@@ -132,9 +132,9 @@ function processModule(store: Store, src: string, filename: string) {
   }
 
   function defineImport(node: Node, source: string) {
-    const filename = resolveImport(source.replace(/^\.\/+/, ''))
+    const filename = resolveImport(source.replace(/^\.\/+/, 'src/'))
     if (!filename) {
-      throw new Error(`File "${filename}" does not exist.`)
+      throw new Error(`File "${source}" does not exist.`)
     }
     if (importedFiles.has(filename)) {
       return importToIdMap.get(filename)!

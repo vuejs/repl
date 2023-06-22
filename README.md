@@ -2,25 +2,51 @@
 
 Vue SFC REPL as a Vue 3 component.
 
-## Simple Usage
+## Basic Usage
+
+**Note: 2.0 now supports Monaco Editor, but also requires explicitly passing in the editor to be used for tree-shaking.**
+
+### With CodeMirror Editor
+
+Basic editing experience with no intellisense. Lighter weight, fewer network requests, better for embedding use cases.
 
 ```vue
 <script setup>
 import { Repl } from '@vue/repl'
+import CodeMirror from '@vue/repl/codemirror-editor'
 import '@vue/repl/style.css'
 </script>
 
 <template>
-  <Repl />
+  <Repl :editor="CodeMirror" />
+</template>
+```
+
+### With Monaco Editor
+
+With Volar support, autocomplete, type inference, and semantic highlighting. Heavier bundle, loads dts files from CDN, better for standalone use cases.
+
+```vue
+<script setup>
+import { Repl } from '@vue/repl'
+import Monaco from '@vue/repl/monaco-editor'
+import '@vue/repl/style.css'
+</script>
+
+<template>
+  <Repl :editor="Monaco" />
 </template>
 ```
 
 ## Advanced Usage
 
+Customize the behavior of the REPL by manually initializing the store.
+
 ```vue
 <script setup>
 import { watchEffect } from 'vue'
 import { Repl, ReplStore } from '@vue/repl'
+import Monaco from '@vue/repl/monaco-editor'
 
 // retrieve some configuration options from the URL
 const query = new URLSearchParams(location.search)
@@ -33,7 +59,7 @@ const store = new ReplStore({
   showOutput: query.has('showOutput'),
   // starts on a different tab on the output pane if the URL has a outputMode query
   // and default to the "preview" tab
-  outputMode: (query.get('outputMode') || 'preview'),
+  outputMode: query.get('outputMode') || 'preview',
 
   // specify the default URL to import Vue runtime from in the sandbox
   // default is the CDN link from jsdelivr.com with version matching Vue's version
@@ -56,6 +82,6 @@ store.setVueVersion('3.2.8')
 </script>
 
 <template>
-  <Repl :store="store" :showCompileOutput="true" />
+  <Repl :store="store" :editor="Monaco" :showCompileOutput="true" />
 </template>
 ```
