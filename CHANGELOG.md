@@ -1,3 +1,12 @@
+# [2.1.0](https://github.com/vuejs/repl/compare/v2.0.0...v2.1.0) (2023-06-22)
+
+
+### Features
+
+* support custom file go to difinition ([#102](https://github.com/vuejs/repl/issues/102)) ([519b0cc](https://github.com/vuejs/repl/commit/519b0cc079dccdb08ed00f1b5d2fb0c965fbab03))
+
+
+
 # [2.0.0](https://github.com/vuejs/repl/compare/v1.5.0...v2.0.0) (2023-06-22)
 
 ### Features
