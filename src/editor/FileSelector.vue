@@ -4,7 +4,16 @@ import { computed, inject, ref, VNode, Ref } from 'vue'
 
 const store = inject('store') as Store
 
+/**
+ * When `true`: indicates adding a new file
+ * When `string`: indicates renaming a file, and holds the old filename in case
+ * of cancel.
+ */
 const pending = ref<boolean | string>(false)
+/**
+ * Text shown in the input box when editing a file's name
+ * This is a display name so it should always strip off the `src/` prefix.
+ */
 const pendingFilename = ref('Comp.vue')
 const showImportMap = inject('import-map') as Ref<boolean>
 const files = computed(() =>
@@ -45,7 +54,8 @@ function focus({ el }: VNode) {
 
 function doneNameFile() {
   if (!pending.value) return
-  const filename = pendingFilename.value
+  // add back the src prefix
+  const filename = 'src/' + pendingFilename.value
   const oldFilename = pending.value === true ? '' : pending.value
 
   if (!/\.(vue|js|ts|css|json)$/.test(filename)) {
@@ -75,8 +85,12 @@ function doneNameFile() {
 }
 
 function editFileName(file: string) {
-  pendingFilename.value = file
+  pendingFilename.value = stripSrcPrefix(file)
   pending.value = file
+}
+
+function stripSrcPrefix(file: string) {
+  return file.replace(/^src\//, '')
 }
 
 const fileSel = ref(null)
@@ -108,7 +122,7 @@ function horizontalScroll(e: WheelEvent) {
         @dblclick="i > 0 && editFileName(file)"
       >
         <span class="label">{{
-          file === importMapFile ? 'Import Map' : file
+          file === importMapFile ? 'Import Map' : stripSrcPrefix(file)
         }}</span>
         <span v-if="i > 0" class="remove" @click.stop="store.deleteFile(file)">
           <svg class="icon" width="12" height="12" viewBox="0 0 24 24">
@@ -117,7 +131,10 @@ function horizontalScroll(e: WheelEvent) {
           </svg>
         </span>
       </div>
-      <div v-if="(pending === true && i === files.length - 1) || (pending === file)" class="file pending">
+      <div
+        v-if="(pending === true && i === files.length - 1) || pending === file"
+        class="file pending"
+      >
         <input
           v-model="pendingFilename"
           spellcheck="false"
