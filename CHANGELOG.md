@@ -1,3 +1,12 @@
+## [2.1.2](https://github.com/vuejs/repl/compare/v2.1.1...v2.1.2) (2023-06-22)
+
+
+### Bug Fixes
+
+* ensure imported editor can be passed as prop without type error ([414b0e6](https://github.com/vuejs/repl/commit/414b0e6cb729234ccb188332b22c184e44f162e0))
+
+
+
 ## [2.1.1](https://github.com/vuejs/repl/compare/v2.1.0...v2.1.1) (2023-06-22)
 
 
