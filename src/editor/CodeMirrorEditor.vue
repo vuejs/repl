@@ -7,7 +7,7 @@ export default {
 <script setup lang="ts">
 import CodeMirror, { type Props } from '../codemirror/CodeMirror.vue'
 import { computed } from 'vue'
-import type { PreviewMode } from '../types'
+import type { PreviewMode } from './types'
 
 const props = defineProps<{
   value: string

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import Monaco from '../monaco/Monaco.vue'
-import type { PreviewMode } from '../types'
+import type { PreviewMode } from './types'
 
 defineProps<{
   value: string

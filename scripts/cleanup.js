@@ -11,4 +11,6 @@ fs.renameSync(
   'dist/MonacoEditor.vue.d.ts'
 )
 
+fs.renameSync('dist/src/editor/types.d.ts', 'dist/types.d.ts')
+
 fs.rmSync('dist/src', { recursive: true })

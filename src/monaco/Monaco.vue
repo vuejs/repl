@@ -20,7 +20,7 @@ import * as monaco from 'monaco-editor-core'
 import { getOrCreateModel } from './utils'
 import { loadGrammars, loadTheme } from 'monaco-volar'
 import { Store } from '../store'
-import type { PreviewMode } from '../types'
+import type { PreviewMode } from '../editor/types'
 
 const props = withDefaults(
   defineProps<{
