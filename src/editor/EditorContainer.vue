@@ -2,16 +2,17 @@
 import FileSelector from './FileSelector.vue'
 import Message from '../Message.vue'
 import { debounce } from '../utils'
-import { inject, Ref } from 'vue'
+import { inject, ref } from 'vue'
 import { Store } from '../store'
 import { EditorComponentType } from '../types'
+import MessageToggle from './MessageToggle.vue'
 
 const props = defineProps<{
   editorComponent: EditorComponentType
 }>()
 
 const store = inject('store') as Store
-const showMessage = inject('showMessage') as Ref<boolean>
+const showMessage = ref(true)
 
 const onChange = debounce((code: string) => {
   store.state.activeFile.code = code
@@ -30,6 +31,7 @@ const onChange = debounce((code: string) => {
       v-if="props.editorComponent.editorType !== 'monaco' && showMessage"
       :err="store.state.errors[0]"
     />
+    <MessageToggle v-model="showMessage" />
   </div>
 </template>
 

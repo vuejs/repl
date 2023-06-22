@@ -2,7 +2,7 @@
 import SplitPane from './SplitPane.vue'
 import Output from './output/Output.vue'
 import { Store, ReplStore, SFCOptions } from './store'
-import { provide, ref, toRef } from 'vue'
+import { provide, toRef } from 'vue'
 import { EditorComponentType } from './types'
 import EditorContainer from './editor/EditorContainer.vue'
 
@@ -62,14 +62,11 @@ sfcOptions.script.fs = {
 
 store.init()
 
-const showMessage = ref(true)
-
 provide('store', store)
 provide('autoresize', props.autoResize)
 provide('import-map', toRef(props, 'showImportMap'))
 provide('clear-console', toRef(props, 'clearConsole'))
 provide('preview-options', props.previewOptions)
-provide('showMessage', showMessage)
 </script>
 
 <template>
