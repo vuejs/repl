@@ -105,6 +105,22 @@ onMounted(async () => {
   })
   editor.value = editorInstance
 
+  // Support for go to definition
+  monaco.editor.registerEditorOpener({
+    openCodeEditor(_, resource) {
+      const path = resource.path
+      if (/^\//.test(path) && !/^\/node_modules/.test(path)) {
+        const fileName = path.replace('/', '')
+        if (fileName !== store.state.activeFile.filename) {
+          store.setActive(fileName)
+          return true
+        }
+      }
+
+      return false
+    }
+  })
+
   // Support for semantic highlighting
   const t = (editorInstance as any)._themeService._theme
   t.getTokenStyleMetadata = (
