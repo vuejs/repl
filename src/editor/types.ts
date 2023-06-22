@@ -13,6 +13,8 @@ interface EditorEmits {
   (e: 'change', code: string): void
 }
 
-export type EditorComponentType = Component<EditorProps, EditorEmits> & {
+type EditorComponentType = Component<EditorProps, EditorEmits> & {
   editorType: 'monaco' | 'codemirror'
 }
+
+export default EditorComponentType

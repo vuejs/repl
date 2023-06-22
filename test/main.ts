@@ -2,6 +2,7 @@ import { createApp, h, watchEffect } from 'vue'
 import { Repl, ReplStore } from '../src'
 import MonacoEditor from '../src/editor/MonacoEditor.vue'
 // import CodeMirrorEditor from '../src/editor/CodeMirrorEditor.vue'
+import EditorComponentType from '../src/editor/types'
 ;(window as any).process = { env: {} }
 
 const App = {
@@ -37,10 +38,9 @@ const App = {
     // store.setVueVersion('3.2.8')
 
     return () =>
-      //@ts-ignore
       h(Repl, {
         store,
-        editor: MonacoEditor,
+        editor: MonacoEditor as any as EditorComponentType,
         // layout: 'vertical',
         ssr: true,
         sfcOptions: {

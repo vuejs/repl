@@ -11,19 +11,19 @@
   "types": "dist/repl.d.ts",
   "exports": {
     ".": {
+      "types": "./dist/repl.d.ts",
       "import": "./dist/vue-repl.js",
-      "require": "./dist/ssr-stub.js",
-      "types": "./dist/repl.d.ts"
+      "require": "./dist/ssr-stub.js"
     },
     "./monaco-editor": {
+      "types": "./dist/editor-types.d.ts",
       "import": "./dist/monaco-editor.js",
-      "require": null,
-      "types": "./dist/MonacoEditor.vue.d.ts"
+      "require": null
     },
     "./codemirror-editor": {
+      "types": "./dist/editor-types.d.ts",
       "import": "./dist/codemirror-editor.js",
-      "require": null,
-      "types": "./dist/CodeMirrorEditor.vue.d.ts"
+      "require": null
     },
     "./style.css": "./dist/style.css",
     "./dist/style.css": "./dist/style.css"
