@@ -1,3 +1,12 @@
+## [2.1.3](https://github.com/vuejs/repl/compare/v2.1.2...v2.1.3) (2023-06-22)
+
+
+### Bug Fixes
+
+* actually fix editor type ([95ab2ab](https://github.com/vuejs/repl/commit/95ab2abc29b01a565ba7bc25ef293f1434db5ef6))
+
+
+
 ## [2.1.2](https://github.com/vuejs/repl/compare/v2.1.1...v2.1.2) (2023-06-22)
 
 
