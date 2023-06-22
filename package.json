@@ -31,7 +31,6 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "t": "vue-tsc -p tsconfig.build.json",
     "build-types": "vue-tsc -p tsconfig.build.json && api-extractor run -c api-extractor.json && node scripts/cleanup.js",
     "changelog": "conventional-changelog -p angular -i CHANGELOG.md -s",
     "prepublishOnly": "npm run build && npm run build-types"
