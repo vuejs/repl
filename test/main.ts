@@ -2,7 +2,7 @@ import { createApp, h, watchEffect } from 'vue'
 import { Repl, ReplStore } from '../src'
 import MonacoEditor from '../src/editor/MonacoEditor.vue'
 // import CodeMirrorEditor from '../src/editor/CodeMirrorEditor.vue'
-import EditorComponentType from '../src/editor/types'
+import { EditorComponentType } from '../src/editor/types'
 ;(window as any).process = { env: {} }
 
 const App = {

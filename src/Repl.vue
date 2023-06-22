@@ -3,7 +3,7 @@ import SplitPane from './SplitPane.vue'
 import Output from './output/Output.vue'
 import { Store, ReplStore, SFCOptions } from './store'
 import { provide, toRef } from 'vue'
-import type EditorComponentType from './editor/types'
+import type { EditorComponentType } from './editor/types'
 import EditorContainer from './editor/EditorContainer.vue'
 
 export interface Props {
