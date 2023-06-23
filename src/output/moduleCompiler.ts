@@ -6,7 +6,7 @@ import {
   walkIdentifiers,
   extractIdentifiers,
   isInDestructureAssignment,
-  isStaticProperty
+  isStaticProperty,
 } from 'vue/compiler-sfc'
 import { ExportSpecifier, Identifier, Node } from '@babel/types'
 
@@ -63,7 +63,7 @@ function processFile(
   let {
     code: js,
     importedFiles,
-    hasDynamicImport
+    hasDynamicImport,
   } = processModule(
     store,
     isSSR ? file.compiled.ssr : file.compiled.js,
@@ -113,7 +113,7 @@ function processModule(store: Store, src: string, filename: string) {
 
   const ast = babelParse(src, {
     sourceFilename: filename,
-    sourceType: 'module'
+    sourceType: 'module',
   }).program.body
 
   const idToImportMap = new Map<string, string>()
@@ -305,13 +305,13 @@ function processModule(store: Store, src: string, filename: string) {
           )
         }
       }
-    }
+    },
   })
 
   return {
     code: s.toString(),
     importedFiles,
-    hasDynamicImport
+    hasDynamicImport,
   }
 }
 

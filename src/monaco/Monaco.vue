@@ -14,7 +14,7 @@ import {
   watchEffect,
   inject,
   watch,
-  computed
+  computed,
 } from 'vue'
 import * as monaco from 'monaco-editor-core'
 import { getOrCreateModel } from './utils'
@@ -30,7 +30,7 @@ const props = withDefaults(
     mode?: PreviewMode
   }>(),
   {
-    readonly: false
+    readonly: false,
   }
 )
 
@@ -96,13 +96,13 @@ onMounted(async () => {
     automaticLayout: true,
     scrollBeyondLastLine: false,
     minimap: {
-      enabled: false
+      enabled: false,
     },
     inlineSuggest: {
-      enabled: false
+      enabled: false,
     },
     'semanticHighlighting.enabled': true,
-    fixedOverflowWidgets: true
+    fixedOverflowWidgets: true,
   })
   editor.value = editorInstance
 
@@ -119,7 +119,7 @@ onMounted(async () => {
       }
 
       return false
-    }
+    },
   })
 
   // Support for semantic highlighting
@@ -147,7 +147,7 @@ onMounted(async () => {
   if (props.readonly) {
     watch(
       () => props.value,
-      value => {
+      (value) => {
         editorInstance.setValue(value || '')
         monaco.editor.setModelLanguage(editorInstance.getModel()!, lang.value)
       }
@@ -185,7 +185,7 @@ onMounted(async () => {
     emits('change', editorInstance.getValue())
   })
 
-  editorInstance.onDidChangeCursorSelection(e => {
+  editorInstance.onDidChangeCursorSelection((e) => {
     const selection = e.selection
     const file = store.state.files[props.filename]
     if (file) {

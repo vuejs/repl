@@ -4,7 +4,7 @@ import { computed } from 'vue'
 import type { PreviewMode } from './types'
 
 defineOptions({
-  editorType: 'monaco'
+  editorType: 'monaco',
 })
 
 const props = defineProps<{
@@ -26,17 +26,17 @@ const modes: Record<string, Props['mode']> = {
   css: 'css',
   html: 'htmlmixed',
   js: {
-    name: 'javascript'
+    name: 'javascript',
   },
   json: {
     name: 'javascript',
-    json: true
+    json: true,
   },
   ts: {
     name: 'javascript',
-    typescript: true
+    typescript: true,
   },
-  vue: 'htmlmixed'
+  vue: 'htmlmixed',
 }
 
 const activeMode = computed(() => {

@@ -20,7 +20,7 @@ const modes = computed(() =>
 
 const mode = ref<OutputModes>(
   (modes.value as readonly string[]).includes(store.initialOutputMode)
-    ? store.initialOutputMode as OutputModes
+    ? (store.initialOutputMode as OutputModes)
     : 'preview'
 )
 </script>
@@ -37,7 +37,7 @@ const mode = ref<OutputModes>(
   </div>
 
   <div class="output-container">
-    <Preview :show="mode === 'preview'" :ssr="ssr"/>
+    <Preview :show="mode === 'preview'" :ssr="ssr" />
     <props.editorComponent
       v-if="mode !== 'preview'"
       readonly
