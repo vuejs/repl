@@ -5,7 +5,7 @@ import { debounce } from '../utils'
 import { inject, ref } from 'vue'
 import { Store } from '../store'
 import MessageToggle from './MessageToggle.vue'
-import { EditorComponentType } from './types'
+import type { EditorComponentType } from './types'
 
 const props = defineProps<{
   editorComponent: EditorComponentType
