@@ -2,7 +2,7 @@
 import SplitPane from './SplitPane.vue'
 import Output from './output/Output.vue'
 import { Store, ReplStore, SFCOptions } from './store'
-import { provide, toRef } from 'vue'
+import { provide, ref, toRef } from 'vue'
 import type { EditorComponentType } from './editor/types'
 import EditorContainer from './editor/EditorContainer.vue'
 
@@ -47,6 +47,7 @@ if (!props.editor) {
   throw new Error('The "editor" prop is now required.')
 }
 
+const outputRef = ref<InstanceType<typeof Output>>()
 const { store } = props
 const sfcOptions = (store.options = props.sfcOptions || {})
 if (!sfcOptions.script) {
@@ -76,10 +77,7 @@ provide('preview-options', props.previewOptions)
  * Reload the preview iframe
  */
 function reload() {
-  const sandbox = document.querySelector('iframe[sandbox]') as HTMLIFrameElement
-  if (sandbox) {
-    sandbox.contentWindow?.location.reload()
-  }
+  outputRef.value?.reload()
 }
 
 defineExpose({ reload })
@@ -93,6 +91,7 @@ defineExpose({ reload })
       </template>
       <template #right>
         <Output
+          ref="outputRef"
           :editorComponent="editor"
           :showCompileOutput="props.showCompileOutput"
           :ssr="!!props.ssr"

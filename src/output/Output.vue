@@ -12,6 +12,7 @@ const props = defineProps<{
 }>()
 
 const store = inject('store') as Store
+const previewRef = ref<InstanceType<typeof Preview>>()
 const modes = computed(() =>
   props.showCompileOutput
     ? (['preview', 'js', 'css', 'ssr'] as const)
@@ -23,6 +24,12 @@ const mode = ref<OutputModes>(
     ? (store.initialOutputMode as OutputModes)
     : 'preview'
 )
+
+function reload() {
+  previewRef.value?.reload()
+}
+
+defineExpose({ reload })
 </script>
 
 <template>
@@ -37,7 +44,7 @@ const mode = ref<OutputModes>(
   </div>
 
   <div class="output-container">
-    <Preview :show="mode === 'preview'" :ssr="ssr" />
+    <Preview ref="previewRef" :show="mode === 'preview'" :ssr="ssr" />
     <props.editorComponent
       v-if="mode !== 'preview'"
       readonly

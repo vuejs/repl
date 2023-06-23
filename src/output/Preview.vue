@@ -264,6 +264,15 @@ async function updatePreview() {
     runtimeError.value = (e as Error).message
   }
 }
+
+/**
+ * Reload the preview iframe
+ */
+function reload() {
+  sandbox.contentWindow?.location.reload()
+}
+
+defineExpose({ reload })
 </script>
 
 <template>
