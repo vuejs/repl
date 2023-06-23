@@ -101,7 +101,7 @@ provide('preview-options', props.previewOptions)
   --color-branding-dark: #416f9c;
   --header-height: 38px;
 
-  height: 100vh;
+  height: 100%;
   margin: 0;
   overflow: hidden;
   font-size: 13px;
