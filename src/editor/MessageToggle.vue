@@ -1,19 +1,11 @@
 <script setup lang="ts">
-  withDefaults(defineProps<{
-    modelValue: boolean
-  }>(), {
-    modelValue: false
-  })
-
-  defineEmits<{
-    (e: 'update:modelValue', next: boolean): void 
-  }>()
+const modelValue = defineModel({
+  default: false,
+})
 </script>
 <template>
   <div class="wrapper" @click="$emit('update:modelValue', !modelValue)">
-    <span>
-      Message
-    </span>
+    <span> Show Error </span>
     <div class="toggle" :class="[{ active: modelValue }]">
       <div class="indicator" />
     </div>
@@ -47,10 +39,10 @@
 .indicator {
   font-size: 12px;
   background-color: var(--text-light);
-  width: 14px;  
+  width: 14px;
   height: 14px;
   border-radius: 50%;
-  transition: transform ease-in-out .2s;
+  transition: transform ease-in-out 0.2s;
   position: absolute;
   left: 2px;
   top: 2px;
