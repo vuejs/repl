@@ -101,7 +101,8 @@ onMounted(async () => {
     inlineSuggest: {
       enabled: false
     },
-    'semanticHighlighting.enabled': true
+    'semanticHighlighting.enabled': true,
+    fixedOverflowWidgets: true
   })
   editor.value = editorInstance
 
