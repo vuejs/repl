@@ -1,13 +1,11 @@
-<script lang="ts">
-export default {
-  editorType: 'codemirror'
-}
-</script>
-
 <script setup lang="ts">
 import CodeMirror, { type Props } from '../codemirror/CodeMirror.vue'
 import { computed } from 'vue'
 import type { PreviewMode } from './types'
+
+defineOptions({
+  editorType: 'codemirror',
+})
 
 const props = defineProps<{
   value: string
@@ -28,17 +26,17 @@ const modes: Record<string, Props['mode']> = {
   css: 'css',
   html: 'htmlmixed',
   js: {
-    name: 'javascript'
+    name: 'javascript',
   },
   json: {
     name: 'javascript',
-    json: true
+    json: true,
   },
   ts: {
     name: 'javascript',
-    typescript: true
+    typescript: true,
   },
-  vue: 'htmlmixed'
+  vue: 'htmlmixed',
 }
 
 const activeMode = computed(() => {

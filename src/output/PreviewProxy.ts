@@ -55,7 +55,7 @@ export class PreviewProxy {
       }
     } else if (action !== 'cmd_error' && action !== 'cmd_ok') {
       console.error('command not found', id, cmd_data, [
-        ...this.pending_cmds.keys()
+        ...this.pending_cmds.keys(),
       ])
     }
   }

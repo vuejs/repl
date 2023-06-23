@@ -5,7 +5,7 @@ import { utoa, atou } from './utils'
 import {
   SFCScriptCompileOptions,
   SFCAsyncStyleCompileOptions,
-  SFCTemplateCompileOptions
+  SFCTemplateCompileOptions,
 } from 'vue/compiler-sfc'
 import { OutputModes } from './output/types'
 import { Selection } from 'monaco-editor-core'
@@ -34,7 +34,7 @@ export class File {
   compiled = {
     js: '',
     css: '',
-    ssr: ''
+    ssr: '',
   }
   selection: Selection | null = null
 
@@ -119,7 +119,7 @@ export class ReplStore implements Store {
     defaultVueRuntimeURL = `https://cdn.jsdelivr.net/npm/@vue/runtime-dom@${version}/dist/runtime-dom.esm-browser.js`,
     defaultVueServerRendererURL = `https://cdn.jsdelivr.net/npm/@vue/server-renderer@${version}/dist/server-renderer.esm-browser.js`,
     showOutput = false,
-    outputMode = 'preview'
+    outputMode = 'preview',
   }: StoreOptions = {}) {
     const files: StoreState['files'] = {}
 
@@ -148,7 +148,7 @@ export class ReplStore implements Store {
       errors: [],
       vueRuntimeURL: this.defaultVueRuntimeURL,
       vueServerRendererURL: this.defaultVueServerRendererURL,
-      resetFlip: true
+      resetFlip: true,
     })
 
     this.initImportMap()
@@ -283,8 +283,8 @@ export class ReplStore implements Store {
           {
             imports: {
               vue: this.defaultVueRuntimeURL,
-              'vue/server-renderer': this.defaultVueServerRendererURL
-            }
+              'vue/server-renderer': this.defaultVueServerRendererURL,
+            },
           },
           null,
           2
@@ -315,7 +315,7 @@ export class ReplStore implements Store {
       return JSON.parse(this.state.files[importMapFile].code)
     } catch (e) {
       this.state.errors = [
-        `Syntax error in import-map.json: ${(e as Error).message}`
+        `Syntax error in import-map.json: ${(e as Error).message}`,
       ]
       return {}
     }

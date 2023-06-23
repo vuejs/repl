@@ -60,7 +60,7 @@ function doneNameFile() {
 
   if (!/\.(vue|js|ts|css|json)$/.test(filename)) {
     store.state.errors = [
-      `Playground only supports *.vue, *.js, *.ts, *.css, *.json files.`
+      `Playground only supports *.vue, *.js, *.ts, *.css, *.json files.`,
     ]
     return
   }
@@ -101,7 +101,7 @@ function horizontalScroll(e: WheelEvent) {
     Math.abs(e.deltaX) >= Math.abs(e.deltaY) ? e.deltaX : e.deltaY
   const distance = 30 * (direction > 0 ? 1 : -1)
   el.scrollTo({
-    left: el.scrollLeft + distance
+    left: el.scrollLeft + distance,
   })
 }
 </script>

@@ -8,7 +8,7 @@ import {
   watch,
   WatchStopHandle,
   inject,
-  Ref
+  Ref,
 } from 'vue'
 import srcdoc from './srcdoc.html?raw'
 import { PreviewProxy } from './PreviewProxy'
@@ -37,7 +37,7 @@ onMounted(createSandbox)
 // reset sandbox when import map changes
 watch(
   () => store.state.files[importMapFile].code,
-  raw => {
+  (raw) => {
     try {
       const map = JSON.parse(raw)
       if (!map.imports) {
@@ -78,7 +78,7 @@ function createSandbox() {
       'allow-popups',
       'allow-same-origin',
       'allow-scripts',
-      'allow-top-navigation-by-user-activation'
+      'allow-top-navigation-by-user-activation',
     ].join(' ')
   )
 
@@ -150,7 +150,7 @@ function createSandbox() {
     },
     on_console_group_collapsed: (action: any) => {
       // group_logs(action.label, true);
-    }
+    },
   })
 
   sandbox.addEventListener('load', () => {
@@ -170,7 +170,7 @@ async function updatePreview() {
   if (store.vueVersion) {
     const [major, minor, patch] = store.vueVersion
       .split('.')
-      .map(v => parseInt(v, 10))
+      .map((v) => parseInt(v, 10))
     if (major === 3 && (minor < 2 || (minor === 2 && patch < 27))) {
       alert(
         `The selected version of Vue (${store.vueVersion}) does not support in-browser SSR.` +
@@ -208,7 +208,7 @@ async function updatePreview() {
          }).catch(err => {
            console.error("SSR Error", err)
          })
-        `
+        `,
       ])
     }
 
@@ -229,7 +229,7 @@ async function updatePreview() {
               previewOptions?.bodyHTML || ''
             }\``),
       ...modules,
-        `setTimeout(()=> document.getElementById('__sfc-styles').innerHTML = window.__css__,1)`,
+      `setTimeout(()=> document.getElementById('__sfc-styles').innerHTML = window.__css__,1)`,
     ]
 
     // if main file is a vue file, mount it.

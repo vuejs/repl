@@ -9,9 +9,9 @@ const genStub: Plugin = {
     this.emitFile({
       type: 'asset',
       fileName: 'ssr-stub.js',
-      source: `module.exports = {}`
+      source: `module.exports = {}`,
     })
-  }
+  },
 }
 
 export default defineConfig({
@@ -25,13 +25,13 @@ export default defineConfig({
       '@vue/language-service',
       'monaco-editor-core/esm/vs/editor/editor.worker',
       '@volar/monaco/worker',
-      'vue/server-renderer'
-    ]
+      'vue/server-renderer',
+    ],
   },
   resolve: {
     alias: {
-      path: 'path-browserify'
-    }
+      path: 'path-browserify',
+    },
   },
   worker: {
     format: 'es',
@@ -39,10 +39,10 @@ export default defineConfig({
       replace({
         preventAssignment: true,
         values: {
-          'process.env.NODE_ENV': JSON.stringify('production')
-        }
-      })
-    ]
+          'process.env.NODE_ENV': JSON.stringify('production'),
+        },
+      }),
+    ],
   },
   base: './',
   build: {
@@ -52,16 +52,16 @@ export default defineConfig({
       entry: {
         'vue-repl': './src/index.ts',
         'monaco-editor': './src/editor/MonacoEditor.vue',
-        'codemirror-editor': './src/editor/CodeMirrorEditor.vue'
+        'codemirror-editor': './src/editor/CodeMirrorEditor.vue',
       },
       formats: ['es'],
-      fileName: () => '[name].js'
+      fileName: () => '[name].js',
     },
     rollupOptions: {
       output: {
-        chunkFileNames: 'chunks/[name]-[hash].js'
+        chunkFileNames: 'chunks/[name]-[hash].js',
       },
-      external: ['vue', 'vue/compiler-sfc']
-    }
-  }
+      external: ['vue', 'vue/compiler-sfc'],
+    },
+  },
 })
