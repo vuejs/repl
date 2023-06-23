@@ -539,6 +539,6 @@ span.CodeMirror-selectedtext {
   background: none;
 }
 
-.CodeMirror-dialog{
+.CodeMirror-dialog {
   background-color: var(--bg);
 }

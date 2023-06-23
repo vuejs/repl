@@ -64,7 +64,7 @@ const store = new ReplStore({
   // specify the default URL to import Vue runtime from in the sandbox
   // default is the CDN link from jsdelivr.com with version matching Vue's version
   // from peerDependency
-  defaultVueRuntimeURL: 'cdn link to vue.runtime.esm-browser.js'
+  defaultVueRuntimeURL: 'cdn link to vue.runtime.esm-browser.js',
 })
 
 // persist state to URL hash
@@ -73,8 +73,8 @@ watchEffect(() => history.replaceState({}, '', store.serialize()))
 // pre-set import map
 store.setImportMap({
   imports: {
-    myLib: 'cdn link to esm build of myLib'
-  }
+    myLib: 'cdn link to esm build of myLib',
+  },
 })
 
 // use a specific version of Vue

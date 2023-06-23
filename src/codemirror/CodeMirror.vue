@@ -17,7 +17,7 @@ export interface Props {
 const props = withDefaults(defineProps<Props>(), {
   mode: 'htmlmixed',
   value: '',
-  readonly: false
+  readonly: false,
 })
 
 const emit = defineEmits<(e: 'change', value: string) => void>()
@@ -26,13 +26,15 @@ const el = ref()
 const needAutoResize = inject('autoresize')
 
 onMounted(() => {
-  const addonOptions = props.readonly ? {} : {
-    autoCloseBrackets: true,
-    autoCloseTags: true,
-    foldGutter: true,
-    gutters: ['CodeMirror-linenumbers', 'CodeMirror-foldgutter'],
-    keyMap: 'sublime'
-  }
+  const addonOptions = props.readonly
+    ? {}
+    : {
+        autoCloseBrackets: true,
+        autoCloseTags: true,
+        foldGutter: true,
+        gutters: ['CodeMirror-linenumbers', 'CodeMirror-foldgutter'],
+        keyMap: 'sublime',
+      }
 
   const editor = CodeMirror(el.value!, {
     value: '',
@@ -41,7 +43,7 @@ onMounted(() => {
     tabSize: 2,
     lineWrapping: true,
     lineNumbers: true,
-    ...addonOptions
+    ...addonOptions,
   })
 
   editor.on('change', () => {

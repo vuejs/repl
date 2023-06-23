@@ -2,7 +2,7 @@ import { Store, File } from './store'
 import {
   SFCDescriptor,
   BindingMetadata,
-  CompilerOptions
+  CompilerOptions,
 } from 'vue/compiler-sfc'
 import { transform } from 'sucrase'
 // @ts-ignore
@@ -12,7 +12,7 @@ export const COMP_IDENTIFIER = `__sfc__`
 
 async function transformTS(src: string) {
   return transform(src, {
-    transforms: ['typescript']
+    transforms: ['typescript'],
   }).code
 }
 
@@ -62,7 +62,7 @@ export async function compileFile(
   const id = hashId(filename)
   const { errors, descriptor } = store.compiler.parse(code, {
     filename,
-    sourceMap: true
+    sourceMap: true,
   })
   if (errors.length) {
     store.state.errors = errors
@@ -70,12 +70,12 @@ export async function compileFile(
   }
 
   if (
-    descriptor.styles.some(s => s.lang) ||
+    descriptor.styles.some((s) => s.lang) ||
     (descriptor.template && descriptor.template.lang)
   ) {
     store.state.errors = [
       `lang="x" pre-processors for <template> or <style> are currently not ` +
-        `supported.`
+        `supported.`,
     ]
     return
   }
@@ -89,7 +89,7 @@ export async function compileFile(
     return
   }
 
-  const hasScoped = descriptor.styles.some(s => s.scoped)
+  const hasScoped = descriptor.styles.some((s) => s.scoped)
   let clientCode = ''
   let ssrCode = ''
 
@@ -187,7 +187,7 @@ export async function compileFile(
   for (const style of descriptor.styles) {
     if (style.module) {
       store.state.errors = [
-        `<style module> is not supported in the playground.`
+        `<style module> is not supported in the playground.`,
       ]
       return
     }
@@ -198,7 +198,7 @@ export async function compileFile(
       filename,
       id,
       scoped: style.scoped,
-      modules: !!style.module
+      modules: !!style.module,
     })
     if (styleResult.errors.length) {
       // postcss uses pathToFileURL which isn't polyfilled in the browser
@@ -243,9 +243,9 @@ async function doCompileScript(
           ssrCssVars: descriptor.cssVars,
           compilerOptions: {
             ...store.options?.template?.compilerOptions,
-            expressionPlugins
-          }
-        }
+            expressionPlugins,
+          },
+        },
       })
       let code = ''
       if (compiledScript.bindings) {
@@ -291,15 +291,15 @@ async function doCompileTemplate(
     source: descriptor.template!.content,
     filename: descriptor.filename,
     id,
-    scoped: descriptor.styles.some(s => s.scoped),
+    scoped: descriptor.styles.some((s) => s.scoped),
     slotted: descriptor.slotted,
     ssr,
     ssrCssVars: descriptor.cssVars,
     compilerOptions: {
       ...store.options?.template?.compilerOptions,
       bindingMetadata,
-      expressionPlugins: isTS ? ['typescript'] : undefined
-    }
+      expressionPlugins: isTS ? ['typescript'] : undefined,
+    },
   })
   if (templateResult.errors.length) {
     store.state.errors = templateResult.errors

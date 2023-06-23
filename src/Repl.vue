@@ -14,7 +14,7 @@ export interface Props {
   showImportMap?: boolean
   clearConsole?: boolean
   sfcOptions?: SFCOptions
-  layout?: string
+  layout?: 'horizontal' | 'vertical'
   ssr?: boolean
   previewOptions?: {
     headHTML?: string
@@ -38,9 +38,9 @@ const props = withDefaults(defineProps<Props>(), {
     bodyHTML: '',
     customCode: {
       importCode: '',
-      useCode: ''
-    }
-  })
+      useCode: '',
+    },
+  }),
 })
 
 if (!props.editor) {
@@ -61,7 +61,7 @@ sfcOptions.script.fs = {
   readFile(file: string) {
     if (file.startsWith('/')) file = file.slice(1)
     return store.state.files[file].code
-  }
+  },
 }
 
 store.init()
