@@ -1,13 +1,11 @@
-<script lang="ts">
-export default {
-  editorType: 'monaco'
-}
-</script>
-
 <script setup lang="ts">
 import CodeMirror, { type Props } from '../codemirror/CodeMirror.vue'
 import { computed } from 'vue'
 import type { PreviewMode } from './types'
+
+defineOptions({
+  editorType: 'monaco'
+})
 
 const props = defineProps<{
   value: string
