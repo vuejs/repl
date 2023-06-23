@@ -156,10 +156,17 @@ export class ReplStore implements Store {
 
   // don't start compiling until the options are set
   init() {
-    watchEffect(() => compileFile(this, this.state.activeFile))
+    watchEffect(() =>
+      compileFile(this, this.state.activeFile).then(
+        (errs) => (this.state.errors = errs)
+      )
+    )
+    this.state.errors = []
     for (const file in this.state.files) {
       if (file !== defaultMainFile) {
-        compileFile(this, this.state.files[file])
+        compileFile(this, this.state.files[file]).then((errs) =>
+          this.state.errors.push(...errs)
+        )
       }
     }
   }
@@ -219,7 +226,7 @@ export class ReplStore implements Store {
       this.state.mainFile = newFilename
     }
 
-    compileFile(this, file)
+    compileFile(this, file).then((errs) => (this.state.errors = errs))
   }
 
   serialize() {
@@ -260,8 +267,9 @@ export class ReplStore implements Store {
     for (const filename in newFiles) {
       setFile(files, filename, newFiles[filename])
     }
+    this.state.errors = []
     for (const file in files) {
-      await compileFile(this, files[file])
+      this.state.errors.push(...(await compileFile(this, files[file])))
     }
     this.state.mainFile = mainFile
     this.state.files = files

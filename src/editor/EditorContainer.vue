@@ -27,13 +27,8 @@ const onChange = debounce((code: string) => {
       :value="store.state.activeFile.code"
       :filename="store.state.activeFile.filename"
     />
-    <template v-if="editorComponent.editorType !== 'monaco'">
-      <Message
-        v-show="showMessage"
-        :err="store.state.errors[0]"
-      />
-      <MessageToggle v-model="showMessage" />
-    </template>
+    <Message v-show="showMessage" :err="store.state.errors[0]" />
+    <MessageToggle v-model="showMessage" />
   </div>
 </template>
 
