@@ -17,7 +17,6 @@ const showMessage = ref(true)
 const onChange = debounce((code: string) => {
   store.state.activeFile.code = code
 }, 250)
-
 </script>
 
 <template>
