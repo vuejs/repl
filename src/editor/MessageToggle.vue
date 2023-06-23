@@ -1,7 +1,16 @@
 <script setup lang="ts">
-const modelValue = defineModel({
-  default: false,
-})
+withDefaults(
+  defineProps<{
+    modelValue?: boolean
+  }>(),
+  {
+    modelValue: false,
+  }
+)
+
+defineEmits<{
+  (e: 'update:modelValue', next: boolean): void
+}>()
 </script>
 <template>
   <div class="wrapper" @click="$emit('update:modelValue', !modelValue)">
