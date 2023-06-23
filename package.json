@@ -32,7 +32,7 @@
     "dev": "vite",
     "build": "vite build",
     "build-types": "vue-tsc -p tsconfig.build.json && api-extractor run -c api-extractor.json && node scripts/cleanup.js",
-    "changelog": "conventional-changelog -p angular -i CHANGELOG.md -s",
+    "release": "bumpp -r",
     "prepublishOnly": "npm run build && npm run build-types"
   },
   "repository": {
@@ -55,8 +55,8 @@
     "@volar/monaco": "1.7.8",
     "@volar/typescript": "1.7.8",
     "@vue/language-service": "1.8.1",
+    "bumpp": "^9.1.1",
     "codemirror": "^5.62.3",
-    "conventional-changelog-cli": "^3.0.0",
     "fflate": "^0.7.3",
     "hash-sum": "^2.0.0",
     "monaco-editor-core": "^0.38.0",
