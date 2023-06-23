@@ -258,7 +258,10 @@ export class ReplStore implements Store {
       setFile(files, mainFile, welcomeCode)
     }
     for (const filename in newFiles) {
-      setFile(files, filename, newFiles[filename])
+      const normalized = setFile(files, filename, newFiles[filename])
+      if (mainFile === filename) {
+        mainFile = normalized
+      }
     }
     for (const file in files) {
       await compileFile(this, files[file])
@@ -374,6 +377,7 @@ function setFile(
       ? `src/${filename}`
       : filename
   files[normalized] = new File(normalized, content)
+  return normalized
 }
 
 function fixURL(url: string) {
