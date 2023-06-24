@@ -63,6 +63,67 @@ export function loadWasm() {
   return onigasm.loadWASM(onigasmWasm)
 }
 
+let disposeVue: undefined | (() => void)
+export async function reloadVue(store: Store) {
+  disposeVue?.()
+
+  const worker = editor.createWebWorker<any>({
+    moduleId: 'vs/language/vue/vueWorker',
+    label: 'vue',
+    host: createJsDelivrDtsHost(
+      !store.vueVersion
+        ? {}
+        : {
+            vue: store.vueVersion,
+            '@vue/compiler-core': store.vueVersion,
+            '@vue/compiler-dom': store.vueVersion,
+            '@vue/compiler-sfc': store.vueVersion,
+            '@vue/compiler-ssr': store.vueVersion,
+            '@vue/reactivity': store.vueVersion,
+            '@vue/runtime-core': store.vueVersion,
+            '@vue/runtime-dom': store.vueVersion,
+            '@vue/shared': store.vueVersion,
+          },
+      (filename, text) => {
+        getOrCreateModel(Uri.file(filename), undefined, text)
+      }
+    ),
+    createData: {
+      tsconfig: store.getTsConfig?.() || {},
+    },
+  })
+  const languageId = ['vue', 'javascript', 'typescript']
+  const getSyncUris = () =>
+    Object.keys(store.state.files).map((filename) =>
+      Uri.parse(`file:///${filename}`)
+    )
+  const { dispose: disposeMarkers } = volar.editor.activateMarkers(
+    worker,
+    languageId,
+    'vue',
+    getSyncUris,
+    editor
+  )
+  const { dispose: disposeAutoInsertion } = volar.editor.activateAutoInsertion(
+    worker,
+    languageId,
+    getSyncUris,
+    editor
+  )
+  const { dispose: disposeProvides } = await volar.languages.registerProvides(
+    worker,
+    languageId,
+    getSyncUris,
+    languages
+  )
+
+  disposeVue = () => {
+    disposeMarkers()
+    disposeAutoInsertion()
+    disposeProvides()
+  }
+}
+
 export function loadMonacoEnv(store: Store) {
   ;(self as any).MonacoEnvironment = {
     async getWorker(_: any, label: string) {
@@ -75,36 +136,5 @@ export function loadMonacoEnv(store: Store) {
   languages.register({ id: 'vue', extensions: ['.vue'] })
   languages.register({ id: 'javascript', extensions: ['.js'] })
   languages.register({ id: 'typescript', extensions: ['.ts'] })
-  languages.onLanguage('vue', async () => {
-    const worker = editor.createWebWorker<any>({
-      moduleId: 'vs/language/vue/vueWorker',
-      label: 'vue',
-      host: createJsDelivrDtsHost(
-        !store.vueVersion
-          ? {}
-          : {
-              vue: store.vueVersion,
-              '@vue/compiler-core': store.vueVersion,
-              '@vue/compiler-dom': store.vueVersion,
-              '@vue/compiler-sfc': store.vueVersion,
-              '@vue/compiler-ssr': store.vueVersion,
-              '@vue/reactivity': store.vueVersion,
-              '@vue/runtime-core': store.vueVersion,
-              '@vue/runtime-dom': store.vueVersion,
-              '@vue/shared': store.vueVersion,
-            },
-        (filename, text) => {
-          getOrCreateModel(Uri.file(filename), undefined, text)
-        }
-      ),
-    })
-    const languageId = ['vue', 'javascript', 'typescript']
-    const getSyncUris = () =>
-      Object.keys(store.state.files).map((filename) =>
-        Uri.parse(`file:///${filename}`)
-      )
-    volar.editor.activateMarkers(worker, languageId, 'vue', getSyncUris, editor)
-    volar.editor.activateAutoInsertion(worker, languageId, getSyncUris, editor)
-    volar.languages.registerProvides(worker, languageId, getSyncUris, languages)
-  })
+  languages.onLanguage('vue', () => reloadVue(store))
 }
