@@ -29,7 +29,7 @@ const onChange = debounce((code: string) => {
     />
     <template v-if="editorComponent.editorType !== 'monaco'">
       <Message
-        v-if="showMessage"
+        v-show="showMessage"
         :err="store.state.errors[0]"
       />
       <MessageToggle v-model="showMessage" />

@@ -14,7 +14,7 @@ defineEmits<{
 </script>
 <template>
   <div class="wrapper" @click="$emit('update:modelValue', !modelValue)">
-    <span> Show Error </span>
+    <span>Show Error</span>
     <div class="toggle" :class="[{ active: modelValue }]">
       <div class="indicator" />
     </div>
