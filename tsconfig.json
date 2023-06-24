@@ -16,7 +16,8 @@
     "removeComments": false,
     "lib": ["esnext", "dom"],
     "jsx": "preserve",
-    "rootDir": "."
+    "rootDir": ".",
+    "skipLibCheck": true
   },
   "include": ["src", "test", "vite.config.ts"]
 }

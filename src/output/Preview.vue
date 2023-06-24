@@ -13,7 +13,7 @@ import {
 import srcdoc from './srcdoc.html?raw'
 import { PreviewProxy } from './PreviewProxy'
 import { compileModulesForPreview } from './moduleCompiler'
-import { Store, importMapFile } from '../store'
+import { Store } from '../store'
 import { Props } from '../Repl.vue'
 
 const props = defineProps<{ show: boolean; ssr: boolean }>()
@@ -36,14 +36,9 @@ onMounted(createSandbox)
 
 // reset sandbox when import map changes
 watch(
-  () => store.state.files[importMapFile].code,
-  (raw) => {
+  () => store.getImportMap(),
+  () => {
     try {
-      const map = JSON.parse(raw)
-      if (!map.imports) {
-        store.state.errors = [`import-map.json is missing "imports" field.`]
-        return
-      }
       createSandbox()
     } catch (e: any) {
       store.state.errors = [e as Error]
