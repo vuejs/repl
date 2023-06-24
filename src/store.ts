@@ -231,7 +231,9 @@ export class ReplStore implements Store {
   }
 
   deleteFile(filename: string) {
-    if (confirm(`Are you sure you want to delete ${filename}?`)) {
+    if (
+      confirm(`Are you sure you want to delete ${stripSrcPrefix(filename)}?`)
+    ) {
       if (this.state.activeFile.filename === filename) {
         this.state.activeFile = this.state.files[this.state.mainFile]
       }
@@ -434,4 +436,8 @@ function setFile(
 
 function fixURL(url: string) {
   return url.replace('https://sfc.vuejs', 'https://play.vuejs')
+}
+
+export function stripSrcPrefix(file: string) {
+  return file.replace(/^src\//, '')
 }

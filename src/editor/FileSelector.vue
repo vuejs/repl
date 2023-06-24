@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Store, importMapFile, tsconfigFile } from '../store'
+import { Store, importMapFile, tsconfigFile, stripSrcPrefix } from '../store'
 import { computed, inject, ref, VNode, Ref } from 'vue'
 
 const store = inject('store') as Store
@@ -91,10 +91,6 @@ function doneNameFile() {
 function editFileName(file: string) {
   pendingFilename.value = stripSrcPrefix(file)
   pending.value = file
-}
-
-function stripSrcPrefix(file: string) {
-  return file.replace(/^src\//, '')
 }
 
 const fileSel = ref(null)

@@ -15,7 +15,7 @@ const genStub: Plugin = {
 
 export default defineConfig({
   ...base,
-  plugins: [...(base as UserConfig).plugins! , genStub],
+  plugins: [...(base as UserConfig).plugins!, genStub],
   optimizeDeps: {
     // avoid late discovered deps
     include: [
