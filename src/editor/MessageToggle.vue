@@ -9,7 +9,7 @@ withDefaults(
 )
 
 defineEmits<{
-  (e: 'update:modelValue', next: boolean): void
+  (e: 'update:modelValue', value: boolean): void
 }>()
 </script>
 <template>
