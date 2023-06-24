@@ -12,6 +12,7 @@ export interface Props {
   autoResize?: boolean
   showCompileOutput?: boolean
   showImportMap?: boolean
+  showTsConfig?: boolean
   clearConsole?: boolean
   sfcOptions?: SFCOptions
   layout?: 'horizontal' | 'vertical'
@@ -31,6 +32,7 @@ const props = withDefaults(defineProps<Props>(), {
   autoResize: true,
   showCompileOutput: true,
   showImportMap: true,
+  showTsConfig: true,
   clearConsole: true,
   ssr: false,
   previewOptions: () => ({
@@ -69,6 +71,7 @@ store.init()
 provide('store', store)
 provide('autoresize', props.autoResize)
 provide('import-map', toRef(props, 'showImportMap'))
+provide('tsconfig', toRef(props, 'showTsConfig'))
 provide('clear-console', toRef(props, 'clearConsole'))
 provide('preview-options', props.previewOptions)
 </script>

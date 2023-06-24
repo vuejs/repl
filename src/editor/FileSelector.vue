@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Store, importMapFile } from '../store'
+import { Store, importMapFile, tsconfigFile } from '../store'
 import { computed, inject, ref, VNode, Ref } from 'vue'
 
 const store = inject('store') as Store
@@ -15,10 +15,14 @@ const pending = ref<boolean | string>(false)
  * This is a display name so it should always strip off the `src/` prefix.
  */
 const pendingFilename = ref('Comp.vue')
+const showTsConfig = inject('tsconfig') as Ref<boolean>
 const showImportMap = inject('import-map') as Ref<boolean>
 const files = computed(() =>
   Object.entries(store.state.files)
-    .filter(([name, file]) => name !== importMapFile && !file.hidden)
+    .filter(
+      ([name, file]) =>
+        name !== importMapFile && name !== tsconfigFile && !file.hidden
+    )
     .map(([name]) => name)
 )
 
@@ -121,9 +125,7 @@ function horizontalScroll(e: WheelEvent) {
         @click="store.setActive(file)"
         @dblclick="i > 0 && editFileName(file)"
       >
-        <span class="label">{{
-          file === importMapFile ? 'Import Map' : stripSrcPrefix(file)
-        }}</span>
+        <span class="label">{{ stripSrcPrefix(file) }}</span>
         <span v-if="i > 0" class="remove" @click.stop="store.deleteFile(file)">
           <svg class="icon" width="12" height="12" viewBox="0 0 24 24">
             <line stroke="#999" x1="18" y1="6" x2="6" y2="18"></line>
@@ -147,9 +149,18 @@ function horizontalScroll(e: WheelEvent) {
     </template>
     <button class="add" @click="startAddFile">+</button>
 
-    <div v-if="showImportMap" class="import-map-wrapper">
+    <div class="import-map-wrapper">
       <div
-        class="file import-map"
+        v-if="showTsConfig"
+        class="file"
+        :class="{ active: store.state.activeFile.filename === tsconfigFile }"
+        @click="store.setActive(tsconfigFile)"
+      >
+        <span class="label">tsconfig.json</span>
+      </div>
+      <div
+        v-if="showImportMap"
+        class="file"
         :class="{ active: store.state.activeFile.filename === importMapFile }"
         @click="store.setActive(importMapFile)"
       >
