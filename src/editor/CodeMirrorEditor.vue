@@ -4,7 +4,7 @@ import { computed } from 'vue'
 import type { PreviewMode } from './types'
 
 defineOptions({
-  editorType: 'monaco',
+  editorType: 'codemirror',
 })
 
 const props = defineProps<{
