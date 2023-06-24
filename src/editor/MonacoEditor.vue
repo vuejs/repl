@@ -9,7 +9,7 @@ defineProps<{
   mode?: PreviewMode
 }>()
 
-const emits = defineEmits<{
+const emit = defineEmits<{
   (e: 'change', code: string): void
 }>()
 
@@ -18,7 +18,7 @@ defineOptions({
 })
 
 const onChange = (code: string) => {
-  emits('change', code)
+  emit('change', code)
 }
 </script>
 

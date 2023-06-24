@@ -1,9 +1,3 @@
-<script lang="ts">
-import { loadMonacoEnv, loadWasm } from './env'
-
-let init = false
-</script>
-
 <script lang="ts" setup>
 import {
   onMounted,
@@ -11,12 +5,12 @@ import {
   ref,
   shallowRef,
   nextTick,
-  watchEffect,
   inject,
   watch,
   computed,
 } from 'vue'
 import * as monaco from 'monaco-editor-core'
+import { initMonaco } from './env'
 import { getOrCreateModel } from './utils'
 import { loadGrammars, loadTheme } from 'monaco-volar'
 import { Store } from '../store'
@@ -34,46 +28,16 @@ const props = withDefaults(
   }
 )
 
-const emits = defineEmits<{
+const emit = defineEmits<{
   (e: 'change', value: string): void
 }>()
 
-const containerRef = ref<HTMLDivElement | null>()
+const containerRef = ref<HTMLDivElement>()
 const ready = ref(false)
-const editor = shallowRef<monaco.editor.IStandaloneCodeEditor | undefined>(
-  undefined
-)
-const store = inject('store') as Store
+const editor = shallowRef<monaco.editor.IStandaloneCodeEditor>()
+const store = inject<Store>('store')!
 
-if (!init) {
-  init = true
-  loadMonacoEnv(store)
-  loadWasm()
-}
-
-if (!props.readonly) {
-  watchEffect(() => {
-    // create a model for each file in the store
-    for (const filename in store.state.files) {
-      const file = store.state.files[filename]
-      if (monaco.editor.getModel(monaco.Uri.parse(`file:///${filename}`)))
-        continue
-      getOrCreateModel(
-        monaco.Uri.parse(`file:///${filename}`),
-        file.language,
-        file.code
-      )
-    }
-
-    // dispose of any models that are not in the store
-    for (const model of monaco.editor.getModels()) {
-      if (store.state.files[model.uri.toString().substring('file:///'.length)])
-        continue
-      if (model.uri.toString().startsWith('file:///node_modules/')) continue
-      model.dispose()
-    }
-  })
-}
+initMonaco(store)
 
 const lang = computed(() => (props.mode === 'css' ? 'css' : 'javascript'))
 
@@ -105,22 +69,6 @@ onMounted(async () => {
     fixedOverflowWidgets: true,
   })
   editor.value = editorInstance
-
-  // Support for go to definition
-  monaco.editor.registerEditorOpener({
-    openCodeEditor(_, resource) {
-      const path = resource.path
-      if (/^\//.test(path) && !/^\/node_modules/.test(path)) {
-        const fileName = path.replace('/', '')
-        if (fileName !== store.state.activeFile.filename) {
-          store.setActive(fileName)
-          return true
-        }
-      }
-
-      return false
-    },
-  })
 
   // Support for semantic highlighting
   const t = (editorInstance as any)._themeService._theme
@@ -182,7 +130,7 @@ onMounted(async () => {
   })
 
   editorInstance.onDidChangeModelContent(() => {
-    emits('change', editorInstance.getValue())
+    emit('change', editorInstance.getValue())
   })
 
   editorInstance.onDidChangeCursorSelection((e) => {
