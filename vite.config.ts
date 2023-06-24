@@ -1,6 +1,5 @@
-import { defineConfig, Plugin } from 'vite'
-import vue from '@vitejs/plugin-vue'
-import replace from '@rollup/plugin-replace'
+import { defineConfig, Plugin, UserConfig } from 'vite'
+import base from './vite.preview.config'
 
 const genStub: Plugin = {
   name: 'gen-stub',
@@ -15,7 +14,8 @@ const genStub: Plugin = {
 }
 
 export default defineConfig({
-  plugins: [vue(), genStub],
+  ...base,
+  plugins: [...(base as UserConfig).plugins! , genStub],
   optimizeDeps: {
     // avoid late discovered deps
     include: [
@@ -26,22 +26,6 @@ export default defineConfig({
       'monaco-editor-core/esm/vs/editor/editor.worker',
       '@volar/monaco/worker',
       'vue/server-renderer',
-    ],
-  },
-  resolve: {
-    alias: {
-      path: 'path-browserify',
-    },
-  },
-  worker: {
-    format: 'es',
-    plugins: [
-      replace({
-        preventAssignment: true,
-        values: {
-          'process.env.NODE_ENV': JSON.stringify('production'),
-        },
-      }),
     ],
   },
   base: './',

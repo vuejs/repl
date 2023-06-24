@@ -33,6 +33,7 @@
     "dev": "vite",
     "build": "vite build",
     "build-types": "vue-tsc -p tsconfig.build.json && api-extractor run -c api-extractor.json && node scripts/cleanup.js",
+    "build-preview": "vite build -c vite.preview.config.ts",
     "format": "prettier --write .",
     "release": "bumpp -r",
     "prepublishOnly": "npm run build && npm run build-types"
