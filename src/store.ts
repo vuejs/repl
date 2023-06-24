@@ -196,7 +196,7 @@ export class ReplStore implements Store {
     }
   }
 
-  initTsConfig() {
+  private initTsConfig() {
     if (!this.state.files[tsconfigFile]) {
       this.setTsConfig(tsconfig)
     }

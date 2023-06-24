@@ -15,8 +15,8 @@ const pending = ref<boolean | string>(false)
  * This is a display name so it should always strip off the `src/` prefix.
  */
 const pendingFilename = ref('Comp.vue')
-const showTsConfig = inject('tsconfig') as Ref<boolean>
-const showImportMap = inject('import-map') as Ref<boolean>
+const showTsConfig = inject<Ref<boolean>>('tsconfig')
+const showImportMap = inject<Ref<boolean>>('import-map')
 const files = computed(() =>
   Object.entries(store.state.files)
     .filter(

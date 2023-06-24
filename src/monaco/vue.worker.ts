@@ -1,6 +1,6 @@
 // @ts-ignore
 import * as worker from 'monaco-editor-core/esm/vs/editor/editor.worker'
-import * as monaco from 'monaco-editor-core'
+import type * as monaco from 'monaco-editor-core'
 import * as ts from 'typescript'
 import { Config, resolveConfig } from '@vue/language-service'
 import { createLanguageService } from '@volar/monaco/worker'
