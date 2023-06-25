@@ -1,17 +1,9 @@
 <script setup lang="ts">
 import Monaco from '../monaco/Monaco.vue'
-import type { PreviewMode } from './types'
+import type { EditorEmits, EditorProps } from './types'
 
-defineProps<{
-  value: string
-  filename: string
-  readonly?: boolean
-  mode?: PreviewMode
-}>()
-
-const emit = defineEmits<{
-  (e: 'change', code: string): void
-}>()
+defineProps<EditorProps>()
+const emit = defineEmits<EditorEmits>()
 
 defineOptions({
   editorType: 'monaco',

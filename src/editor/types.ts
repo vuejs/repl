@@ -1,19 +1,22 @@
-import { Component } from 'vue'
+import { type FunctionalComponent } from 'vue'
 
 export type PreviewMode = 'js' | 'css' | 'ssr'
 
-interface EditorProps {
+export interface EditorProps {
   value: string
   filename: string
   readonly?: boolean
   mode?: PreviewMode
 }
 
-interface EditorEmits {
+export interface EditorEmits {
   (e: 'change', code: string): void
 }
 
-export type EditorComponentType = Component<EditorProps, EditorEmits> & {
+export type EditorComponentType = FunctionalComponent<
+  EditorProps,
+  { change: (code: string) => void }
+> & {
   editorType: 'monaco' | 'codemirror'
 }
 

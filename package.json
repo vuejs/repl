@@ -54,7 +54,7 @@
     "@rollup/plugin-replace": "^5.0.2",
     "@types/codemirror": "^5.60.2",
     "@types/node": "^18.15.3",
-    "@vitejs/plugin-vue": "^4.1.0",
+    "@vitejs/plugin-vue": "^4.2.3",
     "@volar/monaco": "1.7.8",
     "@volar/typescript": "1.7.8",
     "@vue/language-service": "1.8.1",

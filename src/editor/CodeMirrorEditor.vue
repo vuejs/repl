@@ -1,25 +1,17 @@
 <script setup lang="ts">
 import CodeMirror, { type Props } from '../codemirror/CodeMirror.vue'
 import { computed } from 'vue'
-import type { PreviewMode } from './types'
+import type { EditorEmits, EditorProps } from './types'
 
 defineOptions({
   editorType: 'codemirror',
 })
 
-const props = defineProps<{
-  value: string
-  filename: string
-  readonly?: boolean
-  mode?: PreviewMode
-}>()
-
-const emits = defineEmits<{
-  (e: 'change', code: string): void
-}>()
+const props = defineProps<EditorProps>()
+const emit = defineEmits<EditorEmits>()
 
 const onChange = (code: string) => {
-  emits('change', code)
+  emit('change', code)
 }
 
 const modes: Record<string, Props['mode']> = {

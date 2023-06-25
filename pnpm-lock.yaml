@@ -21,8 +21,8 @@ devDependencies:
     specifier: ^18.15.3
     version: 18.15.3
   '@vitejs/plugin-vue':
-    specifier: ^4.1.0
-    version: 4.1.0(vite@4.3.9)(vue@3.3.4)
+    specifier: ^4.2.3
+    version: 4.2.3(vite@4.3.9)(vue@3.3.4)
   '@volar/monaco':
     specifier: 1.7.8
     version: 1.7.8
@@ -521,8 +521,8 @@ packages:
       '@types/estree': 1.0.1
     dev: true
 
-  /@vitejs/plugin-vue@4.1.0(vite@4.3.9)(vue@3.3.4):
-    resolution: {integrity: sha512-++9JOAFdcXI3lyer9UKUV4rfoQ3T1RN8yDqoCLar86s0xQct5yblxAE+yWgRnU5/0FOlVCpTZpYSBV/bGWrSrQ==}
+  /@vitejs/plugin-vue@4.2.3(vite@4.3.9)(vue@3.3.4):
+    resolution: {integrity: sha512-R6JDUfiZbJA9cMiguQ7jxALsgiprjBeHL5ikpXfJCH62pPHtI+JdJ5xWj6Ev73yXSlYl86+blXn1kZHQ7uElxw==}
     engines: {node: ^14.18.0 || >=16.0.0}
     peerDependencies:
       vite: ^4.0.0

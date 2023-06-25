@@ -3,7 +3,13 @@ import vue from '@vitejs/plugin-vue'
 import replace from '@rollup/plugin-replace'
 
 export default defineConfig({
-  plugins: [vue()],
+  plugins: [
+    vue({
+      script: {
+        defineModel: true,
+      },
+    }),
+  ],
   resolve: {
     alias: {
       path: 'path-browserify',
