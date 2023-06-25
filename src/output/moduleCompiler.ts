@@ -28,7 +28,7 @@ export function compileModulesForPreview(store: Store, isSSR = false) {
         const file = store.state.files[filename]
         if (!seen.has(file)) {
           processed.push(
-            `\nwindow.__css__ += ${JSON.stringify(file.compiled.css)}`
+            `\nwindow.__css__.push(${JSON.stringify(file.compiled.css)})`
           )
         }
       }
@@ -79,7 +79,7 @@ function processFile(
   )
   // append css
   if (file.compiled.css && !isSSR) {
-    js += `\nwindow.__css__ += ${JSON.stringify(file.compiled.css)}`
+    js += `\nwindow.__css__.push(${JSON.stringify(file.compiled.css)})`
   }
 
   // push self
