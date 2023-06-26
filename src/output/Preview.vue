@@ -226,7 +226,7 @@ async function updatePreview() {
       ...modules,
       `setTimeout(()=> {
         document.querySelectorAll('style[css]').forEach(el => el.remove())
-        document.head.insertAdjacentHTML('afterbegin', window.__css__.map(s => \`<style css>\${s}</style>\`).join('\\n'))
+        document.head.insertAdjacentHTML('beforeend', window.__css__.map(s => \`<style css>\${s}</style>\`).join('\\n'))
       }, 1)`,
     ]
 
