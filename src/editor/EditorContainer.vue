@@ -7,6 +7,8 @@ import { Store } from '../store'
 import MessageToggle from './MessageToggle.vue'
 import type { EditorComponentType } from './types'
 
+const SHOW_ERROR_KEY = 'repl_show_error'
+
 const props = defineProps<{
   editorComponent: EditorComponentType
 }>()
@@ -19,11 +21,11 @@ const onChange = debounce((code: string) => {
 }, 250)
 
 function setItem(){
-  localStorage.setItem('repl_show_error', showMessage.value ? 'true':'false')
+  localStorage.setItem(SHOW_ERROR_KEY, showMessage.value ? 'true':'false')
 }
 
 function getItem(){
-  const item = localStorage.getItem('repl_show_error')
+  const item = localStorage.getItem(SHOW_ERROR_KEY)
   return !(item === 'false')
 }
 
