@@ -20,11 +20,11 @@ const onChange = debounce((code: string) => {
   store.state.activeFile.code = code
 }, 250)
 
-function setItem(){
-  localStorage.setItem(SHOW_ERROR_KEY, showMessage.value ? 'true':'false')
+function setItem() {
+  localStorage.setItem(SHOW_ERROR_KEY, showMessage.value ? 'true' : 'false')
 }
 
-function getItem(){
+function getItem() {
   const item = localStorage.getItem(SHOW_ERROR_KEY)
   return !(item === 'false')
 }
