@@ -41,6 +41,7 @@ initMonaco(store)
 
 const lang = computed(() => (props.mode === 'css' ? 'css' : 'javascript'))
 
+const replTheme = inject('theme')
 onMounted(async () => {
   const theme = await loadTheme(monaco.editor)
   ready.value = true
@@ -55,7 +56,7 @@ onMounted(async () => {
       ? { value: props.value, language: lang.value }
       : { model: null }),
     fontSize: 13,
-    theme,
+    theme: replTheme === 'light' ? theme.light : theme.dark,
     readOnly: props.readonly,
     automaticLayout: true,
     scrollBeyondLastLine: false,

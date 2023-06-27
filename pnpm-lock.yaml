@@ -1,4 +1,4 @@
-lockfileVersion: '6.0'
+lockfileVersion: '6.1'
 
 settings:
   autoInstallPeers: true
@@ -54,8 +54,8 @@ devDependencies:
     specifier: ^3.0.1
     version: 3.0.1(onigasm@2.2.5)
   monaco-volar:
-    specifier: ^0.3.0
-    version: 0.3.0(monaco-editor-core@0.38.0)(monaco-editor@0.39.0)
+    specifier: ^0.4.0
+    version: 0.4.0
   onigasm:
     specifier: ^2.2.5
     version: 2.2.5
@@ -1389,21 +1389,10 @@ packages:
       onigasm: 2.2.5
     dev: true
 
-  /monaco-volar@0.3.0(monaco-editor-core@0.38.0)(monaco-editor@0.39.0):
-    resolution: {integrity: sha512-WksEYjBe8B3f/WtpmzJtQbQsLdf9RKnH9xhoZg3ZVXluHx+Gm2HfEEEjgEe+8Fme37tL54bSxUPv/w5XZxmE4w==}
-    peerDependencies:
-      monaco-editor: '*'
-      monaco-editor-core: '*'
-    peerDependenciesMeta:
-      monaco-editor:
-        optional: true
-      monaco-editor-core:
-        optional: true
+  /monaco-volar@0.4.0:
+    resolution: {integrity: sha512-QnUg8cs17BOLacmuIki0Zri0tPQOHOw14LcQFKWigyIo2ChRJnO7grhxQsHOdyOL7vkHxSkMno84wIT8+sEv/A==}
     dependencies:
-      monaco-editor: 0.39.0
-      monaco-editor-core: 0.38.0
       onigasm: 2.2.5
-      vscode-uri: 3.0.7
     dev: true
 
   /mri@1.2.0:
