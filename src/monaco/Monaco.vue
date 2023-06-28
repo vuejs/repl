@@ -10,6 +10,7 @@ import {
   computed,
 } from 'vue'
 import * as monaco from 'monaco-editor-core'
+import { debounce } from '../utils'
 import { initMonaco } from './env'
 import { getOrCreateModel } from './utils'
 import { loadGrammars, loadTheme } from 'monaco-volar'
@@ -129,8 +130,14 @@ onMounted(async () => {
     // ignore save event
   })
 
+  const formatDocument = debounce(
+    () => editorInstance.getAction('editor.action.formatDocument')?.run(),
+    5000
+  )
+
   editorInstance.onDidChangeModelContent(() => {
     emit('change', editorInstance.getValue())
+    formatDocument()
   })
 
   editorInstance.onDidChangeCursorSelection((e) => {
