@@ -7,7 +7,7 @@ import type { EditorComponentType } from './editor/types'
 import EditorContainer from './editor/EditorContainer.vue'
 
 export interface Props {
-  theme: 'dark' | 'light'
+  theme?: 'dark' | 'light'
   editor: EditorComponentType
   store?: Store
   autoResize?: boolean
