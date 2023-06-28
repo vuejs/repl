@@ -7,6 +7,7 @@ import type { EditorComponentType } from './editor/types'
 import EditorContainer from './editor/EditorContainer.vue'
 
 export interface Props {
+  theme?: 'dark' | 'light'
   editor: EditorComponentType
   store?: Store
   autoResize?: boolean
@@ -28,6 +29,7 @@ export interface Props {
 }
 
 const props = withDefaults(defineProps<Props>(), {
+  theme: 'light',
   store: () => new ReplStore(),
   autoResize: true,
   showCompileOutput: true,
@@ -75,7 +77,7 @@ provide('import-map', toRef(props, 'showImportMap'))
 provide('tsconfig', toRef(props, 'showTsConfig'))
 provide('clear-console', toRef(props, 'clearConsole'))
 provide('preview-options', props.previewOptions)
-
+provide('theme', toRef(props, 'theme'))
 /**
  * Reload the preview iframe
  */
