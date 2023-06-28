@@ -8,6 +8,7 @@ import {
   inject,
   watch,
   computed,
+  type Ref,
 } from 'vue'
 import * as monaco from 'monaco-editor-core'
 import { initMonaco } from './env'
@@ -15,7 +16,6 @@ import { getOrCreateModel } from './utils'
 import { loadGrammars, loadTheme } from 'monaco-volar'
 import { Store } from '../store'
 import type { PreviewMode } from '../editor/types'
-import { Ref } from "vue/dist/vue";
 
 const props = withDefaults(
   defineProps<{
@@ -42,7 +42,7 @@ initMonaco(store)
 
 const lang = computed(() => (props.mode === 'css' ? 'css' : 'javascript'))
 
-const replTheme = inject('theme') as Ref<'dark' | 'light'>
+const replTheme = inject<Ref<'dark' | 'light'>>('theme')!
 onMounted(async () => {
   const theme = await loadTheme(monaco.editor)
   ready.value = true
@@ -144,7 +144,7 @@ onMounted(async () => {
   })
 
   // update theme
-  watch(() => replTheme.value, (n) => {
+  watch(replTheme, (n) => {
     editorInstance.updateOptions({
       theme: n === 'light' ? theme.light : theme.dark,
     })
