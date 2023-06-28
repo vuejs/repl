@@ -15,6 +15,7 @@ import { getOrCreateModel } from './utils'
 import { loadGrammars, loadTheme } from 'monaco-volar'
 import { Store } from '../store'
 import type { PreviewMode } from '../editor/types'
+import { Ref } from "vue/dist/vue";
 
 const props = withDefaults(
   defineProps<{
@@ -41,7 +42,7 @@ initMonaco(store)
 
 const lang = computed(() => (props.mode === 'css' ? 'css' : 'javascript'))
 
-const replTheme = inject('theme')
+const replTheme = inject('theme') as Ref<'dark' | 'light'>
 onMounted(async () => {
   const theme = await loadTheme(monaco.editor)
   ready.value = true
@@ -56,7 +57,7 @@ onMounted(async () => {
       ? { value: props.value, language: lang.value }
       : { model: null }),
     fontSize: 13,
-    theme: replTheme === 'light' ? theme.light : theme.dark,
+    theme: replTheme.value === 'light' ? theme.light : theme.dark,
     readOnly: props.readonly,
     automaticLayout: true,
     scrollBeyondLastLine: false,
@@ -140,6 +141,13 @@ onMounted(async () => {
     if (file) {
       file.selection = selection
     }
+  })
+
+  // update theme
+  watch(() => replTheme.value, (n) => {
+    editorInstance.updateOptions({
+      theme: n === 'light' ? theme.light : theme.dark,
+    })
   })
 })
 
