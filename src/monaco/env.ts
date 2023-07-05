@@ -131,6 +131,12 @@ export async function reloadVue(store: Store) {
   }
 }
 
+export interface WorkerMessage {
+  event: 'init'
+  tsVersion: string
+  tsLocale?: string
+}
+
 export function loadMonacoEnv(store: Store) {
   ;(self as any).MonacoEnvironment = {
     async getWorker(_: any, label: string) {
@@ -142,7 +148,11 @@ export function loadMonacoEnv(store: Store) {
               resolve()
             }
           })
-          worker.postMessage({ event: 'init', tsVersion: store.state.typescriptVersion })
+          worker.postMessage({
+            event: 'init',
+            tsVersion: store.state.typescriptVersion,
+            tsLocale: store.state.typescriptLocale,
+          } satisfies WorkerMessage)
         })
         await init
         return worker

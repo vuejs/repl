@@ -12,7 +12,7 @@ import {
   createLanguageHost,
   createServiceEnvironment,
 } from '@volar/monaco/worker'
-import type { WorkerHost } from './env'
+import type { WorkerHost, WorkerMessage } from './env'
 
 export interface CreateData {
   tsconfig: {
@@ -22,22 +22,28 @@ export interface CreateData {
   dependencies: {}
 }
 
-const locale = navigator.language.toLowerCase()
+let locale: string
 
 let ts: typeof import('typescript')
 let tsLocalized: any
 
-self.onmessage = async (msg) => {
+self.onmessage = async (msg: MessageEvent<WorkerMessage>) => {
   if (msg.data?.event === 'init') {
+    if (msg.data.tsLocale) {
+      locale = msg.data.tsLocale
+    }
+
     ;[ts, tsLocalized] = await Promise.all([
       importTsFromCdn(msg.data.tsVersion),
-      fetchJson(
-        `https://cdn.jsdelivr.net/npm/typescript@${msg.data.tsVersion}/lib/${locale}/diagnosticMessages.generated.json`
-      ),
+      locale &&
+        fetchJson(
+          `https://cdn.jsdelivr.net/npm/typescript@${msg.data.tsVersion}/lib/${locale}/diagnosticMessages.generated.json`
+        ),
     ])
     self.postMessage('inited')
     return
   }
+
   worker.initialize(
     (
       ctx: monaco.worker.IWorkerContext<WorkerHost>,

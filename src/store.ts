@@ -86,6 +86,7 @@ export interface StoreState {
   vueRuntimeURL: string
   vueServerRendererURL: string
   typescriptVersion: string
+  typescriptLocale: string | undefined
   // used to force reset the sandbox
   resetFlip: boolean
 }
@@ -168,6 +169,7 @@ export class ReplStore implements Store {
       vueRuntimeURL: this.defaultVueRuntimeURL,
       vueServerRendererURL: this.defaultVueServerRendererURL,
       typescriptVersion: 'latest',
+      typescriptLocale: undefined,
       resetFlip: true,
     })
 
@@ -187,6 +189,7 @@ export class ReplStore implements Store {
       () => [
         this.state.files[tsconfigFile]?.code,
         this.state.typescriptVersion,
+        this.state.typescriptLocale,
       ],
       () => reloadVue(this)
     )
