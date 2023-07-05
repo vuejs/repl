@@ -184,7 +184,10 @@ export class ReplStore implements Store {
     )
 
     watch(
-      () => this.state.files[tsconfigFile]?.code,
+      () => [
+        this.state.files[tsconfigFile]?.code,
+        this.state.typescriptVersion,
+      ],
       () => reloadVue(this)
     )
 
@@ -388,7 +391,6 @@ export class ReplStore implements Store {
 
   setTypeScriptVersion(version: string) {
     this.state.typescriptVersion = version
-    reloadVue(this)
     console.info(`[@vue/repl] Now using TypeScript version: ${version}`)
   }
 
