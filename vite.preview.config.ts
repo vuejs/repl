@@ -16,9 +16,6 @@ export default defineConfig({
     },
   },
   build: {
-    rollupOptions: {
-      external: ['typescript'],
-    },
     commonjsOptions: {
       ignore: ['typescript'],
     },
