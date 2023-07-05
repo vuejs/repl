@@ -1,3 +1,4 @@
+import path from 'node:path'
 import { defineConfig, Plugin, UserConfig } from 'vite'
 import base from './vite.preview.config'
 
@@ -29,6 +30,12 @@ export default defineConfig({
     ],
   },
   base: './',
+  resolve: {
+    alias: {
+      typescript: path.resolve(__dirname, './empty.js'),
+      path: 'path-browserify',
+    },
+  },
   build: {
     target: 'esnext',
     minify: false,
