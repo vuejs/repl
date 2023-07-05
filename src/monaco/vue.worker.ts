@@ -8,6 +8,8 @@ import { createLanguageService, createLanguageHost, createServiceEnvironment } f
 import type { WorkerHost } from './env'
 
 export interface CreateData {
+  locale: string
+  tsLocalized: any
   tsconfig: {
     compilerOptions?: ts.CompilerOptions
     vueCompilerOptions?: Partial<VueCompilerOptions>
@@ -19,7 +21,7 @@ self.onmessage = () => {
   worker.initialize(
     (
       ctx: monaco.worker.IWorkerContext<WorkerHost>,
-      { tsconfig, dependencies }: CreateData
+      { tsconfig, dependencies, locale, tsLocalized }: CreateData
     ) => {
       const { options: compilerOptions } = ts.convertCompilerOptionsFromJson(
         tsconfig?.compilerOptions || {},
@@ -29,6 +31,13 @@ self.onmessage = () => {
       const host = createLanguageHost(ctx.getMirrorModels, env, '/src', compilerOptions)
       const jsDelivrFs = createJsDelivrFs(ctx.host.onFetchCdnFile)
       const jsDelivrUriResolver = createJsDelivrUriResolver('/node_modules', dependencies)
+
+      if (locale) {
+        env.locale = locale
+      }
+      if (tsLocalized) {
+        host.getLocalizedDiagnosticMessages = () => tsLocalized
+      }
 
       decorateServiceEnvironment(env, jsDelivrUriResolver, jsDelivrFs)
 

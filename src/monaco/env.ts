@@ -7,7 +7,6 @@ import onigasmWasm from 'onigasm/lib/onigasm.wasm?url'
 import { editor, languages, Uri } from 'monaco-editor-core'
 import * as volar from '@volar/monaco'
 import { Store } from '../store'
-import { createJsDelivrDtsHost } from 'volar-service-typescript'
 import { getOrCreateModel } from './utils'
 import type { CreateData } from './vue.worker'
 
@@ -76,15 +75,30 @@ export class WorkerHost {
   }
 }
 
+async function fetchJson<T>(url: string) {
+  try {
+    const res = await fetch(url);
+    if (res.status === 200) {
+      return await res.json();
+    }
+  } catch {
+    // ignore
+  }
+}
+
 let disposeVue: undefined | (() => void)
 export async function reloadVue(store: Store) {
   disposeVue?.()
 
+  const locale = navigator.language.toLowerCase()
+  const tsLocalized = await fetchJson(`https://cdn.jsdelivr.net/npm/typescript/lib/${locale}/diagnosticMessages.generated.json`)
   const worker = editor.createWebWorker<any>({
     moduleId: 'vs/language/vue/vueWorker',
     label: 'vue',
     host: new WorkerHost(),
     createData: {
+      locale: locale,
+      tsLocalized: tsLocalized,
       tsconfig: store.getTsConfig?.() || {},
       dependencies: !store.vueVersion
         ? {}
