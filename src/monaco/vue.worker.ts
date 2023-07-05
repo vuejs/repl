@@ -1,9 +1,17 @@
 // @ts-ignore
 import * as worker from 'monaco-editor-core/esm/vs/editor/editor.worker'
 import type * as monaco from 'monaco-editor-core'
-import { createJsDelivrFs, createJsDelivrUriResolver, decorateServiceEnvironment } from '@volar/cdn'
+import {
+  createJsDelivrFs,
+  createJsDelivrUriResolver,
+  decorateServiceEnvironment,
+} from '@volar/cdn'
 import { VueCompilerOptions, resolveConfig } from '@vue/language-service'
-import { createLanguageService, createLanguageHost, createServiceEnvironment } from '@volar/monaco/worker'
+import {
+  createLanguageService,
+  createLanguageHost,
+  createServiceEnvironment,
+} from '@volar/monaco/worker'
 import type { WorkerHost } from './env'
 
 export interface CreateData {
@@ -21,9 +29,11 @@ let tsLocalized: any
 
 self.onmessage = async (msg) => {
   if (msg.data?.event === 'init') {
-    [ts, tsLocalized] = await Promise.all([
+    ;[ts, tsLocalized] = await Promise.all([
       importTsFromCdn(msg.data.tsVersion),
-      fetchJson(`https://cdn.jsdelivr.net/npm/typescript@${msg.data.tsVersion}/lib/${locale}/diagnosticMessages.generated.json`)
+      fetchJson(
+        `https://cdn.jsdelivr.net/npm/typescript@${msg.data.tsVersion}/lib/${locale}/diagnosticMessages.generated.json`
+      ),
     ])
     self.postMessage('inited')
     return
@@ -37,10 +47,18 @@ self.onmessage = async (msg) => {
         tsconfig?.compilerOptions || {},
         ''
       )
-      const env = createServiceEnvironment();
-      const host = createLanguageHost(ctx.getMirrorModels, env, '/src', compilerOptions)
+      const env = createServiceEnvironment()
+      const host = createLanguageHost(
+        ctx.getMirrorModels,
+        env,
+        '/src',
+        compilerOptions
+      )
       const jsDelivrFs = createJsDelivrFs(ctx.host.onFetchCdnFile)
-      const jsDelivrUriResolver = createJsDelivrUriResolver('/node_modules', dependencies)
+      const jsDelivrUriResolver = createJsDelivrUriResolver(
+        '/node_modules',
+        dependencies
+      )
 
       if (locale) {
         env.locale = locale
@@ -67,20 +85,20 @@ self.onmessage = async (msg) => {
 }
 
 async function importTsFromCdn(tsVersion: string) {
-  const _module = globalThis.module;
-  (globalThis as any).module = { exports: {} };
-  const tsUrl = `https://cdn.jsdelivr.net/npm/typescript@${tsVersion}/lib/typescript.js`;
+  const _module = globalThis.module
+  ;(globalThis as any).module = { exports: {} }
+  const tsUrl = `https://cdn.jsdelivr.net/npm/typescript@${tsVersion}/lib/typescript.js`
   await import(/* @vite-ignore */ tsUrl)
-  const ts = module.exports;
-  globalThis.module = _module;
-  return ts as typeof import('typescript');
+  const ts = module.exports
+  globalThis.module = _module
+  return ts as typeof import('typescript')
 }
 
 async function fetchJson<T>(url: string) {
   try {
-    const res = await fetch(url);
+    const res = await fetch(url)
     if (res.status === 200) {
-      return await res.json();
+      return await res.json()
     }
   } catch {
     // ignore

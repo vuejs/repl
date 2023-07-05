@@ -43,7 +43,6 @@ export function initMonaco(store: Store) {
   // Support for go to definition
   monaco.editor.registerEditorOpener({
     openCodeEditor(_, resource) {
-
       if (resource.scheme === 'https') {
         // ignore cdn files
         return true
@@ -88,16 +87,16 @@ export async function reloadVue(store: Store) {
       dependencies: !store.vueVersion
         ? {}
         : {
-          vue: store.vueVersion,
-          '@vue/compiler-core': store.vueVersion,
-          '@vue/compiler-dom': store.vueVersion,
-          '@vue/compiler-sfc': store.vueVersion,
-          '@vue/compiler-ssr': store.vueVersion,
-          '@vue/reactivity': store.vueVersion,
-          '@vue/runtime-core': store.vueVersion,
-          '@vue/runtime-dom': store.vueVersion,
-          '@vue/shared': store.vueVersion,
-        }
+            vue: store.vueVersion,
+            '@vue/compiler-core': store.vueVersion,
+            '@vue/compiler-dom': store.vueVersion,
+            '@vue/compiler-sfc': store.vueVersion,
+            '@vue/compiler-ssr': store.vueVersion,
+            '@vue/reactivity': store.vueVersion,
+            '@vue/runtime-core': store.vueVersion,
+            '@vue/runtime-dom': store.vueVersion,
+            '@vue/shared': store.vueVersion,
+          },
     } satisfies CreateData,
   })
   const languageId = ['vue', 'javascript', 'typescript']
@@ -133,20 +132,20 @@ export async function reloadVue(store: Store) {
 }
 
 export function loadMonacoEnv(store: Store) {
-  ; (self as any).MonacoEnvironment = {
+  ;(self as any).MonacoEnvironment = {
     async getWorker(_: any, label: string) {
       if (label === 'vue') {
-        const worker = await new vueWorker()
-        const init = new Promise(resolve => {
+        const worker = new vueWorker()
+        const init = new Promise<void>((resolve) => {
           worker.addEventListener('message', (data) => {
             if (data.data === 'inited') {
-              resolve(void 0)
+              resolve()
             }
           })
-          worker.postMessage({ event: 'init', tsVersion: 'latest' })
+          worker.postMessage({ event: 'init', tsVersion: store.state.typescriptVersion })
         })
-        await init;
-        return worker;
+        await init
+        return worker
       }
       return new editorWorker()
     },

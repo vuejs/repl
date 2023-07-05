@@ -85,6 +85,7 @@ export interface StoreState {
   errors: (string | Error)[]
   vueRuntimeURL: string
   vueServerRendererURL: string
+  typescriptVersion: string
   // used to force reset the sandbox
   resetFlip: boolean
 }
@@ -166,6 +167,7 @@ export class ReplStore implements Store {
       errors: [],
       vueRuntimeURL: this.defaultVueRuntimeURL,
       vueServerRendererURL: this.defaultVueServerRendererURL,
+      typescriptVersion: 'latest',
       resetFlip: true,
     })
 
@@ -382,6 +384,12 @@ export class ReplStore implements Store {
     scopes?: Record<string, Record<string, string>>
   }) {
     this.state.files[importMapFile]!.code = JSON.stringify(map, null, 2)
+  }
+
+  setTypeScriptVersion(version: string) {
+    this.state.typescriptVersion = version
+    reloadVue(this)
+    console.info(`[@vue/repl] Now using TypeScript version: ${version}`)
   }
 
   async setVueVersion(version: string) {
