@@ -75,30 +75,15 @@ export class WorkerHost {
   }
 }
 
-async function fetchJson<T>(url: string) {
-  try {
-    const res = await fetch(url);
-    if (res.status === 200) {
-      return await res.json();
-    }
-  } catch {
-    // ignore
-  }
-}
-
 let disposeVue: undefined | (() => void)
 export async function reloadVue(store: Store) {
   disposeVue?.()
 
-  const locale = navigator.language.toLowerCase()
-  const tsLocalized = await fetchJson(`https://cdn.jsdelivr.net/npm/typescript/lib/${locale}/diagnosticMessages.generated.json`)
   const worker = editor.createWebWorker<any>({
     moduleId: 'vs/language/vue/vueWorker',
     label: 'vue',
     host: new WorkerHost(),
     createData: {
-      locale: locale,
-      tsLocalized: tsLocalized,
       tsconfig: store.getTsConfig?.() || {},
       dependencies: !store.vueVersion
         ? {}
@@ -148,10 +133,20 @@ export async function reloadVue(store: Store) {
 }
 
 export function loadMonacoEnv(store: Store) {
-  ;(self as any).MonacoEnvironment = {
+  ; (self as any).MonacoEnvironment = {
     async getWorker(_: any, label: string) {
       if (label === 'vue') {
-        return new vueWorker()
+        const worker = await new vueWorker()
+        const init = new Promise(resolve => {
+          worker.addEventListener('message', (data) => {
+            if (data.data === 'inited') {
+              resolve(void 0)
+            }
+          })
+          worker.postMessage({ event: 'init', tsVersion: 'latest' })
+        })
+        await init;
+        return worker;
       }
       return new editorWorker()
     },
