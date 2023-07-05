@@ -95,7 +95,7 @@ async function importTsFromCdn(tsVersion: string) {
   ;(globalThis as any).module = { exports: {} }
   const tsUrl = `https://cdn.jsdelivr.net/npm/typescript@${tsVersion}/lib/typescript.js`
   await import(/* @vite-ignore */ tsUrl)
-  const ts = module.exports
+  const ts = globalThis.module.exports
   globalThis.module = _module
   return ts as typeof import('typescript')
 }
