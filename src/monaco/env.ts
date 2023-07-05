@@ -78,25 +78,37 @@ let disposeVue: undefined | (() => void)
 export async function reloadVue(store: Store) {
   disposeVue?.()
 
+  let dependencies = {};
+
+  if (store.vueVersion) {
+    dependencies = {
+      ...dependencies,
+      vue: store.vueVersion,
+      '@vue/compiler-core': store.vueVersion,
+      '@vue/compiler-dom': store.vueVersion,
+      '@vue/compiler-sfc': store.vueVersion,
+      '@vue/compiler-ssr': store.vueVersion,
+      '@vue/reactivity': store.vueVersion,
+      '@vue/runtime-core': store.vueVersion,
+      '@vue/runtime-dom': store.vueVersion,
+      '@vue/shared': store.vueVersion,
+    }
+  }
+
+  if (store.state.typescriptVersion) {
+    dependencies = {
+      ...dependencies,
+      typescript: store.state.typescriptVersion,
+    }
+  }
+
   const worker = editor.createWebWorker<any>({
     moduleId: 'vs/language/vue/vueWorker',
     label: 'vue',
     host: new WorkerHost(),
     createData: {
       tsconfig: store.getTsConfig?.() || {},
-      dependencies: !store.vueVersion
-        ? {}
-        : {
-            vue: store.vueVersion,
-            '@vue/compiler-core': store.vueVersion,
-            '@vue/compiler-dom': store.vueVersion,
-            '@vue/compiler-sfc': store.vueVersion,
-            '@vue/compiler-ssr': store.vueVersion,
-            '@vue/reactivity': store.vueVersion,
-            '@vue/runtime-core': store.vueVersion,
-            '@vue/runtime-dom': store.vueVersion,
-            '@vue/shared': store.vueVersion,
-          },
+      dependencies,
     } satisfies CreateData,
   })
   const languageId = ['vue', 'javascript', 'typescript']
