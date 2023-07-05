@@ -75,10 +75,10 @@ export class WorkerHost {
 }
 
 let disposeVue: undefined | (() => void)
-export async function reloadVue(store: Store) {
+export async function reloadLanguageTools(store: Store) {
   disposeVue?.()
 
-  let dependencies = {};
+  let dependencies = {}
 
   if (store.vueVersion) {
     dependencies = {
@@ -175,5 +175,7 @@ export function loadMonacoEnv(store: Store) {
   languages.register({ id: 'vue', extensions: ['.vue'] })
   languages.register({ id: 'javascript', extensions: ['.js'] })
   languages.register({ id: 'typescript', extensions: ['.ts'] })
-  languages.onLanguage('vue', () => reloadVue(store))
+
+  store.reloadLanguageTools = () => reloadLanguageTools(store)
+  languages.onLanguage('vue', () => store.reloadLanguageTools!())
 }

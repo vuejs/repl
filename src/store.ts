@@ -9,7 +9,6 @@ import {
 } from 'vue/compiler-sfc'
 import { OutputModes } from './output/types'
 import { Selection } from 'monaco-editor-core'
-import { reloadVue } from './monaco/env'
 
 const defaultMainFile = 'src/App.vue'
 
@@ -109,6 +108,7 @@ export interface Store {
   renameFile: (oldFilename: string, newFilename: string) => void
   getImportMap: () => any
   getTsConfig?: () => any
+  reloadLanguageTools: undefined | (() => void)
   initialShowOutput: boolean
   initialOutputMode: OutputModes
 }
@@ -129,6 +129,7 @@ export class ReplStore implements Store {
   options?: SFCOptions
   initialShowOutput: boolean
   initialOutputMode: OutputModes
+  reloadLanguageTools: undefined | (() => void)
 
   private defaultVueRuntimeURL: string
   private defaultVueServerRendererURL: string
@@ -191,7 +192,7 @@ export class ReplStore implements Store {
         this.state.typescriptVersion,
         this.state.typescriptLocale,
       ],
-      () => reloadVue(this)
+      () => this.reloadLanguageTools?.()
     )
 
     this.state.errors = []
