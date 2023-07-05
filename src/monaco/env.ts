@@ -1,14 +1,14 @@
-import { watchEffect } from 'vue'
-import * as monaco from 'monaco-editor-core'
+import { jsDelivrUriBase } from '@volar/cdn'
+import * as volar from '@volar/monaco'
+import { editor, languages, Uri } from 'monaco-editor-core'
 import editorWorker from 'monaco-editor-core/esm/vs/editor/editor.worker?worker'
-import vueWorker from './vue.worker?worker'
 import * as onigasm from 'onigasm'
 import onigasmWasm from 'onigasm/lib/onigasm.wasm?url'
-import { editor, languages, Uri } from 'monaco-editor-core'
-import * as volar from '@volar/monaco'
+import { watchEffect } from 'vue'
 import { Store } from '../store'
 import { getOrCreateModel } from './utils'
 import type { CreateData } from './vue.worker'
+import vueWorker from './vue.worker?worker'
 
 let initted = false
 export function initMonaco(store: Store) {
@@ -20,20 +20,19 @@ export function initMonaco(store: Store) {
     // create a model for each file in the store
     for (const filename in store.state.files) {
       const file = store.state.files[filename]
-      if (monaco.editor.getModel(monaco.Uri.parse(`file:///${filename}`)))
-        continue
+      if (editor.getModel(Uri.parse(`file:///${filename}`))) continue
       getOrCreateModel(
-        monaco.Uri.parse(`file:///${filename}`),
+        Uri.parse(`file:///${filename}`),
         file.language,
         file.code
       )
     }
 
     // dispose of any models that are not in the store
-    for (const model of monaco.editor.getModels()) {
+    for (const model of editor.getModels()) {
       const uri = model.uri.toString()
       if (store.state.files[uri.substring('file:///'.length)]) continue
-      if (uri.startsWith('file:///node_modules/')) continue
+      if (uri.startsWith(jsDelivrUriBase + '/')) continue
       if (uri.startsWith('inmemory://')) continue
 
       model.dispose()
@@ -41,15 +40,14 @@ export function initMonaco(store: Store) {
   })
 
   // Support for go to definition
-  monaco.editor.registerEditorOpener({
+  editor.registerEditorOpener({
     openCodeEditor(_, resource) {
-      if (resource.scheme === 'https') {
-        // ignore cdn files
+      if (resource.toString().startsWith(jsDelivrUriBase + '/')) {
         return true
       }
 
       const path = resource.path
-      if (/^\//.test(path) && !/^\/node_modules/.test(path)) {
+      if (/^\//.test(path)) {
         const fileName = path.replace('/', '')
         if (fileName !== store.state.activeFile.filename) {
           store.setActive(fileName)

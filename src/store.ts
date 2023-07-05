@@ -8,7 +8,7 @@ import {
   SFCTemplateCompileOptions,
 } from 'vue/compiler-sfc'
 import { OutputModes } from './output/types'
-import { Selection } from 'monaco-editor-core'
+import type { Selection } from 'monaco-editor-core'
 
 const defaultMainFile = 'src/App.vue'
 
