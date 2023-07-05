@@ -9,6 +9,7 @@ import * as volar from '@volar/monaco'
 import { Store } from '../store'
 import { createJsDelivrDtsHost } from 'volar-service-typescript'
 import { getOrCreateModel } from './utils'
+import type { CreateData } from './vue.worker'
 
 let initted = false
 export function initMonaco(store: Store) {
@@ -43,6 +44,12 @@ export function initMonaco(store: Store) {
   // Support for go to definition
   monaco.editor.registerEditorOpener({
     openCodeEditor(_, resource) {
+
+      if (resource.scheme === 'https') {
+        // ignore cdn files
+        return true
+      }
+
       const path = resource.path
       if (/^\//.test(path) && !/^\/node_modules/.test(path)) {
         const fileName = path.replace('/', '')
@@ -63,6 +70,12 @@ export function loadWasm() {
   return onigasm.loadWASM(onigasmWasm)
 }
 
+export class WorkerHost {
+  onFetchCdnFile(uri: string, text: string) {
+    getOrCreateModel(Uri.parse(uri), undefined, text)
+  }
+}
+
 let disposeVue: undefined | (() => void)
 export async function reloadVue(store: Store) {
   disposeVue?.()
@@ -70,27 +83,23 @@ export async function reloadVue(store: Store) {
   const worker = editor.createWebWorker<any>({
     moduleId: 'vs/language/vue/vueWorker',
     label: 'vue',
-    host: createJsDelivrDtsHost(
-      !store.vueVersion
-        ? {}
-        : {
-            vue: store.vueVersion,
-            '@vue/compiler-core': store.vueVersion,
-            '@vue/compiler-dom': store.vueVersion,
-            '@vue/compiler-sfc': store.vueVersion,
-            '@vue/compiler-ssr': store.vueVersion,
-            '@vue/reactivity': store.vueVersion,
-            '@vue/runtime-core': store.vueVersion,
-            '@vue/runtime-dom': store.vueVersion,
-            '@vue/shared': store.vueVersion,
-          },
-      (filename, text) => {
-        getOrCreateModel(Uri.file(filename), undefined, text)
-      }
-    ),
+    host: new WorkerHost(),
     createData: {
       tsconfig: store.getTsConfig?.() || {},
-    },
+      dependencies: !store.vueVersion
+        ? {}
+        : {
+          vue: store.vueVersion,
+          '@vue/compiler-core': store.vueVersion,
+          '@vue/compiler-dom': store.vueVersion,
+          '@vue/compiler-sfc': store.vueVersion,
+          '@vue/compiler-ssr': store.vueVersion,
+          '@vue/reactivity': store.vueVersion,
+          '@vue/runtime-core': store.vueVersion,
+          '@vue/runtime-dom': store.vueVersion,
+          '@vue/shared': store.vueVersion,
+        }
+    } satisfies CreateData,
   })
   const languageId = ['vue', 'javascript', 'typescript']
   const getSyncUris = () =>

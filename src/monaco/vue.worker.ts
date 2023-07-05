@@ -2,40 +2,47 @@
 import * as worker from 'monaco-editor-core/esm/vs/editor/editor.worker'
 import type * as monaco from 'monaco-editor-core'
 import * as ts from 'typescript'
-import { Config, resolveConfig } from '@vue/language-service'
-import { createLanguageService } from '@volar/monaco/worker'
-import createTypeScriptService, { IDtsHost } from 'volar-service-typescript'
+import { createJsDelivrFs, createJsDelivrUriResolver, decorateServiceEnvironment } from '@volar/cdn'
+import { VueCompilerOptions, resolveConfig } from '@vue/language-service'
+import { createLanguageService, createLanguageHost, createServiceEnvironment } from '@volar/monaco/worker'
+import type { WorkerHost } from './env'
+
+export interface CreateData {
+  tsconfig: {
+    compilerOptions?: ts.CompilerOptions
+    vueCompilerOptions?: Partial<VueCompilerOptions>
+  }
+  dependencies: {}
+}
 
 self.onmessage = () => {
   worker.initialize(
     (
-      ctx: monaco.worker.IWorkerContext<IDtsHost>,
-      { tsconfig }: { tsconfig: any }
+      ctx: monaco.worker.IWorkerContext<WorkerHost>,
+      { tsconfig, dependencies }: CreateData
     ) => {
       const { options: compilerOptions } = ts.convertCompilerOptionsFromJson(
         tsconfig?.compilerOptions || {},
         ''
       )
+      const env = createServiceEnvironment();
+      const host = createLanguageHost(ctx.getMirrorModels, env, '/src', compilerOptions)
+      const jsDelivrFs = createJsDelivrFs(ctx.host.onFetchCdnFile)
+      const jsDelivrUriResolver = createJsDelivrUriResolver('/node_modules', dependencies)
 
-      const baseConfig: Config = {
-        services: {
-          typescript: createTypeScriptService({ dtsHost: ctx.host }),
-        },
-      }
+      decorateServiceEnvironment(env, jsDelivrUriResolver, jsDelivrFs)
 
-      return createLanguageService({
-        workerContext: ctx,
-        config: resolveConfig(
-          baseConfig,
+      return createLanguageService(
+        { typescript: ts as any },
+        env,
+        resolveConfig(
+          {},
           compilerOptions,
           tsconfig.vueCompilerOptions || {},
           ts as any
         ),
-        typescript: {
-          module: ts as any,
-          compilerOptions,
-        },
-      })
+        host
+      )
     }
   )
 }
