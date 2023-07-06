@@ -37,7 +37,6 @@
     "format": "prettier --write .",
     "release": "bumpp -r",
     "preinstall": "npx only-allow pnpm",
-    "postinstall": "simple-git-hooks",
     "prepublishOnly": "npm run build && npm run build-types"
   },
   "simple-git-hooks": {
