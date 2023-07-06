@@ -108,7 +108,7 @@ export interface Store {
   renameFile: (oldFilename: string, newFilename: string) => void
   getImportMap: () => any
   getTsConfig?: () => any
-  reloadLanguageTools: undefined | (() => void)
+  reloadLanguageTools?: undefined | (() => void)
   initialShowOutput: boolean
   initialOutputMode: OutputModes
 }
