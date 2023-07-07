@@ -8,7 +8,7 @@ import {
   SFCTemplateCompileOptions,
 } from 'vue/compiler-sfc'
 import { OutputModes } from './output/types'
-import type { Selection } from 'monaco-editor-core'
+import type { editor } from 'monaco-editor-core'
 
 const defaultMainFile = 'src/App.vue'
 
@@ -52,7 +52,7 @@ export class File {
     css: '',
     ssr: '',
   }
-  selection: Selection | null = null
+  editorViewState: editor.ICodeEditorViewState | null = null
 
   constructor(filename: string, code = '', hidden = false) {
     this.filename = filename

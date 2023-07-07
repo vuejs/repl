@@ -105,7 +105,7 @@ onMounted(async () => {
   } else {
     watch(
       () => props.filename,
-      () => {
+      (_, oldFilename) => {
         if (!editorInstance) return
         const file = store.state.files[props.filename]
         if (!file) return null
@@ -114,10 +114,16 @@ onMounted(async () => {
           file.language,
           file.code
         )
+
+        const oldFile = oldFilename ? store.state.files[oldFilename] : null
+        if (oldFile) {
+          oldFile.editorViewState = editorInstance.saveViewState()
+        }
+
         editorInstance.setModel(model)
 
-        if (file.selection) {
-          editorInstance.setSelection(file.selection)
+        if (file.editorViewState) {
+          editorInstance.restoreViewState(file.editorViewState)
           editorInstance.focus()
         }
       },
@@ -133,14 +139,6 @@ onMounted(async () => {
 
   editorInstance.onDidChangeModelContent(() => {
     emit('change', editorInstance.getValue())
-  })
-
-  editorInstance.onDidChangeCursorSelection((e) => {
-    const selection = e.selection
-    const file = store.state.files[props.filename]
-    if (file) {
-      file.selection = selection
-    }
   })
 
   // update theme
