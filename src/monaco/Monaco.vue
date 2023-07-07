@@ -115,9 +115,9 @@ onMounted(async () => {
           file.code
         )
 
-        if (oldFilename) {
-          store.state.files[oldFilename].editorViewState =
-            editorInstance.saveViewState()
+        const oldFile = oldFilename ? store.state.files[oldFilename] : null
+        if (oldFile) {
+          oldFile.editorViewState = editorInstance.saveViewState()
         }
 
         editorInstance.setModel(model)
