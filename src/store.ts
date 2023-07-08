@@ -310,7 +310,7 @@ export class ReplStore implements Store {
     const exported: Record<string, string> = {}
     for (const filename in this.state.files) {
       const normalized =
-        filename === importMapFile ? filename : filename.replace(/^src\//, '')
+        filename === importMapFile ? filename : stripSrcPrefix(filename)
       exported[normalized] = this.state.files[filename].code
     }
     return exported
