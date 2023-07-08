@@ -60,7 +60,6 @@
   "devDependencies": {
     "@babel/types": "^7.22.5",
     "@microsoft/api-extractor": "^7.36.0",
-    "@rollup/plugin-replace": "^5.0.2",
     "@types/codemirror": "^5.60.8",
     "@types/node": "^20.3.2",
     "@vitejs/plugin-vue": "^4.2.3",
