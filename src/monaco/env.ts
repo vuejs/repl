@@ -161,7 +161,7 @@ export function loadMonacoEnv(store: Store) {
           worker.postMessage({
             event: 'init',
             tsVersion: store.state.typescriptVersion,
-            tsLocale: store.state.typescriptLocale,
+            tsLocale: store.state.typescriptLocale || store.state.locale,
           } satisfies WorkerMessage)
         })
         await init

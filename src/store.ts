@@ -85,7 +85,9 @@ export interface StoreState {
   vueRuntimeURL: string
   vueServerRendererURL: string
   typescriptVersion: string
-  typescriptLocale: string | undefined
+  /** @deprecated use `locale` instead */
+  typescriptLocale?: string | undefined
+  locale?: string | undefined
   // used to force reset the sandbox
   resetFlip: boolean
 }
@@ -191,6 +193,7 @@ export class ReplStore implements Store {
         this.state.files[tsconfigFile]?.code,
         this.state.typescriptVersion,
         this.state.typescriptLocale,
+        this.state.locale,
       ],
       () => this.reloadLanguageTools?.()
     )
