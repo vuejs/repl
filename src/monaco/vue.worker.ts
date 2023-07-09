@@ -19,7 +19,7 @@ export interface CreateData {
     compilerOptions?: import('typescript').CompilerOptions
     vueCompilerOptions?: Partial<VueCompilerOptions>
   }
-  dependencies: {}
+  dependencies: Record<string, string>
 }
 
 let locale: string

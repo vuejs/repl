@@ -76,7 +76,9 @@ let disposeVue: undefined | (() => void)
 export async function reloadLanguageTools(store: Store) {
   disposeVue?.()
 
-  let dependencies = {}
+  let dependencies: Record<string, string> = {
+    ...store.state.dependencyVersion,
+  }
 
   if (store.vueVersion) {
     dependencies = {

@@ -90,6 +90,8 @@ export interface StoreState {
   locale?: string | undefined
   // used to force reset the sandbox
   resetFlip: boolean
+  /** \{ dependencyName: version \} */
+  dependencyVersion?: Record<string, string>
 }
 
 export interface SFCOptions {
@@ -194,8 +196,10 @@ export class ReplStore implements Store {
         this.state.typescriptVersion,
         this.state.typescriptLocale,
         this.state.locale,
+        this.state.dependencyVersion,
       ],
-      () => this.reloadLanguageTools?.()
+      () => this.reloadLanguageTools?.(),
+      { deep: true }
     )
 
     this.state.errors = []
@@ -417,6 +421,7 @@ export class ReplStore implements Store {
     imports['vue/server-renderer'] = ssrUrl
     this.setImportMap(importMap)
     this.forceSandboxReset()
+    this.reloadLanguageTools?.()
     console.info(`[@vue/repl] Now using Vue version: ${version}`)
   }
 
