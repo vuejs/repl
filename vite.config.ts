@@ -1,4 +1,4 @@
-import { defineConfig, Plugin, UserConfig } from 'vite'
+import { Plugin, mergeConfig } from 'vite'
 import base from './vite.preview.config'
 
 const genStub: Plugin = {
@@ -13,15 +13,15 @@ const genStub: Plugin = {
   },
 }
 
-export default defineConfig({
-  ...base,
-  plugins: [...(base as UserConfig).plugins!, genStub],
+export default mergeConfig(base, {
+  plugins: [genStub],
   optimizeDeps: {
     // avoid late discovered deps
     include: [
       'path-browserify',
       'onigasm',
       'typescript',
+      '@volar/cdn',
       '@vue/language-service',
       'monaco-editor-core/esm/vs/editor/editor.worker',
       '@volar/monaco/worker',

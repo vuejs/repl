@@ -1,41 +1,112 @@
 // @ts-ignore
 import * as worker from 'monaco-editor-core/esm/vs/editor/editor.worker'
 import type * as monaco from 'monaco-editor-core'
-import * as ts from 'typescript'
-import { Config, resolveConfig } from '@vue/language-service'
-import { createLanguageService } from '@volar/monaco/worker'
-import createTypeScriptService, { IDtsHost } from 'volar-service-typescript'
+import {
+  createJsDelivrFs,
+  createJsDelivrUriResolver,
+  decorateServiceEnvironment,
+} from '@volar/cdn'
+import { VueCompilerOptions, resolveConfig } from '@vue/language-service'
+import {
+  createLanguageService,
+  createLanguageHost,
+  createServiceEnvironment,
+} from '@volar/monaco/worker'
+import type { WorkerHost, WorkerMessage } from './env'
 
-self.onmessage = () => {
+export interface CreateData {
+  tsconfig: {
+    compilerOptions?: import('typescript').CompilerOptions
+    vueCompilerOptions?: Partial<VueCompilerOptions>
+  }
+  dependencies: Record<string, string>
+}
+
+let locale: string
+
+let ts: typeof import('typescript')
+let tsLocalized: any
+
+self.onmessage = async (msg: MessageEvent<WorkerMessage>) => {
+  if (msg.data?.event === 'init') {
+    if (msg.data.tsLocale) {
+      locale = msg.data.tsLocale
+    }
+
+    ;[ts, tsLocalized] = await Promise.all([
+      importTsFromCdn(msg.data.tsVersion),
+      locale &&
+        fetchJson(
+          `https://cdn.jsdelivr.net/npm/typescript@${msg.data.tsVersion}/lib/${locale}/diagnosticMessages.generated.json`
+        ),
+    ])
+    self.postMessage('inited')
+    return
+  }
+
   worker.initialize(
     (
-      ctx: monaco.worker.IWorkerContext<IDtsHost>,
-      { tsconfig }: { tsconfig: any }
+      ctx: monaco.worker.IWorkerContext<WorkerHost>,
+      { tsconfig, dependencies }: CreateData
     ) => {
       const { options: compilerOptions } = ts.convertCompilerOptionsFromJson(
         tsconfig?.compilerOptions || {},
         ''
       )
+      const env = createServiceEnvironment()
+      const host = createLanguageHost(
+        ctx.getMirrorModels,
+        env,
+        '/src',
+        compilerOptions
+      )
+      const jsDelivrFs = createJsDelivrFs(ctx.host.onFetchCdnFile)
+      const jsDelivrUriResolver = createJsDelivrUriResolver(
+        '/node_modules',
+        dependencies
+      )
 
-      const baseConfig: Config = {
-        services: {
-          typescript: createTypeScriptService({ dtsHost: ctx.host }),
-        },
+      if (locale) {
+        env.locale = locale
+      }
+      if (tsLocalized) {
+        host.getLocalizedDiagnosticMessages = () => tsLocalized
       }
 
-      return createLanguageService({
-        workerContext: ctx,
-        config: resolveConfig(
-          baseConfig,
+      decorateServiceEnvironment(env, jsDelivrUriResolver, jsDelivrFs)
+
+      return createLanguageService(
+        { typescript: ts as any },
+        env,
+        resolveConfig(
+          {},
           compilerOptions,
           tsconfig.vueCompilerOptions || {},
           ts as any
         ),
-        typescript: {
-          module: ts as any,
-          compilerOptions,
-        },
-      })
+        host
+      )
     }
   )
+}
+
+async function importTsFromCdn(tsVersion: string) {
+  const _module = globalThis.module
+  ;(globalThis as any).module = { exports: {} }
+  const tsUrl = `https://cdn.jsdelivr.net/npm/typescript@${tsVersion}/lib/typescript.js`
+  await import(/* @vite-ignore */ tsUrl)
+  const ts = globalThis.module.exports
+  globalThis.module = _module
+  return ts as typeof import('typescript')
+}
+
+async function fetchJson<T>(url: string) {
+  try {
+    const res = await fetch(url)
+    if (res.status === 200) {
+      return await res.json()
+    }
+  } catch {
+    // ignore
+  }
 }

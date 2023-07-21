@@ -42,6 +42,7 @@ const App = {
     return () =>
       h(Repl, {
         store,
+        theme: 'dark',
         editor: MonacoEditor as any as EditorComponentType,
         // layout: 'vertical',
         ssr: true,

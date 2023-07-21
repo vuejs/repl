@@ -41,6 +41,30 @@ function formatMessage(err: string | Error): string {
 </template>
 
 <style scoped>
+.msg.err {
+  --color: #f56c6c;
+  --bg-color: #fef0f0;
+}
+
+.dark .msg.err {
+  --bg-color: #2b1d1d;
+}
+
+.msg.warn {
+  --color: #e6a23c;
+  --bg-color: #fdf6ec;
+}
+
+.dark .msg.warn {
+  --bg-color: #292218;
+}
+
+pre {
+  margin: 0;
+  padding: 12px 20px;
+  overflow: auto;
+}
+
 .msg {
   position: absolute;
   bottom: 0;
@@ -56,12 +80,9 @@ function formatMessage(err: string | Error): string {
   min-height: 40px;
   display: flex;
   align-items: stretch;
-}
-
-pre {
-  margin: 0;
-  padding: 12px 20px;
-  overflow: auto;
+  color: var(--color);
+  border-color: var(--color);
+  background-color: var(--bg-color);
 }
 
 .dismiss {
@@ -76,8 +97,8 @@ pre {
   display: block;
   font-size: 9px;
   padding: 0;
-  background-color: red;
-  color: #fff;
+  color: var(--bg-color);
+  background-color: var(--color);
 }
 
 @media (max-width: 720px) {
@@ -89,23 +110,6 @@ pre {
   .msg {
     bottom: 50px;
   }
-}
-
-.msg.err {
-  color: red;
-  border-color: red;
-  background-color: #ffd7d7;
-}
-
-.msg.warn {
-  --color: rgb(105, 95, 27);
-  color: var(--color);
-  border-color: var(--color);
-  background-color: rgb(247, 240, 205);
-}
-
-.msg.warn .dismiss {
-  background-color: var(--color);
 }
 
 .fade-enter-active,

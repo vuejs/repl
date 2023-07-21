@@ -8,6 +8,7 @@ import {
   inject,
   watch,
   computed,
+  type Ref,
 } from 'vue'
 import * as monaco from 'monaco-editor-core'
 import { initMonaco } from './env'
@@ -41,6 +42,7 @@ initMonaco(store)
 
 const lang = computed(() => (props.mode === 'css' ? 'css' : 'javascript'))
 
+const replTheme = inject<Ref<'dark' | 'light'>>('theme')!
 onMounted(async () => {
   const theme = await loadTheme(monaco.editor)
   ready.value = true
@@ -55,7 +57,7 @@ onMounted(async () => {
       ? { value: props.value, language: lang.value }
       : { model: null }),
     fontSize: 13,
-    theme,
+    theme: replTheme.value === 'light' ? theme.light : theme.dark,
     readOnly: props.readonly,
     automaticLayout: true,
     scrollBeyondLastLine: false,
@@ -103,7 +105,7 @@ onMounted(async () => {
   } else {
     watch(
       () => props.filename,
-      () => {
+      (_, oldFilename) => {
         if (!editorInstance) return
         const file = store.state.files[props.filename]
         if (!file) return null
@@ -112,10 +114,16 @@ onMounted(async () => {
           file.language,
           file.code
         )
+
+        const oldFile = oldFilename ? store.state.files[oldFilename] : null
+        if (oldFile) {
+          oldFile.editorViewState = editorInstance.saveViewState()
+        }
+
         editorInstance.setModel(model)
 
-        if (file.selection) {
-          editorInstance.setSelection(file.selection)
+        if (file.editorViewState) {
+          editorInstance.restoreViewState(file.editorViewState)
           editorInstance.focus()
         }
       },
@@ -133,12 +141,11 @@ onMounted(async () => {
     emit('change', editorInstance.getValue())
   })
 
-  editorInstance.onDidChangeCursorSelection((e) => {
-    const selection = e.selection
-    const file = store.state.files[props.filename]
-    if (file) {
-      file.selection = selection
-    }
+  // update theme
+  watch(replTheme, (n) => {
+    editorInstance.updateOptions({
+      theme: n === 'light' ? theme.light : theme.dark,
+    })
   })
 })
 
