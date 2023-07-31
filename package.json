@@ -36,7 +36,6 @@
     "build-preview": "vite build -c vite.preview.config.ts",
     "format": "prettier --write .",
     "release": "bumpp -r",
-    "preinstall": "npx only-allow pnpm",
     "prepublishOnly": "npm run build && npm run build-types"
   },
   "simple-git-hooks": {
