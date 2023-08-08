@@ -94,15 +94,17 @@ onMounted(async () => {
     }
   }
 
-  if (props.readonly) {
-    watch(
-      () => props.value,
-      (value) => {
-        editorInstance.setValue(value || '')
-        monaco.editor.setModelLanguage(editorInstance.getModel()!, lang.value)
-      }
-    )
-  } else {
+  watch(
+    () => props.value,
+    (value) => editorInstance.setValue(value || ''),
+    { immediate: true }
+  )
+
+  watch(lang, (lang) =>
+    monaco.editor.setModelLanguage(editorInstance.getModel()!, lang)
+  )
+
+  if (!props.readonly) {
     watch(
       () => props.filename,
       (_, oldFilename) => {
