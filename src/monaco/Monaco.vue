@@ -96,7 +96,10 @@ onMounted(async () => {
 
   watch(
     () => props.value,
-    (value) => editorInstance.setValue(value || ''),
+    (value) => {
+      if (editorInstance.getValue() === value) return
+      editorInstance.setValue(value || '')
+    },
     { immediate: true }
   )
 
