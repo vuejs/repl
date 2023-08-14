@@ -20,7 +20,7 @@ const props = withDefaults(defineProps<Props>(), {
   readonly: false,
 })
 
-const emit = defineEmits<(e: 'change', value: string) => void>()
+const emit = defineEmits<(e: 'save', value: string) => void>()
 
 const el = ref()
 const needAutoResize = inject('autoresize')
@@ -36,6 +36,10 @@ onMounted(() => {
         keyMap: 'sublime',
       }
 
+  function save() {
+    emit('save', editor.getValue())
+  }
+
   const editor = CodeMirror(el.value!, {
     value: '',
     mode: props.mode,
@@ -46,8 +50,20 @@ onMounted(() => {
     ...addonOptions,
   })
 
-  editor.on('change', () => {
-    emit('change', editor.getValue())
+  let changeTimer: NodeJS.Timeout
+  editor.on('change', (e) => {
+    clearTimeout(changeTimer) // clear previous timer
+
+    changeTimer = setTimeout(() => {
+      save()
+    }, 5000)
+  })
+
+  el.value.addEventListener('keydown', (e) => {
+    if ((e.ctrlKey || e.metaKey) && e.which == 83) {
+      e.preventDefault()
+      save()
+    }
   })
 
   watchEffect(() => {

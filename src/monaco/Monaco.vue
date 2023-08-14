@@ -30,7 +30,7 @@ const props = withDefaults(
 )
 
 const emit = defineEmits<{
-  (e: 'change', value: string): void
+  (e: 'save', value: string): void
 }>()
 
 const containerRef = ref<HTMLDivElement>()
@@ -138,12 +138,26 @@ onMounted(async () => {
 
   await loadGrammars(monaco, editorInstance)
 
+  function save() {
+    emit('save', editorInstance.getValue())
+  }
+
   editorInstance.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS, () => {
-    // ignore save event
+    save()
   })
 
-  editorInstance.onDidChangeModelContent(() => {
-    emit('change', editorInstance.getValue())
+  editorInstance.onDidBlurEditorWidget(() => {
+    save()
+  })
+
+  let changeTimer: NodeJS.Timeout
+
+  editorInstance.onDidChangeModelContent((e) => {
+    clearTimeout(changeTimer) // clear previous timer
+
+    changeTimer = setTimeout(() => {
+      save()
+    }, 5000)
   })
 
   // update theme

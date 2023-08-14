@@ -10,8 +10,8 @@ defineOptions({
 const props = defineProps<EditorProps>()
 const emit = defineEmits<EditorEmits>()
 
-const onChange = (code: string) => {
-  emit('change', code)
+const onSave = (code: string) => {
+  emit('save', code)
 }
 
 const modes: Record<string, Props['mode']> = {
@@ -39,5 +39,10 @@ const activeMode = computed(() => {
 </script>
 
 <template>
-  <CodeMirror @change="onChange" :value="value" :mode="activeMode" />
+  <CodeMirror
+    ref="codeMirrorRef"
+    :value="value"
+    :mode="activeMode"
+    @save="onSave"
+  />
 </template>
