@@ -62,8 +62,8 @@ onMounted(() => {
   editor.on('blur', () => {
     save()
   })
-  el.value.addEventListener('keydown', (e) => {
-    if ((e.ctrlKey || e.metaKey) && e.which == 83) {
+  el.value.addEventListener('keydown', (e: KeyboardEvent) => {
+    if ((e.ctrlKey || e.metaKey) && e.code === 'KeyS') {
       e.preventDefault()
       save()
     }
