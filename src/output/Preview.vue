@@ -90,6 +90,10 @@ function createSandbox() {
       /<!-- PREVIEW-OPTIONS-HEAD-HTML -->/,
       previewOptions?.headHTML || ''
     )
+    .replace(
+      /<!--PREVIEW-OPTIONS-PLACEHOLDER-HTML-->/,
+      previewOptions?.placeholderHTML || ''
+    )
   sandbox.srcdoc = sandboxSrc
   container.value.appendChild(sandbox)
 
