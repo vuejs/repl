@@ -21,6 +21,7 @@ export interface Props {
   previewOptions?: {
     headHTML?: string
     bodyHTML?: string
+    placeholderHTML?: string
     customCode?: {
       importCode?: string
       useCode?: string
@@ -40,6 +41,7 @@ const props = withDefaults(defineProps<Props>(), {
   previewOptions: () => ({
     headHTML: '',
     bodyHTML: '',
+    placeholderHTML: '',
     customCode: {
       importCode: '',
       useCode: '',
