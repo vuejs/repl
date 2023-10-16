@@ -2,7 +2,7 @@
 import SplitPane from './SplitPane.vue'
 import Output from './output/Output.vue'
 import { Store, ReplStore, SFCOptions } from './store'
-import { provide, ref, toRef } from 'vue'
+import { provide, ref, toRef, computed } from 'vue'
 import type { EditorComponentType } from './editor/types'
 import EditorContainer from './editor/EditorContainer.vue'
 
@@ -17,6 +17,7 @@ export interface Props {
   clearConsole?: boolean
   sfcOptions?: SFCOptions
   layout?: 'horizontal' | 'vertical'
+  layoutReverse?: boolean
   ssr?: boolean
   previewOptions?: {
     headHTML?: string
@@ -37,6 +38,7 @@ const props = withDefaults(defineProps<Props>(), {
   showImportMap: true,
   showTsConfig: true,
   clearConsole: true,
+  layoutReverse: false,
   ssr: false,
   previewOptions: () => ({
     headHTML: '',
@@ -73,6 +75,9 @@ sfcOptions.script.fs = {
 
 store.init()
 
+const editorSlotName = computed(() => props.layoutReverse ? 'right' : 'left')
+const outputSlotName = computed(() => props.layoutReverse ? 'left' : 'right')
+
 provide('store', store)
 provide('autoresize', props.autoResize)
 provide('import-map', toRef(props, 'showImportMap'))
@@ -93,10 +98,10 @@ defineExpose({ reload })
 <template>
   <div class="vue-repl">
     <SplitPane :layout="layout">
-      <template #left>
+      <template #[editorSlotName]>
         <EditorContainer :editorComponent="editor" />
       </template>
-      <template #right>
+      <template #[outputSlotName]>
         <Output
           ref="outputRef"
           :editorComponent="editor"
