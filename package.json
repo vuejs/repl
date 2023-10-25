@@ -71,7 +71,7 @@
     "codemirror": "^5.65.14",
     "fflate": "^0.8.0",
     "hash-sum": "^2.0.0",
-    "lint-staged": "^13.2.3",
+    "lint-staged": "^15.0.2",
     "monaco-editor-core": "^0.44.0",
     "monaco-editor-textmate": "^4.0.0",
     "monaco-textmate": "^3.0.1",
