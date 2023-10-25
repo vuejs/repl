@@ -63,16 +63,16 @@
     "@types/codemirror": "^5.60.8",
     "@types/node": "^20.4.5",
     "@vitejs/plugin-vue": "^4.2.3",
-    "@volar/cdn": "~1.9.2",
-    "@volar/monaco": "~1.9.2",
-    "@volar/typescript": "~1.9.2",
-    "@vue/language-service": "1.8.6",
+    "@volar/cdn": "~1.10.5",
+    "@volar/monaco": "~1.10.5",
+    "@volar/typescript": "~1.10.5",
+    "@vue/language-service": "1.8.21",
     "bumpp": "^9.1.1",
     "codemirror": "^5.65.14",
     "fflate": "^0.8.0",
     "hash-sum": "^2.0.0",
     "lint-staged": "^13.2.3",
-    "monaco-editor-core": "^0.40.0",
+    "monaco-editor-core": "^0.44.0",
     "monaco-editor-textmate": "^4.0.0",
     "monaco-textmate": "^3.0.1",
     "monaco-volar": "^0.4.0",
@@ -84,6 +84,6 @@
     "typescript": "^5.1.6",
     "vite": "^4.4.7",
     "vue": "^3.3.4",
-    "vue-tsc": "1.8.6"
+    "vue-tsc": "1.8.21"
   }
 }
