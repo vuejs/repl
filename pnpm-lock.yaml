@@ -33,8 +33,8 @@ devDependencies:
     specifier: ~1.10.5
     version: 1.10.5
   '@vue/language-service':
-    specifier: 1.8.21
-    version: 1.8.21(typescript@5.2.2)
+    specifier: 1.8.22
+    version: 1.8.22(typescript@5.2.2)
   bumpp:
     specifier: ^9.2.0
     version: 9.2.0
@@ -87,8 +87,8 @@ devDependencies:
     specifier: ^3.3.7
     version: 3.3.7(typescript@5.2.2)
   vue-tsc:
-    specifier: 1.8.21
-    version: 1.8.21(typescript@5.2.2)
+    specifier: 1.8.22
+    version: 1.8.22(typescript@5.2.2)
 
 packages:
 
@@ -632,8 +632,8 @@ packages:
       '@vue/shared': 3.3.7
     dev: true
 
-  /@vue/language-core@1.8.21(typescript@5.2.2):
-    resolution: {integrity: sha512-dKQJc1xfWIZfv6BeXyxz3SSNrC7npJpDIN/VOb1rodAm4o247TElrXOHYAJdV9x1KilaEUo3YbnQE+WA3vQwMw==}
+  /@vue/language-core@1.8.22(typescript@5.2.2):
+    resolution: {integrity: sha512-bsMoJzCrXZqGsxawtUea1cLjUT9dZnDsy5TuZ+l1fxRMzUGQUG9+Ypq4w//CqpWmrx7nIAJpw2JVF/t258miRw==}
     peerDependencies:
       typescript: '*'
     peerDependenciesMeta:
@@ -651,14 +651,14 @@ packages:
       vue-template-compiler: 2.7.15
     dev: true
 
-  /@vue/language-service@1.8.21(typescript@5.2.2):
-    resolution: {integrity: sha512-bKKHk2yVANj4BBTK4Gk8gINuPaeM7fHLQGHedRSYbSxJIgCPVRfbdd5qRqCBkVh/GcGM+iz/ofEYxV6vzeBvEg==}
+  /@vue/language-service@1.8.22(typescript@5.2.2):
+    resolution: {integrity: sha512-N2VjxOfkTVzSC2PdPq52bZXAtmL+tSEpALtEkFCxv7YA1XeieMvUv1bn7K7P6CoNhakTMdi2ouEyBg9Lc1A+WQ==}
     dependencies:
       '@volar/language-core': 1.10.5
       '@volar/language-service': 1.10.5
       '@volar/typescript': 1.10.5
       '@vue/compiler-dom': 3.3.7
-      '@vue/language-core': 1.8.21(typescript@5.2.2)
+      '@vue/language-core': 1.8.22(typescript@5.2.2)
       '@vue/shared': 3.3.7
       computeds: 0.0.1
       volar-service-css: 0.0.15(@volar/language-service@1.10.5)
@@ -2230,14 +2230,14 @@ packages:
       he: 1.2.0
     dev: true
 
-  /vue-tsc@1.8.21(typescript@5.2.2):
-    resolution: {integrity: sha512-gc9e+opdeF0zKixaadXT5v2s+x+77oqpuza/vwqDhdDyEeLZUOmZaVeb9noZpkdhFaLq7t7ils/7lFU8E/Hgew==}
+  /vue-tsc@1.8.22(typescript@5.2.2):
+    resolution: {integrity: sha512-j9P4kHtW6eEE08aS5McFZE/ivmipXy0JzrnTgbomfABMaVKx37kNBw//irL3+LlE3kOo63XpnRigyPC3w7+z+A==}
     hasBin: true
     peerDependencies:
       typescript: '*'
     dependencies:
       '@volar/typescript': 1.10.5
-      '@vue/language-core': 1.8.21(typescript@5.2.2)
+      '@vue/language-core': 1.8.22(typescript@5.2.2)
       semver: 7.5.4
       typescript: 5.2.2
     dev: true
