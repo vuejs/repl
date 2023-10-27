@@ -20,7 +20,9 @@ const props = withDefaults(defineProps<Props>(), {
   readonly: false,
 })
 
-const emit = defineEmits<(e: 'save', value: string) => void>()
+const emit = defineEmits<{
+  save: [string]
+}>()
 
 const el = ref()
 const needAutoResize = inject('autoresize')
@@ -50,14 +52,10 @@ onMounted(() => {
     ...addonOptions,
   })
 
-  let changeTimer: NodeJS.Timeout
-  editor.on('change', (e) => {
-    clearTimeout(changeTimer) // clear previous timer
-
-    changeTimer = setTimeout(() => {
-      save()
-    }, 5000)
-  })
+  const autoSave = inject<number>('autoSave')
+  if (autoSave > 0) {
+    editor.on('change', debounce(save, autoSave))
+  }
 
   editor.on('blur', () => {
     save()
