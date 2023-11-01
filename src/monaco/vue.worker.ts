@@ -79,10 +79,10 @@ self.onmessage = async (msg: MessageEvent<WorkerMessage>) => {
         { typescript: ts as any },
         env,
         resolveConfig(
+          ts as any,
           {},
           compilerOptions,
-          tsconfig.vueCompilerOptions || {},
-          ts as any
+          tsconfig.vueCompilerOptions || {}
         ),
         host
       )

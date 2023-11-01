@@ -63,10 +63,10 @@
     "@types/codemirror": "^5.60.12",
     "@types/node": "^20.8.9",
     "@vitejs/plugin-vue": "^4.4.0",
-    "@volar/cdn": "~1.10.7",
-    "@volar/monaco": "~1.10.7",
-    "@volar/typescript": "~1.10.7",
-    "@vue/language-service": "1.8.22",
+    "@volar/cdn": "~1.10.10",
+    "@volar/monaco": "~1.10.10",
+    "@volar/typescript": "~1.10.10",
+    "@vue/language-service": "1.9.0-alpha.2",
     "bumpp": "^9.2.0",
     "codemirror": "^5.65.15",
     "fflate": "^0.8.1",
@@ -77,13 +77,12 @@
     "monaco-textmate": "^3.0.1",
     "monaco-volar": "^0.4.0",
     "onigasm": "^2.2.5",
-    "path-browserify": "^1.0.1",
     "prettier": "^3.0.3",
     "simple-git-hooks": "^2.9.0",
     "sucrase": "^3.34.0",
     "typescript": "^5.2.2",
     "vite": "^4.5.0",
     "vue": "^3.3.7",
-    "vue-tsc": "1.8.22"
+    "vue-tsc": "1.9.0-alpha.2"
   }
 }

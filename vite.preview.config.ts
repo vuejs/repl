@@ -12,7 +12,6 @@ export default defineConfig({
   ],
   resolve: {
     alias: {
-      path: 'path-browserify',
       '@vue/compiler-dom': '@vue/compiler-dom/dist/compiler-dom.cjs.js',
       '@vue/compiler-core': '@vue/compiler-core/dist/compiler-core.cjs.js',
     },
