@@ -57,6 +57,7 @@ onMounted(async () => {
       ? { value: props.value, language: lang.value }
       : { model: null }),
     fontSize: 13,
+    tabSize: 2,
     theme: replTheme.value === 'light' ? theme.light : theme.dark,
     readOnly: props.readonly,
     automaticLayout: true,
