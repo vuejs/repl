@@ -122,7 +122,9 @@ export interface StoreOptions {
   showOutput?: boolean
   // loose type to allow getting from the URL without inducing a typing error
   outputMode?: OutputModes | string
+  productionMode?: boolean
   defaultVueRuntimeURL?: string
+  defaultVueRuntimeProdURL?: string
   defaultVueServerRendererURL?: string
 }
 
@@ -130,21 +132,25 @@ export class ReplStore implements Store {
   state: StoreState
   compiler = defaultCompiler
   vueVersion?: string
+  productionMode = false
   options?: SFCOptions
   initialShowOutput: boolean
   initialOutputMode: OutputModes
   reloadLanguageTools: undefined | (() => void)
 
-  private defaultVueRuntimeURL: string
+  private defaultVueRuntimeDevURL: string
+  private defaultVueRuntimeProdURL: string
   private defaultVueServerRendererURL: string
   private pendingCompiler: Promise<any> | null = null
 
   constructor({
     serializedState = '',
     defaultVueRuntimeURL = `https://cdn.jsdelivr.net/npm/@vue/runtime-dom@${version}/dist/runtime-dom.esm-browser.js`,
+    defaultVueRuntimeProdURL = `https://cdn.jsdelivr.net/npm/@vue/runtime-dom@${version}/dist/runtime-dom.esm-browser.prod.js`,
     defaultVueServerRendererURL = `https://cdn.jsdelivr.net/npm/@vue/server-renderer@${version}/dist/server-renderer.esm-browser.js`,
     showOutput = false,
     outputMode = 'preview',
+    productionMode = false,
   }: StoreOptions = {}) {
     const files: StoreState['files'] = {}
 
@@ -157,7 +163,9 @@ export class ReplStore implements Store {
       setFile(files, defaultMainFile, welcomeCode)
     }
 
-    this.defaultVueRuntimeURL = defaultVueRuntimeURL
+    this.productionMode = productionMode
+    this.defaultVueRuntimeDevURL = defaultVueRuntimeURL
+    this.defaultVueRuntimeProdURL = defaultVueRuntimeProdURL
     this.defaultVueServerRendererURL = defaultVueServerRendererURL
     this.initialShowOutput = showOutput
     this.initialOutputMode = outputMode as OutputModes
@@ -180,6 +188,12 @@ export class ReplStore implements Store {
 
     this.initImportMap()
     this.initTsConfig()
+  }
+
+  get defaultVueRuntimeURL(): string {
+    return this.productionMode
+      ? this.defaultVueRuntimeProdURL
+      : this.defaultVueRuntimeDevURL
   }
 
   // don't start compiling until the options are set
@@ -408,7 +422,10 @@ export class ReplStore implements Store {
   async setVueVersion(version: string) {
     this.vueVersion = version
     const compilerUrl = `https://cdn.jsdelivr.net/npm/@vue/compiler-sfc@${version}/dist/compiler-sfc.esm-browser.js`
-    const runtimeUrl = `https://cdn.jsdelivr.net/npm/@vue/runtime-dom@${version}/dist/runtime-dom.esm-browser.js`
+    // differentiate prod/dev for runtime
+    const runtimeUrl = `https://cdn.jsdelivr.net/npm/@vue/runtime-dom@${version}/dist/runtime-dom.esm-browser${
+      this.productionMode ? `.prod` : ``
+    }.js`
     const ssrUrl = `https://cdn.jsdelivr.net/npm/@vue/server-renderer@${version}/dist/server-renderer.esm-browser.js`
     this.pendingCompiler = import(/* @vite-ignore */ compilerUrl)
     this.compiler = await this.pendingCompiler
@@ -437,6 +454,15 @@ export class ReplStore implements Store {
     this.setImportMap(importMap)
     this.forceSandboxReset()
     console.info(`[@vue/repl] Now using default Vue version`)
+  }
+
+  toggleProduction() {
+    this.productionMode = !this.productionMode
+    if (this.vueVersion) {
+      this.setVueVersion(this.vueVersion)
+    } else {
+      this.resetVueVersion()
+    }
   }
 }
 
