@@ -145,6 +145,7 @@ export class ReplStore implements Store {
   private defaultVueRuntimeProdURL: string
   private defaultVueServerRendererURL: string
   private pendingCompiler: Promise<any> | null = null
+
   constructor({
     serializedState = '',
     defaultVueRuntimeURL = `https://cdn.jsdelivr.net/npm/@vue/runtime-dom@${version}/dist/runtime-dom.esm-browser.js`,

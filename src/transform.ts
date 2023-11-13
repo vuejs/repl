@@ -221,11 +221,8 @@ export async function compileFile(
   if (css) {
     compiled.css = css.trim()
   } else {
-    compiled.css = '/* No <style> tags present */'
-    isCE
-      ? (compiled.css =
-          '/* The component style of the custom element will be compiled into the component object */')
-      : (compiled.css = '/* No <style> tags present */')
+    compiled.css = isCE ?  (compiled.css = '/* The component style of the custom element will be compiled into the component object */')
+      : ('/* No <style> tags present */')
   }
 
   if (clientCode || ssrCode) {
