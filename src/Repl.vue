@@ -75,8 +75,8 @@ sfcOptions.script.fs = {
 
 store.init()
 
-const editorSlotName = computed(() => props.layoutReverse ? 'right' : 'left')
-const outputSlotName = computed(() => props.layoutReverse ? 'left' : 'right')
+const editorSlotName = computed(() => (props.layoutReverse ? 'right' : 'left'))
+const outputSlotName = computed(() => (props.layoutReverse ? 'left' : 'right'))
 
 provide('store', store)
 provide('autoresize', props.autoResize)
