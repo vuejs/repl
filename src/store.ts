@@ -9,24 +9,13 @@ import {
 } from 'vue/compiler-sfc'
 import { OutputModes } from './output/types'
 import type { editor } from 'monaco-editor-core'
+import welcomeCode from './template/welcome.vue?raw'
+import newFileCode from './template/new-file.vue?raw'
 
 const defaultMainFile = 'src/App.vue'
 
 export const importMapFile = 'import-map.json'
 export const tsconfigFile = 'tsconfig.json'
-
-const welcomeCode = `
-<script setup>
-import { ref } from 'vue'
-
-const msg = ref('Hello World!')
-</script>
-
-<template>
-  <h1>{{ msg }}</h1>
-  <input v-model="msg">
-</template>
-`.trim()
 
 const tsconfig = {
   compilerOptions: {
@@ -259,7 +248,7 @@ export class ReplStore implements Store {
   addFile(fileOrFilename: string | File): void {
     const file =
       typeof fileOrFilename === 'string'
-        ? new File(fileOrFilename)
+        ? new File(fileOrFilename, newFileCode)
         : fileOrFilename
     this.state.files[file.filename] = file
     if (!file.hidden) this.setActive(file.filename)
