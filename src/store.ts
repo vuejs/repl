@@ -10,7 +10,7 @@ import {
 import { OutputModes } from './output/types'
 import type { editor } from 'monaco-editor-core'
 import welcomeCode from './template/welcome.vue?raw'
-import newFileCode from './template/new-file.vue?raw'
+import newSFCCode from './template/new-sfc.vue?raw'
 
 const defaultMainFile = 'src/App.vue'
 
@@ -243,7 +243,10 @@ export class ReplStore implements Store {
   addFile(fileOrFilename: string | File): void {
     const file =
       typeof fileOrFilename === 'string'
-        ? new File(fileOrFilename, newFileCode)
+        ? new File(
+            fileOrFilename,
+            fileOrFilename.endsWith('.vue') ? newSFCCode : ''
+          )
         : fileOrFilename
     this.state.files[file.filename] = file
     if (!file.hidden) this.setActive(file.filename)
