@@ -104,6 +104,7 @@ export interface Store {
   reloadLanguageTools?: undefined | (() => void)
   initialShowOutput: boolean
   initialOutputMode: OutputModes
+  customElement: boolean | string | RegExp | (string | RegExp)[]
 }
 
 export interface StoreOptions {
@@ -115,6 +116,7 @@ export interface StoreOptions {
   defaultVueRuntimeURL?: string
   defaultVueRuntimeProdURL?: string
   defaultVueServerRendererURL?: string
+  customElement?: boolean | string | RegExp | (string | RegExp)[]
 }
 
 export class ReplStore implements Store {
@@ -126,6 +128,7 @@ export class ReplStore implements Store {
   initialShowOutput: boolean
   initialOutputMode: OutputModes
   reloadLanguageTools: undefined | (() => void)
+  customElement: boolean | string | RegExp | (string | RegExp)[]
 
   private defaultVueRuntimeDevURL: string
   private defaultVueRuntimeProdURL: string
@@ -140,6 +143,7 @@ export class ReplStore implements Store {
     showOutput = false,
     outputMode = 'preview',
     productionMode = false,
+    customElement = /\.ce\.vue$/,
   }: StoreOptions = {}) {
     const files: StoreState['files'] = {}
 
@@ -157,6 +161,7 @@ export class ReplStore implements Store {
     this.defaultVueRuntimeProdURL = defaultVueRuntimeProdURL
     this.defaultVueServerRendererURL = defaultVueServerRendererURL
     this.initialShowOutput = showOutput
+    this.customElement = customElement
     this.initialOutputMode = outputMode as OutputModes
 
     let mainFile = defaultMainFile

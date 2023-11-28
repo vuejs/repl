@@ -167,17 +167,33 @@ export async function compileFile(
     )
   }
 
-  if (clientCode || ssrCode) {
-    appendSharedCode(
-      `\n${COMP_IDENTIFIER}.__file = ${JSON.stringify(filename)}` +
-        `\nexport default ${COMP_IDENTIFIER}`
-    )
-    compiled.js = clientCode.trimStart()
-    compiled.ssr = ssrCode.trimStart()
-  }
-
   // styles
+  const ceFilter = store.customElement
+  function isCustomElement(filters: typeof ceFilter): boolean {
+    if (typeof filters === 'boolean') {
+      return filters
+    }
+
+    if (typeof filters === 'string') {
+      return filters.includes(filename)
+    } else if (
+      !Array.isArray(filters) &&
+      Object.prototype.toString.call(filters) === '[object RegExp]'
+    ) {
+      return filters.test(filename)
+    }
+
+    if (Array.isArray(filters)) {
+      return filters.some((filter) => {
+        return isCustomElement(filter)
+      })
+    }
+    return false
+  }
+  let isCE = isCustomElement(ceFilter)
+
   let css = ''
+  let styles: string[] = []
   for (const style of descriptor.styles) {
     if (style.module) {
       return [`<style module> is not supported in the playground.`]
@@ -199,13 +215,27 @@ export async function compileFile(
       }
       // proceed even if css compile errors
     } else {
-      css += styleResult.code + '\n'
+      isCE ? styles.push(styleResult.code) : (css += styleResult.code + '\n')
     }
   }
   if (css) {
     compiled.css = css.trim()
   } else {
-    compiled.css = '/* No <style> tags present */'
+    compiled.css = isCE ?  (compiled.css = '/* The component style of the custom element will be compiled into the component object */')
+      : ('/* No <style> tags present */')
+  }
+
+  if (clientCode || ssrCode) {
+    const ceStyles = isCE
+      ? `\n${COMP_IDENTIFIER}.styles = ${JSON.stringify(styles)}`
+      : ''
+    appendSharedCode(
+      `\n${COMP_IDENTIFIER}.__file = ${JSON.stringify(filename)}` +
+        ceStyles +
+        `\nexport default ${COMP_IDENTIFIER}`
+    )
+    compiled.js = clientCode.trimStart()
+    compiled.ssr = ssrCode.trimStart()
   }
 
   return []
