@@ -246,13 +246,15 @@ export class ReplStore implements Store {
   }
 
   addFile(fileOrFilename: string | File): void {
-    const file =
-      typeof fileOrFilename === 'string'
-        ? new File(
-            fileOrFilename,
-            fileOrFilename.endsWith('.vue') ? newSFCCode : ''
-          )
-        : fileOrFilename
+    let file: File
+    if (typeof fileOrFilename === 'string') {
+      file = new File(
+        fileOrFilename,
+        fileOrFilename.endsWith('.vue') ? newSFCCode : ''
+      )
+    } else {
+      file = fileOrFilename
+    }
     this.state.files[file.filename] = file
     if (!file.hidden) this.setActive(file.filename)
   }
@@ -342,14 +344,15 @@ export class ReplStore implements Store {
     for (const filename in newFiles) {
       setFile(files, filename, newFiles[filename])
     }
-    this.state.errors = []
+    const errors = []
     for (const file in files) {
-      this.state.errors.push(...(await compileFile(this, files[file])))
+      errors.push(...(await compileFile(this, files[file])))
     }
-    this.state.mainFile = mainFile
+    this.state.errors = errors
+    this.state.mainFile = addSrcPrefix(mainFile)
     this.state.files = files
     this.initImportMap()
-    this.setActive(mainFile)
+    this.setActive(this.state.mainFile)
     this.forceSandboxReset()
   }
 
@@ -470,13 +473,16 @@ function setFile(
 ) {
   // prefix user files with src/
   // for cleaner Volar path completion when using Monaco editor
-  const normalized =
-    filename !== importMapFile &&
-    filename !== tsconfigFile &&
-    !filename.startsWith('src/')
-      ? `src/${filename}`
-      : filename
+  const normalized = addSrcPrefix(filename)
   files[normalized] = new File(normalized, content)
+}
+
+function addSrcPrefix(file: string) {
+  return file === importMapFile ||
+    file === tsconfigFile ||
+    file.startsWith('src/')
+    ? file
+    : `src/${file}`
 }
 
 function fixURL(url: string) {
