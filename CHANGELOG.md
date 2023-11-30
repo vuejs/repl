@@ -1,3 +1,13 @@
+# [3.0.0](https://github.com/vuejs/repl/compare/v2.9.0...v3.0.0) (2023-11-30)
+
+
+### Bug Fixes
+
+* handle main file src prefix when setting files + avoid infinite loop due to state.error push ([743b731](https://github.com/vuejs/repl/commit/743b73121dbd63f164a013c8ba722d0a8bfe5ebd))
+* make main repl styles lower specificity for easier override ([fbfaa44](https://github.com/vuejs/repl/commit/fbfaa4495c9bbf3ab936bec27445c52c9521b67e))
+
+
+
 # [2.9.0](https://github.com/vuejs/repl/compare/v2.8.1...v2.9.0) (2023-11-30)
 
 
