@@ -1,4 +1,7 @@
-import { type FunctionalComponent } from 'vue'
+import CodeMirrorEditor from "./CodeMirrorEditor.vue";
+import MonacoEditor from "./MonacoEditor.vue";
+
+export type EditorComponentType = typeof CodeMirrorEditor | typeof MonacoEditor
 
 export type PreviewMode = 'js' | 'css' | 'ssr'
 
@@ -12,14 +15,3 @@ export interface EditorProps {
 export interface EditorEmits {
   (e: 'change', code: string): void
 }
-
-export type EditorComponentType = FunctionalComponent<
-  EditorProps,
-  { change: (code: string) => void }
-> & {
-  editorType: 'monaco' | 'codemirror'
-}
-
-declare const EditorComponent: EditorComponentType
-
-export default EditorComponent
