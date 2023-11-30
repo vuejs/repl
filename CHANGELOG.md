@@ -1,9 +1,218 @@
+# [2.9.0](https://github.com/vuejs/repl/compare/v2.8.1...v2.9.0) (2023-11-30)
+
+
+### Bug Fixes
+
+* **types:** fix editor prop types ([828f202](https://github.com/vuejs/repl/commit/828f2027ff3986a029de3833f521525c7ac3e1d7))
+
+
+### Features
+
+* support custom element styles ([#173](https://github.com/vuejs/repl/issues/173)) ([812730d](https://github.com/vuejs/repl/commit/812730db62b6f1865cee90b67f9f593412a0dce6))
+
+
+
+## [2.8.1](https://github.com/vuejs/repl/compare/v2.8.0...v2.8.1) (2023-11-28)
+
+
+### Bug Fixes
+
+* new sfc file template ([79643d7](https://github.com/vuejs/repl/commit/79643d71a5eabd7e7c9c092e8501cc07f9ee5136))
+* worker plugins for vite 5 ([6e66250](https://github.com/vuejs/repl/commit/6e6625084d0c9ba8c24915ebd1060b7421e0de5b))
+
+
+
+# [2.8.0](https://github.com/vuejs/repl/compare/v2.7.0...v2.8.0) (2023-11-19)
+
+
+### Features
+
+* add template for new file ([9a0be1d](https://github.com/vuejs/repl/commit/9a0be1df8c06ffdeab2985f9e9cd5f2cde1437fe))
+
+
+
+# [2.7.0](https://github.com/vuejs/repl/compare/v2.6.3...v2.7.0) (2023-11-12)
+
+
+### Features
+
+* support toggling between dev/prod for Vue runtime ([8d3a2e6](https://github.com/vuejs/repl/commit/8d3a2e62358104663af48531467ac8eda4bafffa))
+
+
+
+## [2.6.3](https://github.com/vuejs/repl/compare/v2.6.2...v2.6.3) (2023-11-03)
+
+
+
+## [2.6.2](https://github.com/vuejs/repl/compare/v2.6.1...v2.6.2) (2023-11-01)
+
+
+
+## [2.6.1](https://github.com/vuejs/repl/compare/v2.5.8...v2.6.1) (2023-10-26)
+
+
+### Features
+
+* add layout reverse api [#162](https://github.com/vuejs/repl/issues/162) ([#163](https://github.com/vuejs/repl/issues/163)) ([c1cd77a](https://github.com/vuejs/repl/commit/c1cd77a913b050e2fb3d921d4dcd86a1db74b8b1))
+* support custom display placeholder content ([#160](https://github.com/vuejs/repl/issues/160)) ([9ca27a1](https://github.com/vuejs/repl/commit/9ca27a12cf92b6ac6b7132a5c2ae667a13af4faa))
+
+
+
+## [2.5.8](https://github.com/vuejs/repl/compare/v2.5.7...v2.5.8) (2023-08-10)
+
+
+### Bug Fixes
+
+* don't set editor value if not changed ([bd59eef](https://github.com/vuejs/repl/commit/bd59eefb1d2731179f772ab118ee642f453fa5d2)), closes [#147](https://github.com/vuejs/repl/issues/147)
+
+
+
+## [2.5.7](https://github.com/vuejs/repl/compare/v2.5.6...v2.5.7) (2023-08-08)
+
+
+### Bug Fixes
+
+* respect value from monaco editor props ([49fdc71](https://github.com/vuejs/repl/commit/49fdc7161ec91fed617043aca0b751858a10289e)), closes [#145](https://github.com/vuejs/repl/issues/145)
+
+
+
+## [2.5.6](https://github.com/vuejs/repl/compare/v2.5.5...v2.5.6) (2023-07-31)
+
+
+### Bug Fixes
+
+* remove preinstall ([8e41043](https://github.com/vuejs/repl/commit/8e410433eb46b45845c39aca8ad2895c3fabae12)), closes [/github.com/vuejs/repl/commit/569fe6275db45a420850cac9419b4614a51a360e#r123111912](https://github.com//github.com/vuejs/repl/commit/569fe6275db45a420850cac9419b4614a51a360e/issues/r123111912)
+
+
+
+## [2.5.5](https://github.com/vuejs/repl/compare/v2.5.4...v2.5.5) (2023-07-09)
+
+
+### Features
+
+* expose dependency version ([aecfd8a](https://github.com/vuejs/repl/commit/aecfd8a92e6e7814dd6dbd5d5e94f71ef9fe5b1a))
+
+
+
+## [2.5.4](https://github.com/vuejs/repl/compare/v2.5.3...v2.5.4) (2023-07-09)
+
+
+### Bug Fixes
+
+* replace NODE_ENV ([863f8f3](https://github.com/vuejs/repl/commit/863f8f39d36d25240388a9c5bc68eff0ea7e7856))
+
+
+
+## [2.5.3](https://github.com/vuejs/repl/compare/v2.5.2...v2.5.3) (2023-07-08)
+
+
+### Bug Fixes
+
+* filename index auto-increment ([#133](https://github.com/vuejs/repl/issues/133)) ([4f55810](https://github.com/vuejs/repl/commit/4f55810f729fc61e22eafa7ea69afe79bcfe1cb6))
+* make reloadLanguageTools optional ([5ab1a2d](https://github.com/vuejs/repl/commit/5ab1a2d149820ecb737c3bc97581a87f3adc83d7))
+* use dev version of compiler ([#132](https://github.com/vuejs/repl/issues/132)) ([bfc3522](https://github.com/vuejs/repl/commit/bfc3522422926b0e3f18c1368111066cf268e206))
+
+
+
+## [2.5.2](https://github.com/vuejs/repl/compare/v2.5.1...v2.5.2) (2023-07-06)
+
+
+### Bug Fixes
+
+* remove postinstall ([8167272](https://github.com/vuejs/repl/commit/816727232d0adac0c0955c1d6bee9d7be7f70d61))
+
+
+
+## [2.5.1](https://github.com/vuejs/repl/compare/v2.5.0...v2.5.1) (2023-07-05)
+
+
+### Bug Fixes
+
+* cannot get ts module in prod env ([0cc220d](https://github.com/vuejs/repl/commit/0cc220d7efaafaaa3b8af07c34fd27c7825caa8b))
+* cdn file models were accidentally disposed ([4301d86](https://github.com/vuejs/repl/commit/4301d8659ad84d9c6b66d63f1567cf31119eb9f4))
+
+
+### Features
+
+* use ts version option for ts lib dts acquire ([376fe3b](https://github.com/vuejs/repl/commit/376fe3ba2582fc128ccc4bbb2cd4b19666a5f1ec))
+
+
+
+# [2.5.0](https://github.com/vuejs/repl/compare/v2.4.0...v2.5.0) (2023-07-05)
+
+
+### Bug Fixes
+
+* change message toggle position ([#120](https://github.com/vuejs/repl/issues/120)) ([3f7e090](https://github.com/vuejs/repl/commit/3f7e090c143ca0a40b0bff1d13f2db3e6964b17a))
+
+
+### Features
+
+* download TS dynamically ([#125](https://github.com/vuejs/repl/issues/125)) ([97f698f](https://github.com/vuejs/repl/commit/97f698f1f88690ab371e156ac2113955fdaa5fa8))
+* expose TS localized languages ([a52dd14](https://github.com/vuejs/repl/commit/a52dd1468a6d6fb8ce4927a0a6771529f6a0f1ab))
+* respect browser language ([f9fedcd](https://github.com/vuejs/repl/commit/f9fedcd1ca56a6965c9617a16d2fba834f8a44a1)), closes [#123](https://github.com/vuejs/repl/issues/123)
+* upgrade volar ([d925ba3](https://github.com/vuejs/repl/commit/d925ba3c8a08966eab06eaf2720a7476415e7760))
+
+
+
+# [2.4.0](https://github.com/vuejs/repl/compare/v2.3.0...v2.4.0) (2023-06-28)
+
+
+### Bug Fixes
+
+* multiple style tags ([#116](https://github.com/vuejs/repl/issues/116)) ([f0f5512](https://github.com/vuejs/repl/commit/f0f5512f49832321a6c96631025927635a834d9a))
+* strip src prefix on dialog ([d29d1de](https://github.com/vuejs/repl/commit/d29d1de3f31930005dfc0b29f7d8a0435c0f94a4))
+
+
+### Features
+
+* add `reload` function ([#103](https://github.com/vuejs/repl/issues/103)) ([12ebcea](https://github.com/vuejs/repl/commit/12ebceab49c2a56702fffdfc01bb8b0bc3a708ca))
+* add monaco light theme ([#121](https://github.com/vuejs/repl/issues/121)) ([ead9667](https://github.com/vuejs/repl/commit/ead9667a85c1f217dab5955ebd9a11992b3fbe65))
+* memorize show error state ([#117](https://github.com/vuejs/repl/issues/117)) ([ab4b7cd](https://github.com/vuejs/repl/commit/ab4b7cd4d2c99b2750e29feaa0b3487f4bb8ed85))
+
+
+
+# [2.3.0](https://github.com/vuejs/repl/compare/v2.2.0...v2.3.0) (2023-06-24)
+
+
+### Features
+
+* add tsconfig file ([#114](https://github.com/vuejs/repl/issues/114)) ([29f6af5](https://github.com/vuejs/repl/commit/29f6af5037826a6d37f77ba4cae748e7297152e3))
+
+
+
+# [2.2.0](https://github.com/vuejs/repl/compare/v2.1.4...v2.2.0) (2023-06-24)
+
+
+### Bug Fixes
+
+* don't dispose in-memory files ([5f543da](https://github.com/vuejs/repl/commit/5f543da6815e30c76dc3a595b993a380043af54b))
+* set page height ([ee814e7](https://github.com/vuejs/repl/commit/ee814e7313162f19d45dcff7a3ecabedfdf081d5)), closes [#112](https://github.com/vuejs/repl/issues/112)
+
+
+### Features
+
+* add default height for Repl component ([#109](https://github.com/vuejs/repl/issues/109)) ([d9673eb](https://github.com/vuejs/repl/commit/d9673eb4c7a3e20ca7d0f1e152d177c6c1f8956d))
+* add error toggle ([#98](https://github.com/vuejs/repl/issues/98)) ([51819cc](https://github.com/vuejs/repl/commit/51819ccd3adcd40c189bd216f635ca6f62c4bc56))
+
+
+
+## [2.1.4](https://github.com/vuejs/repl/compare/v2.1.3...v2.1.4) (2023-06-23)
+
+
+### Bug Fixes
+
+* default main file path ([c0184da](https://github.com/vuejs/repl/commit/c0184da073456706c44cc5e78e2d3283f4d3fe0f))
+* **monaco:** enable `fixedOverflowWidgets` option ([#110](https://github.com/vuejs/repl/issues/110)) ([c7ddf12](https://github.com/vuejs/repl/commit/c7ddf12f25b23675c12c2760297c7d7d37668943))
+
+
+
 ## [2.1.3](https://github.com/vuejs/repl/compare/v2.1.2...v2.1.3) (2023-06-22)
 
 
 ### Bug Fixes
 
-* actually fix editor type ([95ab2ab](https://github.com/vuejs/repl/commit/95ab2abc29b01a565ba7bc25ef293f1434db5ef6))
+* actually fix editor type lol ([95ab2ab](https://github.com/vuejs/repl/commit/95ab2abc29b01a565ba7bc25ef293f1434db5ef6))
 
 
 
@@ -36,41 +245,64 @@
 
 # [2.0.0](https://github.com/vuejs/repl/compare/v1.5.0...v2.0.0) (2023-06-22)
 
+
+### Bug Fixes
+
+* disable pug and script setup codeLens ([1c6e646](https://github.com/vuejs/repl/commit/1c6e6464bea009b279fe43ed401e722230bf95bd))
+* don't delete dts models ([d04a1ed](https://github.com/vuejs/repl/commit/d04a1ed01a9f5aaeafc6845d6165dcc9b45b7a04))
+* f@ck ([0aa0a24](https://github.com/vuejs/repl/commit/0aa0a24e9c196d846827623b48b5eace0b8498a0))
+* larger font size ([#100](https://github.com/vuejs/repl/issues/100)) ([a1a3fe1](https://github.com/vuejs/repl/commit/a1a3fe1294cf0daa89e30902d607addbdd525b6e))
+* make monaco editor works normally ([f538199](https://github.com/vuejs/repl/commit/f538199e5cd99c380b3b5468cc660d47a6910783))
+* minor fix ([aacba06](https://github.com/vuejs/repl/commit/aacba0673414b759377e3cbfa764bff82d64f857))
+* split monaco out ([fd0b06a](https://github.com/vuejs/repl/commit/fd0b06af78e25632ee4fd6525ae5c90ef2c51f0b))
+* styles ([6aee9cf](https://github.com/vuejs/repl/commit/6aee9cfa7df19de0f60f0d9fe2ccbd2291998cbb))
+* update exports and types ([e4988b0](https://github.com/vuejs/repl/commit/e4988b0a9ddbc9888e481fd8f1c000b1756a5ba5))
+* use monaco-volar ([9846c8e](https://github.com/vuejs/repl/commit/9846c8e67720c2d7402d52bc1c2106a9a1b28c08))
+* use worker ([e1e80b9](https://github.com/vuejs/repl/commit/e1e80b9e40805bd541ccd80d48b01228378bf2c7))
+
+
 ### Features
 
-* Support using Monaco Editor + Volar ([#34](https://github.com/vuejs/repl/pull/34))
+* add ls ([a7bffd6](https://github.com/vuejs/repl/commit/a7bffd64c43e8ff375f1e59b62c78ca13969c723))
+* complete provideDefinition ([2035fc4](https://github.com/vuejs/repl/commit/2035fc49977e5c2f5e8c57fe80c0bb53bb85df70))
+* completed provideCompletionItems ([81ef510](https://github.com/vuejs/repl/commit/81ef51028f9188fcf598e78e45836f09b9f191ae))
+* completed provideHover ([3922239](https://github.com/vuejs/repl/commit/39222398316adfda107f2b00d2cc27523f6cef52))
+* completed provideSignatureHelp ([c599f2b](https://github.com/vuejs/repl/commit/c599f2bdf136d0d02e0c2f50198d8f71f0e858f2))
+* completed setModelMarkers ([86079ad](https://github.com/vuejs/repl/commit/86079ad2030559052cef8b32e0d4a301a62b5f65))
+* implemented provideCodeActions, resolveCodeAction ([1d37f55](https://github.com/vuejs/repl/commit/1d37f55eacb4124171813d1db777496aa1bddeb3))
+* implemented provideCodeLenses, resolveCodeLens ([bddb65b](https://github.com/vuejs/repl/commit/bddb65b19053f069de3a3366666e3db1fd6bd6b1))
+* implemented provideDeclaration ([8e437f0](https://github.com/vuejs/repl/commit/8e437f0e8796ba3b8d7a19478fc1b9bcde6f2e43))
+* implemented provideDocumentColors, provideColorPresentations ([ddde114](https://github.com/vuejs/repl/commit/ddde1140945ac819765d93c7e33b07046fca55a6))
+* implemented provideDocumentFormattingEdits ([73f046d](https://github.com/vuejs/repl/commit/73f046d80cd17c9dea7051f6d488e3b757366ad9))
+* implemented provideDocumentHighlights ([f782496](https://github.com/vuejs/repl/commit/f7824960cb34f4ee2b58ad37a2af1a9364367b7a))
+* implemented provideDocumentRangeFormattingEdits ([0e64a81](https://github.com/vuejs/repl/commit/0e64a81a57e2e973d95bcf3bba03c43f48abc508))
+* implemented provideDocumentSymbols ([1cda6c6](https://github.com/vuejs/repl/commit/1cda6c638223c3d26f1b07deb24c6ba7b699014b))
+* implemented provideFoldingRanges ([dd083d3](https://github.com/vuejs/repl/commit/dd083d3b246b5db8e7a158585e0fc912c9dd03ce))
+* implemented provideImplementation ([49d8d7e](https://github.com/vuejs/repl/commit/49d8d7e52b34e94956a1e93bd7c98452d96831dd))
+* implemented provideInlayHints ([61d18c9](https://github.com/vuejs/repl/commit/61d18c97d9ea309a48ff50188661bcbfe97312a4))
+* implemented provideLinkedEditingRanges ([1046ac8](https://github.com/vuejs/repl/commit/1046ac8a29045b7a326002cb3fec9387675d9b33))
+* implemented provideLinks ([3bc4063](https://github.com/vuejs/repl/commit/3bc406352ac7ce697e7d6c4b83f7ff737adede08))
+* implemented provideOnTypeFormattingEdits ([f50e1c9](https://github.com/vuejs/repl/commit/f50e1c9c1ef7ed0ea02d51cdaaa5802f69911c7f))
+* implemented provideReferences ([6b05d17](https://github.com/vuejs/repl/commit/6b05d1726d3e06c36008b847a55978e1e7b99843))
+* implemented provideRenameEdits ([5ca6318](https://github.com/vuejs/repl/commit/5ca63181a2beebcc180282cd70f6732e572fd51d))
+* implemented provideSelectionRanges ([2037d73](https://github.com/vuejs/repl/commit/2037d73ded9944b10a4379d369aeec06a304df97))
+* implemented provideTypeDefinition ([b80bb0d](https://github.com/vuejs/repl/commit/b80bb0da90481cbebb214abf4a333daa7c4a42e9))
+* implemented resolveCompletionItem ([3ef6ffd](https://github.com/vuejs/repl/commit/3ef6ffdf58a66f74a8903b7479b43195b13aeb69))
+* **monaco:** support to keep selection and cursor position ([#99](https://github.com/vuejs/repl/issues/99)) ([db8c1bd](https://github.com/vuejs/repl/commit/db8c1bdd13ac44c15336795387aa8e7a449dfd74))
+* pass vue dts module version from store ([2a0dfc0](https://github.com/vuejs/repl/commit/2a0dfc011a547d61523e5f64d882e5ed940bbb30))
+* support auto close tag / auto .value ([f765d54](https://github.com/vuejs/repl/commit/f765d54a69ef6aca5586873d19cf3f666adeb0c5))
+* support omitting ts/js extensions ([130a137](https://github.com/vuejs/repl/commit/130a137dd9640ea912e68d27e390dd03664e2699))
+* upgrade volar ([0783d93](https://github.com/vuejs/repl/commit/0783d93fdd310e92ae3b2e22b0dc6ea78f93beaf))
+* upgrade volar ([0aac8d1](https://github.com/vuejs/repl/commit/0aac8d11632e0963e0ae3de4e02cf47a16deec60))
+* use monaco ([e833cf1](https://github.com/vuejs/repl/commit/e833cf14d447063654a02a83ba12fd23c8619c77))
 
-### BREAKING CHANGES
 
-* The main `Repl` component now requires passing in the editor to be used via the `editor` prop. This is necessary so that the unused editor can be tree-shaken.
+### Performance Improvements
 
-  Example using Monaco:
+* cache `ts.ScriptSnapshot.fromString` ([6f34b78](https://github.com/vuejs/repl/commit/6f34b78d7d637d8fc238ca68c8beb87884f110b0))
+* preset failed node_modules paths to speed up dts acquisition ([e93f049](https://github.com/vuejs/repl/commit/e93f0499719595aad61473b0b7819ece1b46818e))
 
-  ```vue
-  <script setup>
-  import { Repl } from '@vue/repl'
-  import Monaco from '@vue/repl/monaco-editor'
-  import '@vue/repl/style.css'
-  </script>
 
-  <template>
-    <Repl :editor="Monaco" />
-  </template>
-  ```
-
-  Example using CodeMirror:
-
-  ```vue
-  <script setup>
-  import { Repl } from '@vue/repl'
-  import CodeMirror from '@vue/repl/codemirror-editor'
-  import '@vue/repl/style.css'
-  </script>
-
-  <template>
-    <Repl :editor="CodeMirror" />
-  </template>
-  ```
 
 # [1.5.0](https://github.com/vuejs/repl/compare/v1.4.1...v1.5.0) (2023-06-14)
 
@@ -270,3 +502,6 @@
 * support passing in compiler-sfc options ([f6c7049](https://github.com/vuejs/repl/commit/f6c7049f9bc4a5e1dd3e1c1948ba2ecb43fad3c3))
 * support ts in template expressions ([a1e9881](https://github.com/vuejs/repl/commit/a1e98814699c020a2d82c8c5aad664e99bd6ef52))
 * vertical mode ([d59bb6c](https://github.com/vuejs/repl/commit/d59bb6cd0eb0e03fa548595f5c64b990cecd133e))
+
+
+

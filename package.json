@@ -42,8 +42,8 @@
     "build": "vite build",
     "build-preview": "vite build -c vite.preview.config.ts",
     "format": "prettier --write .",
-    "release": "bumpp -r",
-    "changelog": "conventional-changelog -p angular -i CHANGELOG.md -s",
+    "release": "bumpp --all",
+    "version": "conventional-changelog -p angular -i CHANGELOG.md -s -r 0",
     "prepublishOnly": "npm run build"
   },
   "simple-git-hooks": {
