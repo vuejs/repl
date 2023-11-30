@@ -14,7 +14,8 @@ Basic editing experience with no intellisense. Lighter weight, fewer network req
 <script setup>
 import { Repl } from '@vue/repl'
 import CodeMirror from '@vue/repl/codemirror-editor'
-import '@vue/repl/style.css'
+// import '@vue/repl/style.css'
+// ^ no longer needed after 3.0
 </script>
 
 <template>
@@ -30,7 +31,8 @@ With Volar support, autocomplete, type inference, and semantic highlighting. Hea
 <script setup>
 import { Repl } from '@vue/repl'
 import Monaco from '@vue/repl/monaco-editor'
-import '@vue/repl/style.css'
+// import '@vue/repl/style.css'
+// ^ no longer needed after 3.0
 </script>
 
 <template>
