@@ -113,7 +113,7 @@ defineExpose({ reload })
   </div>
 </template>
 
-<style scoped>
+<style>
 .vue-repl {
   --bg: #fff;
   --bg-soft: #f8f8f8;
@@ -142,7 +142,7 @@ defineExpose({ reload })
   --color-branding-dark: #89ddff;
 }
 
-:deep(button) {
+.vue-repl button {
   border: none;
   outline: none;
   cursor: pointer;
