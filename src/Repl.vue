@@ -97,7 +97,7 @@ defineExpose({ reload })
 
 <template>
   <div class="vue-repl">
-    <SplitPane :layout="layout">
+    <SplitPane :layout="layout" :layout-reverse="layoutReverse">
       <template #[editorSlotName]>
         <EditorContainer :editorComponent="editor" />
       </template>

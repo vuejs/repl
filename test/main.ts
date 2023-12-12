@@ -44,6 +44,7 @@ const App = {
         theme: 'dark',
         editor: MonacoEditor,
         // layout: 'vertical',
+        // layoutReverse: true,
         ssr: true,
         sfcOptions: {
           script: {

@@ -2,7 +2,10 @@
 import { ref, reactive, computed, inject } from 'vue'
 import { Store } from './store'
 
-const props = defineProps<{ layout?: 'horizontal' | 'vertical' }>()
+const props = defineProps<{
+  layout?: 'horizontal' | 'vertical'
+  layoutReverse?: boolean
+}>()
 const isVertical = computed(() => props.layout === 'vertical')
 
 const container = ref()
@@ -74,7 +77,7 @@ function dragEnd() {
     </div>
 
     <button class="toggler" @click="showOutput = !showOutput">
-      {{ showOutput ? '< Code' : 'Output >' }}
+      {{ showOutput !== props.layoutReverse ? '< Code' : 'Output >' }}
     </button>
   </div>
 </template>
