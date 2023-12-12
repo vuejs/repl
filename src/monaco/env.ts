@@ -68,7 +68,9 @@ export function loadWasm() {
 
 export class WorkerHost {
   onFetchCdnFile(uri: string, text: string) {
-    getOrCreateModel(Uri.parse(uri), undefined, text)
+    ;(
+      getOrCreateModel(Uri.parse(uri), undefined, text) as any
+    )?._languageSelectionListener?.value?.dispose()
   }
 }
 
