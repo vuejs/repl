@@ -116,7 +116,8 @@ function dragEnd() {
   color: var(--text-light);
   position: absolute;
   left: 50%;
-  bottom: 20px;
+  bottom: 21px;
+  line-height: 19px;
   background-color: var(--bg);
   padding: 8px 12px;
   border-radius: 8px;
