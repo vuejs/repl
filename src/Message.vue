@@ -70,7 +70,7 @@ pre {
   bottom: 0;
   left: 8px;
   right: 8px;
-  z-index: 10;
+  z-index: 20;
   border: 2px solid transparent;
   border-radius: 6px;
   font-family: var(--font-code);
