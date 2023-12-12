@@ -132,7 +132,9 @@ function horizontalScroll(e: WheelEvent) {
       <div
         v-if="(pending === true && i === files.length - 1) || pending === file"
         class="file pending"
+        :class="{ active: store.state.activeFile.filename === file }"
       >
+        <span class="file pending">{{ pendingFilename }}</span>
         <input
           v-model="pendingFilename"
           spellcheck="false"
@@ -196,6 +198,7 @@ function horizontalScroll(e: WheelEvent) {
 }
 
 .file {
+  position: relative;
   display: inline-block;
   font-size: 13px;
   font-family: var(--font-code);
@@ -213,18 +216,24 @@ function horizontalScroll(e: WheelEvent) {
   padding: 8px 10px 6px;
   line-height: 20px;
 }
+.file.pending span {
+  min-width: 50px;
+  padding-right: 32px;
+  background-color: rgba(200, 200, 200, 0.2);
+  color: transparent;
+}
 .file.pending input {
-  width: 90px;
-  height: 30px;
-  line-height: 30px;
-  outline: none;
-  border: 1px solid var(--border);
-  border-radius: 4px;
-  padding: 0 0 0 10px;
-  margin-top: 2px;
-  margin-left: 6px;
+  position: absolute;
+  inset: 8px 7px auto;
+  font-size: 13px;
   font-family: var(--font-code);
-  font-size: 12px;
+  line-height: 20px;
+  outline: none;
+  border: none;
+  padding: 0 3px;
+  min-width: 1px;
+  color: inherit;
+  background-color: transparent;
 }
 .file .remove {
   display: inline-block;
