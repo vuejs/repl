@@ -1,16 +1,14 @@
+## [3.0.1](https://github.com/vuejs/repl/compare/v3.0.0...v3.0.1) (2023-12-19)
+
+
+### Bug Fixes
+
+* ensure reuse AST in non-inline mode ([5e4c710](https://github.com/vuejs/repl/commit/5e4c7101e4b6cc27fb0810390b0ca0287a101149))
+
+
+
 # [3.0.0](https://github.com/vuejs/repl/compare/v2.9.0...v3.0.0) (2023-11-30)
 
-### Features
-
-* auto import css + split editor css from main component ([7322589](https://github.com/vuejs/repl/commit/7322589b64742bf8246a0ac4f5bf65e3e991e63f))
-
-  This change splits up the CSS between the main Repl component and the two
-  editors. This avoids including Monaco Editor css when using CodeMirror, and
-  vice-versa. In addition, CSS will be auto imported when the relevant
-  JS entries are imported.
-
-  To avoid having to separately import all the CSS, the generated JS now
-  automatically imports the CSS for you. This is breaking because it makes the dist files require a build system that can handle CSS imports from JS.
 
 ### Bug Fixes
 
@@ -69,7 +67,11 @@
 
 
 
-## [2.6.1](https://github.com/vuejs/repl/compare/v2.5.8...v2.6.1) (2023-10-26)
+## [2.6.1](https://github.com/vuejs/repl/compare/v2.6.0...v2.6.1) (2023-10-26)
+
+
+
+# [2.6.0](https://github.com/vuejs/repl/compare/v2.5.8...v2.6.0) (2023-10-26)
 
 
 ### Features
