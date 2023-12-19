@@ -303,6 +303,8 @@ async function doCompileTemplate(
   let { code, errors } = store.compiler.compileTemplate({
     isProd: false,
     ...store.options?.template,
+    // @ts-ignore TODO remove ignore in 3.4
+    ast: descriptor.template!.ast,
     source: descriptor.template!.content,
     filename: descriptor.filename,
     id,
