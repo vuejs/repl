@@ -9,14 +9,14 @@ defineOptions({
   editorType: 'monaco',
 })
 
-const onChange = (code: string) => {
-  emit('change', code)
+const onSave = (code: string) => {
+  emit('save', code)
 }
 </script>
 
 <template>
   <Monaco
-    @change="onChange"
+    @save="onSave"
     :filename="filename"
     :value="value"
     :readonly="readonly"

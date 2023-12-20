@@ -11,6 +11,7 @@ import {
   type Ref,
 } from 'vue'
 import * as monaco from 'monaco-editor-core'
+import { debounce } from '../utils'
 import { initMonaco } from './env'
 import { getOrCreateModel } from './utils'
 import { loadGrammars, loadTheme } from 'monaco-volar'
@@ -30,7 +31,7 @@ const props = withDefaults(
 )
 
 const emit = defineEmits<{
-  (e: 'change', value: string): void
+  save: [string]
 }>()
 
 const containerRef = ref<HTMLDivElement>()
@@ -43,6 +44,9 @@ initMonaco(store)
 const lang = computed(() => (props.mode === 'css' ? 'css' : 'javascript'))
 
 const replTheme = inject<Ref<'dark' | 'light'>>('theme')!
+
+const autoSave = inject<number>('autoSave')
+
 onMounted(async () => {
   const theme = await loadTheme(monaco.editor)
   ready.value = true
@@ -139,12 +143,21 @@ onMounted(async () => {
 
   await loadGrammars(monaco, editorInstance)
 
+  function save() {
+    emit('save', editorInstance.getValue())
+    editorInstance.getAction('editor.action.formatDocument')?.run()
+  }
+
+  if (autoSave > 0) {
+    editorInstance.onDidChangeModelContent(debounce(save, autoSave))
+  }
+
   editorInstance.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS, () => {
-    // ignore save event
+    save()
   })
 
-  editorInstance.onDidChangeModelContent(() => {
-    emit('change', editorInstance.getValue())
+  editorInstance.onDidBlurEditorWidget(() => {
+    save()
   })
 
   // update theme
