@@ -1,3 +1,17 @@
+# [3.1.0](https://github.com/vuejs/repl/compare/v3.0.1...v3.1.0) (2023-12-21)
+
+
+### Bug Fixes
+
+* remove onigasm dep ([e7a73ac](https://github.com/vuejs/repl/commit/e7a73ac249ce44a6f4b661f6e6ff4842f3225d6b))
+
+
+### Features
+
+* use shikiji for more accurate highlight ([#190](https://github.com/vuejs/repl/issues/190)) ([e79aa1a](https://github.com/vuejs/repl/commit/e79aa1af8dc898d9170c5f33ee031ead61f32320))
+
+
+
 ## [3.0.1](https://github.com/vuejs/repl/compare/v3.0.0...v3.0.1) (2023-12-19)
 
 
