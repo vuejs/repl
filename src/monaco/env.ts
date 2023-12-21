@@ -2,8 +2,6 @@ import { jsDelivrUriBase } from '@volar/cdn'
 import * as volar from '@volar/monaco'
 import { editor, languages, Uri } from 'monaco-editor-core'
 import editorWorker from 'monaco-editor-core/esm/vs/editor/editor.worker?worker'
-import * as onigasm from 'onigasm'
-import onigasmWasm from 'onigasm/lib/onigasm.wasm?url'
 import { watchEffect } from 'vue'
 import { Store } from '../store'
 import { getOrCreateModel } from './utils'
@@ -14,7 +12,6 @@ let initted = false
 export function initMonaco(store: Store) {
   if (initted) return
   loadMonacoEnv(store)
-  loadWasm()
 
   watchEffect(() => {
     // create a model for each file in the store
@@ -60,10 +57,6 @@ export function initMonaco(store: Store) {
   })
 
   initted = true
-}
-
-export function loadWasm() {
-  return onigasm.loadWASM(onigasmWasm)
 }
 
 export class WorkerHost {
