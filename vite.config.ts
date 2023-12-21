@@ -51,7 +51,6 @@ export default mergeConfig(base, {
   optimizeDeps: {
     // avoid late discovered deps
     include: [
-      'onigasm',
       'typescript',
       'monaco-editor-core/esm/vs/editor/editor.worker',
       'vue/server-renderer',
