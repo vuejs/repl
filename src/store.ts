@@ -89,8 +89,6 @@ export interface SFCOptions {
   template?: Partial<SFCTemplateCompileOptions>
 }
 
-type IDefaultTplConfig = { welcomeCode?: string, newSFCCode?: string }
-
 export interface Store {
   state: StoreState
   options?: SFCOptions
@@ -119,7 +117,8 @@ export interface StoreOptions {
   defaultVueRuntimeProdURL?: string
   defaultVueServerRendererURL?: string
   customElement?: boolean | string | RegExp | (string | RegExp)[]
-  defaultTemplate?: IDefaultTplConfig
+  defaultWelcomeTpl?: string
+  defaultSFCTpl?: string
 }
 
 export class ReplStore implements Store {
@@ -137,7 +136,8 @@ export class ReplStore implements Store {
   private defaultVueRuntimeProdURL: string
   private defaultVueServerRendererURL: string
   private pendingCompiler: Promise<any> | null = null
-  private defaultTemplate: IDefaultTplConfig
+  private defaultWelcomeTpl?: string
+  private defaultSFCTpl?: string
 
   constructor({
     serializedState = '',
@@ -148,13 +148,12 @@ export class ReplStore implements Store {
     outputMode = 'preview',
     productionMode = false,
     customElement = /\.ce\.vue$/,
-    defaultTemplate = {
-      welcomeCode: welcomeCode,
-      newSFCCode: newSFCCode
-    },
+    defaultWelcomeTpl = welcomeCode,
+    defaultSFCTpl = newSFCCode,
   }: StoreOptions = {}) {
     const files: StoreState['files'] = {}
-    this.defaultTemplate = defaultTemplate
+    this.defaultWelcomeTpl = defaultWelcomeTpl
+    this.defaultSFCTpl = defaultSFCTpl
 
     if (serializedState) {
       const saved = JSON.parse(atou(serializedState))
@@ -162,7 +161,7 @@ export class ReplStore implements Store {
         setFile(files, filename, saved[filename])
       }
     } else {
-      setFile(files, defaultMainFile, this.defaultTemplate.welcomeCode as string)
+      setFile(files, defaultMainFile, this.defaultWelcomeTpl)
     }
 
     this.productionMode = productionMode
@@ -259,7 +258,7 @@ export class ReplStore implements Store {
     if (typeof fileOrFilename === 'string') {
       file = new File(
         fileOrFilename,
-        fileOrFilename.endsWith('.vue') ? this.defaultTemplate.newSFCCode : ''
+        fileOrFilename.endsWith('.vue') ? this.defaultSFCTpl : ''
       )
     } else {
       file = fileOrFilename
