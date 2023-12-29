@@ -11,12 +11,12 @@ const App = {
       serializedState: location.hash.slice(1),
       showOutput: query.has('so'),
       outputMode: query.get('om') || 'preview',
-      defaultVueRuntimeURL: import.meta.env.PROD
-        ? undefined
-        : `${location.origin}/src/vue-dev-proxy`,
-      defaultVueServerRendererURL: import.meta.env.PROD
-        ? undefined
-        : `${location.origin}/src/vue-server-renderer-dev-proxy`,
+      // defaultVueRuntimeURL: import.meta.env.PROD
+      //   ? undefined
+      //   : `${location.origin}/src/vue-dev-proxy`,
+      // defaultVueServerRendererURL: import.meta.env.PROD
+      //   ? undefined
+      //   : `${location.origin}/src/vue-server-renderer-dev-proxy`,
     }))
 
     console.log(store)

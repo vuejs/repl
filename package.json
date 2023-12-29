@@ -91,5 +91,8 @@
     "vite-plugin-dts": "^3.6.4",
     "vue": "^3.3.13",
     "vue-tsc": "1.9.0-alpha.3"
+  },
+  "dependencies": {
+    "chobitsu": "^1.4.6"
   }
 }

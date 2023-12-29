@@ -2,7 +2,6 @@
 import Message from '../Message.vue'
 import {
   ref,
-  onMounted,
   onUnmounted,
   watchEffect,
   watch,
@@ -11,10 +10,11 @@ import {
   Ref,
 } from 'vue'
 import srcdoc from './srcdoc.html?raw'
-import { PreviewProxy } from './PreviewProxy'
 import { compileModulesForPreview } from './moduleCompiler'
 import { Store } from '../store'
 import { Props } from '../Repl.vue'
+
+import chobitsuEmbed from './chobitsu-embed.ts?braw'
 
 const props = defineProps<{ show: boolean; ssr: boolean }>()
 
@@ -27,12 +27,7 @@ const container = ref()
 const runtimeError = ref()
 const runtimeWarning = ref()
 
-let sandbox: HTMLIFrameElement
-let proxy: PreviewProxy
 let stopUpdateWatcher: WatchStopHandle | undefined
-
-// create sandbox on mount
-onMounted(createSandbox)
 
 // reset sandbox when import map changes
 watch(
@@ -51,31 +46,47 @@ watch(
 watch(() => store.state.resetFlip, createSandbox)
 
 onUnmounted(() => {
-  proxy.destroy()
   stopUpdateWatcher && stopUpdateWatcher()
 })
 
-function createSandbox() {
-  if (sandbox) {
-    // clear prev sandbox
-    proxy.destroy()
-    stopUpdateWatcher && stopUpdateWatcher()
-    container.value.removeChild(sandbox)
-  }
+import devtoolsHtml from './devtools.html?raw'
 
-  sandbox = document.createElement('iframe')
-  sandbox.setAttribute(
-    'sandbox',
-    [
-      'allow-forms',
-      'allow-modals',
-      'allow-pointer-lock',
-      'allow-popups',
-      'allow-same-origin',
-      'allow-scripts',
-      'allow-top-navigation-by-user-activation',
-    ].join(' ')
+const useDevtoolsSrc = () => {
+  const devtoolsRawUrl = URL.createObjectURL(
+    new Blob([devtoolsHtml], { type: 'text/html' })
   )
+  onUnmounted(() => URL.revokeObjectURL(devtoolsRawUrl))
+  return `${devtoolsRawUrl}#?embedded=${encodeURIComponent(location.origin)}`
+}
+
+const devtoolsSrc = useDevtoolsSrc()
+const devtoolsIframe = ref<HTMLIFrameElement>()
+
+const previewIframe = ref<HTMLIFrameElement>()
+watch(previewIframe, (iframe) => {
+  if (iframe) createSandbox()
+})
+
+const messageListener = (event: MessageEvent) => {
+  if (!devtoolsIframe.value || !previewIframe.value) return
+
+  if (event.source === previewIframe.value.contentWindow) {
+    devtoolsIframe.value.contentWindow!.postMessage(event.data, '*')
+  }
+  if (event.source === devtoolsIframe.value.contentWindow) {
+    previewIframe.value.contentWindow!.postMessage(
+      { event: 'DEV', data: event.data },
+      '*'
+    )
+  }
+}
+window.addEventListener('message', messageListener)
+
+const previewSrc = ref('')
+function createSandbox(): void {
+  if (previewSrc.value) URL.revokeObjectURL(previewSrc.value)
+
+  stopUpdateWatcher?.()
 
   const importMap = store.getImportMap()
   if (!importMap.imports) {
@@ -88,74 +99,18 @@ function createSandbox() {
     .replace(/<!--IMPORT_MAP-->/, JSON.stringify(importMap))
     .replace(
       /<!-- PREVIEW-OPTIONS-HEAD-HTML -->/,
-      previewOptions?.headHTML || ''
+      (previewOptions?.headHTML || '') +
+        `\<script type="module"\>${chobitsuEmbed}\<\/script\>`
     )
     .replace(
       /<!--PREVIEW-OPTIONS-PLACEHOLDER-HTML-->/,
       previewOptions?.placeholderHTML || ''
     )
-  sandbox.srcdoc = sandboxSrc
-  container.value.appendChild(sandbox)
 
-  proxy = new PreviewProxy(sandbox, {
-    on_fetch_progress: (progress: any) => {
-      // pending_imports = progress;
-    },
-    on_error: (event: any) => {
-      const msg =
-        event.value instanceof Error ? event.value.message : event.value
-      if (
-        msg.includes('Failed to resolve module specifier') ||
-        msg.includes('Error resolving module specifier')
-      ) {
-        runtimeError.value =
-          msg.replace(/\. Relative references must.*$/, '') +
-          `.\nTip: edit the "Import Map" tab to specify import paths for dependencies.`
-      } else {
-        runtimeError.value = event.value
-      }
-    },
-    on_unhandled_rejection: (event: any) => {
-      let error = event.value
-      if (typeof error === 'string') {
-        error = { message: error }
-      }
-      runtimeError.value = 'Uncaught (in promise): ' + error.message
-    },
-    on_console: (log: any) => {
-      if (log.duplicate) {
-        return
-      }
-      if (log.level === 'error') {
-        if (log.args[0] instanceof Error) {
-          runtimeError.value = log.args[0].message
-        } else {
-          runtimeError.value = log.args[0]
-        }
-      } else if (log.level === 'warn') {
-        if (log.args[0].toString().includes('[Vue warn]')) {
-          runtimeWarning.value = log.args
-            .join('')
-            .replace(/\[Vue warn\]:/, '')
-            .trim()
-        }
-      }
-    },
-    on_console_group: (action: any) => {
-      // group_logs(action.label, false);
-    },
-    on_console_group_end: () => {
-      // ungroup_logs();
-    },
-    on_console_group_collapsed: (action: any) => {
-      // group_logs(action.label, true);
-    },
-  })
-
-  sandbox.addEventListener('load', () => {
-    proxy.handle_links()
-    stopUpdateWatcher = watchEffect(updatePreview)
-  })
+  stopUpdateWatcher = watchEffect(updatePreview)
+  previewSrc.value = URL.createObjectURL(
+    new Blob([sandboxSrc], { type: 'text/html' })
+  )
 }
 
 async function updatePreview() {
@@ -182,16 +137,18 @@ async function updatePreview() {
   try {
     const mainFile = store.state.mainFile
 
+    const codeToEval: string[] = []
     // if SSR, generate the SSR bundle and eval it to render the HTML
     if (isSSR && mainFile.endsWith('.vue')) {
       const ssrModules = compileModulesForPreview(store, true)
       console.log(
         `[@vue/repl] successfully compiled ${ssrModules.length} modules for SSR.`
       )
-      await proxy.eval([
-        `const __modules__ = {};`,
-        ...ssrModules,
-        `import { renderToString as _renderToString } from 'vue/server-renderer'
+      codeToEval.push(
+        ...[
+          `const __modules__ = {};`,
+          ...ssrModules,
+          `import { renderToString as _renderToString } from 'vue/server-renderer'
          import { createSSRApp as _createApp } from 'vue'
          const AppComponent = __modules__["${mainFile}"].default
          AppComponent.name = 'Repl'
@@ -208,7 +165,10 @@ async function updatePreview() {
            console.error("SSR Error", err)
          })
         `,
-      ])
+        ]
+      )
+
+      console.log('run done ')
     }
 
     // compile code to simulated module system
@@ -219,21 +179,22 @@ async function updatePreview() {
       }.`
     )
 
-    const codeToEval = [
-      `window.__modules__ = {};window.__css__ = [];` +
-        `if (window.__app__) window.__app__.unmount();` +
-        (isSSR
-          ? ``
-          : `document.body.innerHTML = '<div id="app"></div>' + \`${
-              previewOptions?.bodyHTML || ''
-            }\``),
-      ...modules,
-      `setTimeout(()=> {
+    codeToEval.push(
+      ...[
+        `window.__modules__ = {};window.__css__ = [];` +
+          `if (window.__app__) window.__app__.unmount();` +
+          (isSSR
+            ? ``
+            : `document.body.innerHTML = '<div id="app"></div>' + \`${
+                previewOptions?.bodyHTML || ''
+              }\``),
+        ...modules,
+        `setTimeout(()=> {
         document.querySelectorAll('style[css]').forEach(el => el.remove())
         document.head.insertAdjacentHTML('beforeend', window.__css__.map(s => \`<style css>\${s}</style>\`).join('\\n'))
       }, 1)`,
-    ]
-
+      ]
+    )
     // if main file is a vue file, mount it.
     if (mainFile.endsWith('.vue')) {
       codeToEval.push(
@@ -261,7 +222,7 @@ async function updatePreview() {
     }
 
     // eval code in sandbox
-    await proxy.eval(codeToEval)
+    await previewEval(codeToEval)
   } catch (e: any) {
     console.error(e)
     runtimeError.value = (e as Error).message
@@ -272,24 +233,85 @@ async function updatePreview() {
  * Reload the preview iframe
  */
 function reload() {
-  sandbox.contentWindow?.location.reload()
+  previewIframe.value?.contentWindow?.location.reload()
 }
 
 defineExpose({ reload })
+
+function previewEval(script: string[]) {
+  console.log('ok k')
+
+  return new Promise<void>((resolve, reject) => {
+    const id = Math.random().toString(36)
+
+    const handler = (event: MessageEvent) => {
+      if (event.data.event === 'MYEVAL') {
+        if (id === event.data.id) {
+          if (event.data.error) reject(new Error(event.data.error))
+          else resolve()
+          window.removeEventListener('message', handler)
+        }
+      }
+    }
+    window.addEventListener('message', handler)
+    previewIframe.value?.contentWindow!.postMessage(
+      { event: 'MYEVAL', id, data: { script } },
+      '*'
+    )
+  })
+}
+
+const devtoolsLoaded = ref(false)
+const previewLoaded = ref(false)
+
+function onLoadPreview() {
+  previewLoaded.value = true
+  if (devtoolsLoaded.value)
+    previewIframe.value?.contentWindow!.postMessage({ event: 'LOADED' }, '*')
+  updatePreview()
+}
+function onLoadDevtools() {
+  devtoolsLoaded.value = true
+  if (previewLoaded.value)
+    previewIframe.value?.contentWindow!.postMessage({ event: 'LOADED' }, '*')
+}
 </script>
 
 <template>
-  <div class="iframe-container" v-show="show" ref="container"></div>
+  <div class="iframe-container" v-show="show" ref="container">
+    <iframe
+      sandbox="allow-popups-to-escape-sandbox allow-scripts allow-popups allow-forms allow-pointer-lock allow-top-navigation allow-modals allow-same-origin"
+      ref="previewIframe"
+      @load="onLoadPreview"
+      :src="previewSrc"
+      class="preview"
+    />
+    <iframe
+      class="devtools"
+      :src="`${devtoolsSrc}`"
+      ref="devtoolsIframe"
+      @load="onLoadDevtools"
+    />
+  </div>
+
   <Message :err="runtimeError" />
   <Message v-if="!runtimeError" :warn="runtimeWarning" />
 </template>
 
 <style scoped>
 .iframe-container,
-.iframe-container :deep(iframe) {
+.iframe-container .preview {
   width: 100%;
   height: 100%;
   border: none;
   background-color: #fff;
+}
+
+.devtools {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 50%;
 }
 </style>
