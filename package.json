@@ -69,7 +69,7 @@
     "@rollup/plugin-replace": "^5.0.5",
     "@types/codemirror": "^5.60.15",
     "@types/node": "^20.10.5",
-    "@vitejs/plugin-vue": "^4.5.2",
+    "@vitejs/plugin-vue": "^5.0.2",
     "@volar/cdn": "~1.11.1",
     "@volar/monaco": "~1.11.1",
     "@volar/typescript": "~1.11.1",
