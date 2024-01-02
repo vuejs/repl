@@ -1,3 +1,12 @@
+## [3.1.1](https://github.com/vuejs/repl/compare/v3.1.0...v3.1.1) (2024-01-02)
+
+
+### Bug Fixes
+
+* pass sfc template options to sfc parse ([d72dfdf](https://github.com/vuejs/repl/commit/d72dfdfd2e2670592c957616fcf4e694609912a0))
+
+
+
 # [3.1.0](https://github.com/vuejs/repl/compare/v3.0.1...v3.1.0) (2023-12-21)
 
 
