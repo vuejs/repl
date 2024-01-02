@@ -86,7 +86,7 @@ function createSandbox() {
     importMap.imports.vue = store.state.vueRuntimeURL
   }
   const sandboxSrc = srcdoc
-    .replace(/<html>/, `<html class="${theme.value}"></html>`)
+    .replace(/<html>/, `<html class="${theme.value}">`)
     .replace(/<!--IMPORT_MAP-->/, JSON.stringify(importMap))
     .replace(
       /<!-- PREVIEW-OPTIONS-HEAD-HTML -->/,
