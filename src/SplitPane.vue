@@ -2,7 +2,10 @@
 import { ref, reactive, computed, inject } from 'vue'
 import { Store } from './store'
 
-const props = defineProps<{ layout?: 'horizontal' | 'vertical' }>()
+const props = defineProps<{
+  layout?: 'horizontal' | 'vertical'
+  defaultSplit?: number
+}>()
 const isVertical = computed(() => props.layout === 'vertical')
 
 const container = ref()
@@ -13,7 +16,7 @@ const showOutput = ref(store.initialShowOutput)
 
 const state = reactive({
   dragging: false,
-  split: 50,
+  split: props.defaultSplit ?? 50,
 })
 
 const boundSplit = computed(() => {
