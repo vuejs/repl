@@ -13,7 +13,6 @@ import {
 } from 'vue'
 import srcdoc from './srcdoc.html?raw'
 import { compileModulesForPreview } from '../moduleCompiler'
-import chii from "./front_end/entrypoints/chii_app/chii_app.js?braw2"
 import { Store } from '../../store'
 import { Props } from '../../Repl.vue'
 
@@ -56,7 +55,7 @@ onUnmounted(() => {
 })
 const useDevtoolsSrc = () => {
   const devtoolsRawUrl = URL.createObjectURL(
-    new Blob([devtoolsHtml.replace("SCRIPT_CHII", `\<script type="module" src="${props.chii ?? new URL(chii, import.meta.url).toString() ?? `${location.origin}/dist/repl.js`}"\>\<\/script\>`)], { type: 'text/html' })
+    new Blob([devtoolsHtml.replace("SCRIPT_CHII", `\<script type="module" src="${props.chii ?? `${location.origin}/dist/repl.js`}"\>\<\/script\>`)], { type: 'text/html' })
   )
   onUnmounted(() => URL.revokeObjectURL(devtoolsRawUrl))
   return `${devtoolsRawUrl}#?embedded=${encodeURIComponent(location.origin)}`

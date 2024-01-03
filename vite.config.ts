@@ -67,7 +67,8 @@ export default mergeConfig(base, {
         'monaco-editor': './src/editor/MonacoEditor.vue',
         'codemirror-editor': './src/editor/CodeMirrorEditor.vue',
         'preview-chii': './src/output/mode-chii/Preview.vue',
-        'preview-normal': './src/output/mode-normal/Preview.vue'
+        'preview-normal': './src/output/mode-normal/Preview.vue',
+        'plugin-vite': './src/vite-plugin-chii.ts'
       },
       formats: ['es'],
       fileName: () => '[name].js',
@@ -77,7 +78,7 @@ export default mergeConfig(base, {
       output: {
         chunkFileNames: 'chunks/[name]-[hash].js',
       },
-      external: ['vue', 'vue/compiler-sfc'],
+      external: ['vue', 'vue/compiler-sfc', 'node:path', 'vite'],
     },
   },
 })

@@ -3,6 +3,8 @@ import { Repl, ReplStore } from '../src'
 import MonacoEditor from '../src/editor/MonacoEditor.vue'
 // import CodeMirrorEditor from '../src/editor/CodeMirrorEditor.vue'
 import PreviewChii from '../src/output/mode-chii/Preview.vue'
+import chii from 'virtual:chii'
+
 // import PreviewNormal from '../src/output/mode-normal/Preview.vue'
 ;(window as any).process = { env: {} }
 
@@ -46,6 +48,7 @@ const App = {
         theme: 'dark',
         editor: MonacoEditor,
         preview: PreviewChii,
+        chii,
         // layout: 'vertical',
         ssr: true,
         sfcOptions: {

@@ -1,4 +1,4 @@
-declare module '*?braw2' {
+declare module 'virtual:chii' {
   const value: string
   export default value
 }
