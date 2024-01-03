@@ -51,6 +51,17 @@ watch(
 // reset sandbox when version changes
 watch(() => store.state.resetFlip, createSandbox)
 
+// reset theme
+watch(
+  () => theme.value,
+  (value) => {
+    const html = sandbox.contentDocument?.documentElement
+    if (html) {
+      html.className = value
+    }
+  }
+)
+
 onUnmounted(() => {
   proxy.destroy()
   stopUpdateWatcher && stopUpdateWatcher()
