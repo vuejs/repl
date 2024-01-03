@@ -3,7 +3,6 @@ import dts from 'vite-plugin-dts'
 import base from './vite.preview.config'
 import fs from 'node:fs'
 import path from 'node:path'
-// import { obfuscate } from "javascript-obfuscator"
 
 const genStub: Plugin = {
   name: 'gen-stub',
