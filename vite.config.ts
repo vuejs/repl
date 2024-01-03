@@ -7,44 +7,6 @@ import path from 'node:path'
 import esbuild from 'esbuild'
 // import { obfuscate } from "javascript-obfuscator"
 
-export function vitePluginBuildRaw(): Plugin {
-  return {
-    name: 'vite-plugin-build-raw',
-    transform(src, id) {
-      if (id.includes('?braw')) {
-        id = id.replace(/\?braw$/, '')
-        // console.log({ id })
-        const code = esbuild.buildSync({
-          entryPoints: [id],
-          format: 'iife',
-          bundle: true,
-          minify:
-            id.includes('&minify') || process.env.NODE_ENV === 'production',
-          treeShaking: true,
-          write: false,
-          // sourcemap: true
-          // sideEff,
-          define: Object.fromEntries(
-            [['CRYPTO_PASSWORD', ''], ...Object.entries(process.env)].map(
-              ([name, value]) => [
-                `process.env.${name.replace(/[^\w\d_$]/g, '_')}`,
-                JSON.stringify(value),
-              ]
-            )
-          ),
-        })
-        const { text } = code.outputFiles[0]
-
-        return {
-          code: `export default ${JSON.stringify(text)}`,
-
-          map: null,
-        }
-      }
-    },
-  }
-}
-
 const genStub: Plugin = {
   name: 'gen-stub',
   apply: 'build',
@@ -88,7 +50,6 @@ export default mergeConfig(base, {
     }),
     genStub,
     patchCssFiles,
-    vitePluginBuildRaw(),
   ],
   optimizeDeps: {
     // avoid late discovered deps
