@@ -101,12 +101,12 @@ function createSandbox(): void {
   const sandboxSrc = srcdoc
     .replace(/<!--IMPORT_MAP-->/, JSON.stringify(importMap))
     .replace(
-      /<!-- PREVIEW-OPTIONS-HEAD-HTML -->/,
+      /PREVIEW_OPTIONS_HEAD/,
       (previewOptions?.headHTML || '') +
         `\<script type="module"\>${chobitsuEmbed}\<\/script\>`
     )
     .replace(
-      /<!--PREVIEW-OPTIONS-PLACEHOLDER-HTML-->/,
+      /PREVIEW_OPTIONS_PLACEHOLDER/,
       previewOptions?.placeholderHTML || ''
     )
 
@@ -119,7 +119,7 @@ function createSandbox(): void {
 const previewEvalDelay = debounceAsync(previewEval, 300)
 async function updatePreview() {
   if (import.meta.env.PROD && clearConsole.value) {
-    console.clear()
+    //console.clear()
   }
   runtimeError.value = null
   runtimeWarning.value = null
