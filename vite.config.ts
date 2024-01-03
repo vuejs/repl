@@ -65,6 +65,8 @@ export default mergeConfig(base, {
         'vue-repl': './src/index.ts',
         'monaco-editor': './src/editor/MonacoEditor.vue',
         'codemirror-editor': './src/editor/CodeMirrorEditor.vue',
+        'preview-chii': './src/output/mode-chii/Preview.vue',
+        'preview-normal': './src/output/mode-normal/Preview.vue'
       },
       formats: ['es'],
       fileName: () => '[name].js',

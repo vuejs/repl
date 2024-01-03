@@ -6,9 +6,13 @@ import { provide, ref, toRef, computed } from 'vue'
 import type { EditorComponentType } from './editor/types'
 import EditorContainer from './editor/EditorContainer.vue'
 
+import type PreviewNormal from './output/mode-normal/Preview.vue'
+import type PreviewChii from './output/mode-chii/Preview.vue'
+
 export interface Props {
   theme?: 'dark' | 'light'
   editor: EditorComponentType
+  preview: typeof PreviewChii | typeof PreviewNormal
   store?: Store
   autoResize?: boolean
   showCompileOutput?: boolean
@@ -106,6 +110,7 @@ defineExpose({ reload })
         <Output
           ref="outputRef"
           :editorComponent="editor"
+          :preview-component="preview"
           :showCompileOutput="props.showCompileOutput"
           :ssr="!!props.ssr"
           :chii="chii"

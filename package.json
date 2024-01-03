@@ -26,6 +26,14 @@
       "import": "./dist/codemirror-editor.js",
       "require": null
     },
+    "./preview-chii": {
+      "types": "./dist/preview-chii.d.ts",
+      "import": "./dist/preview-chii.js"
+    },
+    "./preview-normal": {
+      "types": "./dist/preview-normal.d.ts",
+      "import": "./dist/preview-normal.js"
+    },
     "./style.css": "./dist/vue-repl.css",
     "./dist/style.css": "./dist/vue-repl.css"
   },

@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import Message from '../Message.vue'
-import SplitPanel from '../SplitPane.vue'
+import Message from '../../Message.vue'
+import SplitPanel from '../../SplitPane.vue'
 import {
   ref,
   onUnmounted,
@@ -12,14 +12,14 @@ import {
   onBeforeUnmount,
 } from 'vue'
 import srcdoc from './srcdoc.html?raw'
-import { compileModulesForPreview } from './moduleCompiler'
-import { Store } from '../store'
-import { Props } from '../Repl.vue'
+import { compileModulesForPreview } from '../moduleCompiler'
+import { Store } from '../../store'
+import { Props } from '../../Repl.vue'
 
 import chobitsuEmbed from './chobitsu-embed.ts?braw'
 
 import devtoolsHtml from './devtools.html?raw'
-import { debounceAsync } from '../utils'
+import { debounceAsync } from '../../utils'
 
 const props = defineProps<{ show: boolean; ssr: boolean; chii?: string }>()
 
