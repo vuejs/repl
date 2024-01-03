@@ -162,8 +162,10 @@ function dragEnd() {
 @media (max-width: 720px) {
   .left,
   .right {
-    width: 100% !important;
-    height: 100% !important;
+    position: absolute;
+    inset: 0;
+    width: auto !important;
+    height: auto !important;
   }
   .dragger {
     display: none;
@@ -172,13 +174,20 @@ function dragEnd() {
     display: block;
   }
   .split-pane .right {
-    display: none;
+    z-index: -1;
+    pointer-events: none;
+  }
+  .split-pane .left {
+    z-index: 0;
+    pointer-events: all;
   }
   .split-pane.show-output .right {
-    display: block;
+    z-index: 0;
+    pointer-events: all;
   }
   .split-pane.show-output .left {
-    display: none;
+    z-index: -1;
+    pointer-events: none;
   }
 }
 </style>
