@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import Message from '../Message.vue'
+import SplitPanel from '../SplitPane.vue'
 import {
   ref,
   onUnmounted,
@@ -16,6 +17,9 @@ import { Store } from '../store'
 import { Props } from '../Repl.vue'
 
 import chobitsuEmbed from './chobitsu-embed.ts?braw'
+
+import devtoolsHtml from './devtools.html?raw'
+import { debounceAsync } from '../utils'
 
 const props = defineProps<{ show: boolean; ssr: boolean }>()
 
@@ -49,8 +53,6 @@ watch(() => store.state.resetFlip, createSandbox)
 onUnmounted(() => {
   stopUpdateWatcher && stopUpdateWatcher()
 })
-
-import devtoolsHtml from './devtools.html?raw'
 
 const useDevtoolsSrc = () => {
   const devtoolsRawUrl = URL.createObjectURL(
@@ -114,6 +116,7 @@ function createSandbox(): void {
   )
 }
 
+const previewEvalDelay = debounceAsync(previewEval, 300)
 async function updatePreview() {
   if (import.meta.env.PROD && clearConsole.value) {
     console.clear()
@@ -223,7 +226,7 @@ async function updatePreview() {
     }
 
     // eval code in sandbox
-    await previewEval(codeToEval)
+    await previewEvalDelay(codeToEval)
   } catch (e: any) {
     console.error(e)
     runtimeError.value = (e as Error).message
@@ -283,19 +286,25 @@ function onLoadDevtools() {
 
 <template>
   <div class="iframe-container" v-show="show" ref="container">
-    <iframe
-      sandbox="allow-popups-to-escape-sandbox allow-scripts allow-popups allow-forms allow-pointer-lock allow-top-navigation allow-modals allow-same-origin"
-      ref="previewIframe"
-      @load="onLoadPreview"
-      :src="previewSrc"
-      class="preview"
-    />
-    <iframe
-      class="devtools"
-      :src="`${devtoolsSrc}`"
-      ref="devtoolsIframe"
-      @load="onLoadDevtools"
-    />
+    <SplitPanel layout="vertical" :default-split="100 - 43">
+      <template #left>
+        <iframe
+          sandbox="allow-popups-to-escape-sandbox allow-scripts allow-popups allow-forms allow-pointer-lock allow-top-navigation allow-modals allow-same-origin"
+          ref="previewIframe"
+          @load="onLoadPreview"
+          :src="previewSrc"
+          class="preview"
+        />
+      </template>
+      <template #right>
+        <iframe
+          class="devtools"
+          :src="`${devtoolsSrc}`"
+          ref="devtoolsIframe"
+          @load="onLoadDevtools"
+        />
+      </template>
+    </SplitPanel>
   </div>
 
   <Message :err="runtimeError" />
@@ -316,6 +325,6 @@ function onLoadDevtools() {
   bottom: 0;
   left: 0;
   width: 100%;
-  height: 50%;
+  height: 100%;
 }
 </style>

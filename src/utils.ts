@@ -9,6 +9,23 @@ export function debounce(fn: Function, n = 100) {
     }, n)
   }
 }
+export function debounceAsync(fn: Function, n = 100) {
+  let handle: any
+  let oldResolve: (() => void) | undefined
+  return (...args: any[]) => {
+    return new Promise<void>((resolve, reject) => {
+      oldResolve?.()
+
+      oldResolve = resolve
+      if (handle) clearTimeout(handle)
+      handle = setTimeout(() => {
+        resolve(fn(...args))
+        oldResolve?.()
+        oldResolve = undefined
+      }, n)
+    })
+  }
+}
 
 export function utoa(data: string): string {
   const buffer = strToU8(data)
