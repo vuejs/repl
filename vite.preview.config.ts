@@ -2,12 +2,17 @@ import { defineConfig, Plugin } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import replace from '@rollup/plugin-replace'
 import esbuild from 'esbuild'
+import { build } from 'vite'
+
+import { rmSync } from 'fs'
+
+rmSync(`${__dirname}/dist`, { recursive: true, force: true })
 
 function vitePluginBuildRaw(): Plugin {
   return {
     name: 'vite-plugin-build-raw',
     transform(src, id) {
-      if (id.includes('?braw')) {
+      if (id.endsWith('?braw')) {
         id = id.replace(/\?braw$/, '')
         // console.log({ id })
         const code = esbuild.buildSync({
@@ -38,10 +43,42 @@ function vitePluginBuildRaw(): Plugin {
     },
   }
 }
+function vitePluginbraw2(): Plugin {
+  return {
+    name: 'vite-plugin-braw2',
+    apply: 'build',
+    enforce: 'post',
+    async load(id) {
+      if (id.endsWith('?braw2')) {
+        const file = id.slice(0, -5) // remove '?braw2' from the end
+
+        await build({
+          configFile: false,
+          build: {
+            emptyOutDir: false,
+            target: 'esnext',
+            minify: false,
+            assetsInlineLimit: 0,
+            lib: {
+              entry: { chii: file },
+              formats: ['es'],
+              fileName: () => '[name].js',
+            },
+            outDir: __dirname + '/dist',
+          },
+        })
+
+        // return the path of the compiled file
+        return `export default \`\${location.origin}/chii.js\``
+      }
+    },
+  }
+}
 
 export default defineConfig({
   plugins: [
     vitePluginBuildRaw(),
+    vitePluginbraw2(),
     vue({
       script: {
         defineModel: true,
@@ -55,6 +92,7 @@ export default defineConfig({
     },
   },
   build: {
+    emptyOutDir: false,
     commonjsOptions: {
       ignore: ['typescript'],
     },

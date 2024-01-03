@@ -13,7 +13,7 @@ import {
 } from 'vue'
 import srcdoc from './srcdoc.html?raw'
 import { compileModulesForPreview } from '../moduleCompiler'
-import chii from "./front_end/entrypoints/chii_app/chii_app.js?url"
+import chii from "./front_end/entrypoints/chii_app/chii_app.js?braw2"
 import { Store } from '../../store'
 import { Props } from '../../Repl.vue'
 

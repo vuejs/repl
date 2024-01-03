@@ -58,6 +58,7 @@ export default mergeConfig(base, {
   },
   base: './',
   build: {
+    emptyOutDir: false,
     target: 'esnext',
     minify: false,
     lib: {
