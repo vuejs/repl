@@ -228,10 +228,8 @@ async function updatePreview() {
               previewOptions?.bodyHTML || ''
             }\``),
       ...modules,
-      `setTimeout(()=> {
-        document.querySelectorAll('style[css]').forEach(el => el.remove())
-        document.head.insertAdjacentHTML('beforeend', window.__css__.map(s => \`<style css>\${s}</style>\`).join('\\n'))
-      }, 1)`,
+      `document.querySelectorAll('style[css]').forEach(el => el.remove())
+        document.head.insertAdjacentHTML('beforeend', window.__css__.map(s => \`<style css>\${s}</style>\`).join('\\n'))`,
     ]
 
     // if main file is a vue file, mount it.
