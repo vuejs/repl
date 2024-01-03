@@ -26,7 +26,7 @@ export interface Props {
     customCodeSSR?: {
       importCode?: string
       useCode?: string
-    },
+    }
     customCode?: {
       importCode?: string
       useCode?: string
