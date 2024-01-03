@@ -1,5 +1,5 @@
-import CodeMirrorEditor from './CodeMirrorEditor.vue'
-import MonacoEditor from './MonacoEditor.vue'
+import CodeMirrorEditor from "./CodeMirrorEditor.vue";
+import MonacoEditor from "./MonacoEditor.vue";
 
 export type EditorComponentType = typeof CodeMirrorEditor | typeof MonacoEditor
 

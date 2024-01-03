@@ -11,7 +11,7 @@ export async function registerHighlighter() {
   const highlighter = await getHighlighterCore({
     themes: [themeDark, themeLight],
     langs: [langVue],
-    loadWasm: getWasmInlined,
+    loadWasm: getWasmInlined
   })
   monaco.languages.register({ id: 'vue' })
   shikijiToMonaco(highlighter, monaco)

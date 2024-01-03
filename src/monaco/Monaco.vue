@@ -43,7 +43,7 @@ const lang = computed(() => (props.mode === 'css' ? 'css' : 'javascript'))
 
 const replTheme = inject<Ref<'dark' | 'light'>>('theme')!
 onMounted(async () => {
-  const theme = await import('./highlight').then((r) => r.registerHighlighter())
+  const theme = await import('./highlight').then(r => r.registerHighlighter())
   ready.value = true
   await nextTick()
 
