@@ -57,6 +57,7 @@ export async function compileFile(
   const { errors, descriptor } = store.compiler.parse(code, {
     filename,
     sourceMap: true,
+    templateParseOptions: store.options?.template?.compilerOptions,
   })
   if (errors.length) {
     return errors
