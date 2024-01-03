@@ -8,6 +8,7 @@ import {
   WatchStopHandle,
   inject,
   Ref,
+  onBeforeUnmount,
 } from 'vue'
 import srcdoc from './srcdoc.html?raw'
 import { compileModulesForPreview } from './moduleCompiler'
@@ -238,9 +239,9 @@ function reload() {
 
 defineExpose({ reload })
 
+const cleaners: (() => void)[] = []
+onBeforeUnmount(() => cleaners.forEach((cleaner) => cleaner()))
 function previewEval(script: string[]) {
-  console.log('ok k')
-
   return new Promise<void>((resolve, reject) => {
     const id = Math.random().toString(36)
 
@@ -249,10 +250,13 @@ function previewEval(script: string[]) {
         if (id === event.data.id) {
           if (event.data.error) reject(new Error(event.data.error))
           else resolve()
-          window.removeEventListener('message', handler)
+          cleaner()
+          cleaners.splice(cleaners.indexOf(cleaner) >>> 0, 1)
         }
       }
     }
+    const cleaner = () => window.removeEventListener('message', handler)
+    cleaners.push(cleaner)
     window.addEventListener('message', handler)
     previewIframe.value?.contentWindow!.postMessage(
       { event: 'MYEVAL', id, data: { script } },
