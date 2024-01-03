@@ -23,6 +23,10 @@ export interface Props {
     headHTML?: string
     bodyHTML?: string
     placeholderHTML?: string
+    customCodeSSR?: {
+      importCode?: string
+      useCode?: string
+    },
     customCode?: {
       importCode?: string
       useCode?: string
@@ -44,6 +48,10 @@ const props = withDefaults(defineProps<Props>(), {
     headHTML: '',
     bodyHTML: '',
     placeholderHTML: '',
+    customCodeSSR: {
+      importCode: '',
+      useCode: '',
+    },
     customCode: {
       importCode: '',
       useCode: '',

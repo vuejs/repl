@@ -193,9 +193,7 @@ async function updatePreview() {
         ...ssrModules,
         `import { renderToString as _renderToString } from 'vue/server-renderer'
          import { createSSRApp as _createApp } from 'vue'
-         const SSR_SERVER = true
-         const SSR_CLIENT = false
-         ${previewOptions?.customCode?.importCode || ''}
+         ${previewOptions?.customCodeSSR?.importCode || ''}
          const AppComponent = __modules__["${mainFile}"].default
          AppComponent.name = 'Repl'
          const app = _createApp(AppComponent)
@@ -203,7 +201,7 @@ async function updatePreview() {
            app.config.unwrapInjectedRef = true
          }
          app.config.warnHandler = () => {}
-         ${previewOptions?.customCode?.useCode || ''}
+         ${previewOptions?.customCodeSSR?.useCode || ''}
          window.__ssr_promise__ = _renderToString(app).then(html => {
            document.body.innerHTML = '<div id="app">' + html + '</div>' + \`${
              previewOptions?.bodyHTML || ''
@@ -244,7 +242,6 @@ async function updatePreview() {
         `import { ${
           isSSR ? `createSSRApp` : `createApp`
         } as _createApp } from "vue"
-        const SSR_SERVER = false
         const SSR_CLIENT = ${String(isSSR)}
         ${previewOptions?.customCode?.importCode || ''}
         const _mount = () => {
