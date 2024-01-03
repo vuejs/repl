@@ -7,7 +7,7 @@ import path from 'node:path'
 import esbuild from 'esbuild'
 // import { obfuscate } from "javascript-obfuscator"
 
-function vitePluginBuildRaw(): Plugin {
+export function vitePluginBuildRaw(): Plugin {
   return {
     name: 'vite-plugin-build-raw',
     transform(src, id) {

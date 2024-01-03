@@ -1,9 +1,11 @@
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import replace from '@rollup/plugin-replace'
+import { vitePluginBuildRaw } from './vite.config'
 
 export default defineConfig({
   plugins: [
+    vitePluginBuildRaw(),
     vue({
       script: {
         defineModel: true,
