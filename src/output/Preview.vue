@@ -56,7 +56,7 @@ onUnmounted(() => {
 
 const useDevtoolsSrc = () => {
   const devtoolsRawUrl = URL.createObjectURL(
-    new Blob([devtoolsHtml], { type: 'text/html' })
+    new Blob([devtoolsHtml.replace("SCRIPT_CHII", `\<script type="module" src="${location.origin}/dist/repl.js"\>\<\/script\>`)], { type: 'text/html' })
   )
   onUnmounted(() => URL.revokeObjectURL(devtoolsRawUrl))
   return `${devtoolsRawUrl}#?embedded=${encodeURIComponent(location.origin)}`
@@ -103,7 +103,7 @@ function createSandbox(): void {
     .replace(
       /PREVIEW_OPTIONS_HEAD/,
       (previewOptions?.headHTML || '') +
-        `\<script type="module"\>${chobitsuEmbed}\<\/script\>`
+      `\<script type="module"\>${chobitsuEmbed}\<\/script\>`
     )
     .replace(
       /PREVIEW_OPTIONS_PLACEHOLDER/,
@@ -132,7 +132,7 @@ async function updatePreview() {
     if (major === 3 && (minor < 2 || (minor === 2 && patch < 27))) {
       alert(
         `The selected version of Vue (${store.vueVersion}) does not support in-browser SSR.` +
-          ` Rendering in client mode instead.`
+        ` Rendering in client mode instead.`
       )
       isSSR = false
     }
@@ -162,9 +162,8 @@ async function updatePreview() {
          }
          app.config.warnHandler = () => {}
          window.__ssr_promise__ = _renderToString(app).then(html => {
-           document.body.innerHTML = '<div id="app">' + html + '</div>' + \`${
-             previewOptions?.bodyHTML || ''
-           }\`
+           document.body.innerHTML = '<div id="app">' + html + '</div>' + \`${previewOptions?.bodyHTML || ''
+          }\`
          }).catch(err => {
            console.error("SSR Error", err)
          })
@@ -178,20 +177,18 @@ async function updatePreview() {
     // compile code to simulated module system
     const modules = compileModulesForPreview(store)
     console.log(
-      `[@vue/repl] successfully compiled ${modules.length} module${
-        modules.length > 1 ? `s` : ``
+      `[@vue/repl] successfully compiled ${modules.length} module${modules.length > 1 ? `s` : ``
       }.`
     )
 
     codeToEval.push(
       ...[
         `window.__modules__ = {};window.__css__ = [];` +
-          `if (window.__app__) window.__app__.unmount();` +
-          (isSSR
-            ? ``
-            : `document.body.innerHTML = '<div id="app"></div>' + \`${
-                previewOptions?.bodyHTML || ''
-              }\``),
+        `if (window.__app__) window.__app__.unmount();` +
+        (isSSR
+          ? ``
+          : `document.body.innerHTML = '<div id="app"></div>' + \`${previewOptions?.bodyHTML || ''
+          }\``),
         ...modules,
         `setTimeout(()=> {
         document.querySelectorAll('style[css]').forEach(el => el.remove())
@@ -202,8 +199,7 @@ async function updatePreview() {
     // if main file is a vue file, mount it.
     if (mainFile.endsWith('.vue')) {
       codeToEval.push(
-        `import { ${
-          isSSR ? `createSSRApp` : `createApp`
+        `import { ${isSSR ? `createSSRApp` : `createApp`
         } as _createApp } from "vue"
         ${previewOptions?.customCode?.importCode || ''}
         const _mount = () => {
@@ -290,19 +286,10 @@ function onLoadDevtools() {
       <template #left>
         <iframe
           sandbox="allow-popups-to-escape-sandbox allow-scripts allow-popups allow-forms allow-pointer-lock allow-top-navigation allow-modals allow-same-origin"
-          ref="previewIframe"
-          @load="onLoadPreview"
-          :src="previewSrc"
-          class="preview"
-        />
+          ref="previewIframe" @load="onLoadPreview" :src="previewSrc" class="preview" />
       </template>
       <template #right>
-        <iframe
-          class="devtools"
-          :src="`${devtoolsSrc}`"
-          ref="devtoolsIframe"
-          @load="onLoadDevtools"
-        />
+        <iframe class="devtools" :src="`${devtoolsSrc}`" ref="devtoolsIframe" @load="onLoadDevtools" />
       </template>
     </SplitPanel>
   </div>

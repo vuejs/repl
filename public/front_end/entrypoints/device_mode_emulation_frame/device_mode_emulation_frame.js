@@ -1,0 +1,1 @@
+import"../../core/dom_extension/dom_extension.js";import"../../Images/Images.js";import*as o from"../../core/platform/platform.js";o.runOnWindowLoad((()=>{if(!window.opener)return;window.opener.Emulation.AdvancedApp.instance().deviceModeEmulationFrameLoaded(document)}));

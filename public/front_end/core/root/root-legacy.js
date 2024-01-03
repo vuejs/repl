@@ -1,0 +1,1 @@
+import*as o from"./root.js";self.Root=self.Root||{},Root=Root||{},Root.Runtime=o.Runtime.Runtime,Root.Runtime.experiments=o.Runtime.experiments,Root.Runtime.queryParam=o.Runtime.Runtime.queryParam,Root.runtime,Root.Runtime.loadResourcePromise=o.Runtime.loadResourcePromise,Root.Runtime.Extension=o.Runtime.Extension,Root.Runtime.Module=o.Runtime.Module;

@@ -1,0 +1,1 @@
+Root.allDescriptors.push(...[]);Root.applicationDescriptor.modules.push(...[]);import*as RootModule from'../../core/root/root.js';import'../devtools_app/devtools_app.js';import'../../panels/screencast/screencast-meta.js';import*as Startup from'../startup/startup.js';Startup.RuntimeInstantiator.startApplication('inspector');
