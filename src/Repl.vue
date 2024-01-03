@@ -19,6 +19,7 @@ export interface Props {
   layout?: 'horizontal' | 'vertical'
   layoutReverse?: boolean
   ssr?: boolean
+  chii?: string
   previewOptions?: {
     headHTML?: string
     bodyHTML?: string
@@ -107,6 +108,7 @@ defineExpose({ reload })
           :editorComponent="editor"
           :showCompileOutput="props.showCompileOutput"
           :ssr="!!props.ssr"
+          :chii="chii"
         />
       </template>
     </SplitPane>

@@ -9,6 +9,7 @@ const props = defineProps<{
   editorComponent: EditorComponentType
   showCompileOutput?: boolean
   ssr: boolean
+  chii?: string
 }>()
 
 const store = inject('store') as Store
@@ -44,7 +45,7 @@ defineExpose({ reload })
   </div>
 
   <div class="output-container">
-    <Preview ref="previewRef" :show="mode === 'preview'" :ssr="ssr" />
+    <Preview ref="previewRef" :show="mode === 'preview'" :ssr="ssr" :chii="chii" />
     <props.editorComponent
       v-if="mode !== 'preview'"
       readonly

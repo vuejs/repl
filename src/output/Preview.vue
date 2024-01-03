@@ -21,7 +21,7 @@ import chobitsuEmbed from './chobitsu-embed.ts?braw'
 import devtoolsHtml from './devtools.html?raw'
 import { debounceAsync } from '../utils'
 
-const props = defineProps<{ show: boolean; ssr: boolean }>()
+const props = defineProps<{ show: boolean; ssr: boolean; chii?: string }>()
 
 const store = inject('store') as Store
 const clearConsole = inject('clear-console') as Ref<boolean>
@@ -56,7 +56,7 @@ onUnmounted(() => {
 
 const useDevtoolsSrc = () => {
   const devtoolsRawUrl = URL.createObjectURL(
-    new Blob([devtoolsHtml.replace("SCRIPT_CHII", `\<script type="module" src="${location.origin}/dist/repl.js"\>\<\/script\>`)], { type: 'text/html' })
+    new Blob([devtoolsHtml.replace("SCRIPT_CHII", `\<script type="module" src="${props.chii ?? `${location.origin}/dist/repl.js`}"\>\<\/script\>`)], { type: 'text/html' })
   )
   onUnmounted(() => URL.revokeObjectURL(devtoolsRawUrl))
   return `${devtoolsRawUrl}#?embedded=${encodeURIComponent(location.origin)}`
