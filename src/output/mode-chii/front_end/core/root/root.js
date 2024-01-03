@@ -137,7 +137,7 @@ class a {
     return this.modulesMap
   }
   loadLegacyModule(e) {
-    return import(`../../${e}`)
+    return import(`../../${e}.js`)
   }
 }
 class l {
