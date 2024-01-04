@@ -57,6 +57,7 @@ export async function compileFile(
   const { errors, descriptor } = store.compiler.parse(code, {
     filename,
     sourceMap: true,
+    templateParseOptions: store.options?.template?.compilerOptions,
   })
   if (errors.length) {
     return errors
@@ -221,8 +222,10 @@ export async function compileFile(
   if (css) {
     compiled.css = css.trim()
   } else {
-    compiled.css = isCE ?  (compiled.css = '/* The component style of the custom element will be compiled into the component object */')
-      : ('/* No <style> tags present */')
+    compiled.css = isCE
+      ? (compiled.css =
+          '/* The component style of the custom element will be compiled into the component object */')
+      : '/* No <style> tags present */'
   }
 
   if (clientCode || ssrCode) {

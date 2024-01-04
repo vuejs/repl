@@ -20,6 +20,7 @@ const props = defineProps<{ show: boolean; ssr: boolean }>()
 
 const store = inject('store') as Store
 const clearConsole = inject('clear-console') as Ref<boolean>
+const theme = inject('theme') as Ref<'dark' | 'light'>
 
 const previewOptions = inject('preview-options') as Props['previewOptions']
 
@@ -85,6 +86,7 @@ function createSandbox() {
     importMap.imports.vue = store.state.vueRuntimeURL
   }
   const sandboxSrc = srcdoc
+    .replace(/<html>/, `<html class="${theme.value}">`)
     .replace(/<!--IMPORT_MAP-->/, JSON.stringify(importMap))
     .replace(
       /<!-- PREVIEW-OPTIONS-HEAD-HTML -->/,
@@ -228,10 +230,8 @@ async function updatePreview() {
               previewOptions?.bodyHTML || ''
             }\``),
       ...modules,
-      `setTimeout(()=> {
-        document.querySelectorAll('style[css]').forEach(el => el.remove())
-        document.head.insertAdjacentHTML('beforeend', window.__css__.map(s => \`<style css>\${s}</style>\`).join('\\n'))
-      }, 1)`,
+      `document.querySelectorAll('style[css]').forEach(el => el.remove())
+        document.head.insertAdjacentHTML('beforeend', window.__css__.map(s => \`<style css>\${s}</style>\`).join('\\n'))`,
     ]
 
     // if main file is a vue file, mount it.
@@ -279,7 +279,12 @@ defineExpose({ reload })
 </script>
 
 <template>
-  <div class="iframe-container" v-show="show" ref="container"></div>
+  <div
+    class="iframe-container"
+    :class="theme"
+    v-show="show"
+    ref="container"
+  ></div>
   <Message :err="runtimeError" />
   <Message v-if="!runtimeError" :warn="runtimeWarning" />
 </template>
@@ -291,5 +296,8 @@ defineExpose({ reload })
   height: 100%;
   border: none;
   background-color: #fff;
+}
+.iframe-container.dark :deep(iframe) {
+  background-color: #1e1e1e;
 }
 </style>

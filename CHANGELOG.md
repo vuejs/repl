@@ -1,3 +1,28 @@
+# [3.2.0](https://github.com/vuejs/repl/compare/v3.1.1...v3.2.0) (2024-01-03)
+
+
+### Bug Fixes
+
+* **codemirror:** fix codemirror editor showing nothing on start on small layouts when starting in ouput mode ([#181](https://github.com/vuejs/repl/issues/181)) ([6d7598d](https://github.com/vuejs/repl/commit/6d7598d763c79d777efae4e17ef61132930ae9a0))
+* **messages:** place error messages in editor in front of bottom toggles ([#183](https://github.com/vuejs/repl/issues/183)) ([b1594d0](https://github.com/vuejs/repl/commit/b1594d07dbb29d7d3c15afa4110a4005d4245297))
+* **Preview:** fix style loading delay ([#191](https://github.com/vuejs/repl/issues/191)) ([ece4414](https://github.com/vuejs/repl/commit/ece4414186fab8bb19290ed047e2a4ab665ae3ef))
+
+
+### Features
+
+* **playground:** use a height of 100dvh with fallback to original 100vh ([#182](https://github.com/vuejs/repl/issues/182)) ([9e99990](https://github.com/vuejs/repl/commit/9e99990f7aa2bd8792510fcc03fda931691e8353))
+
+
+
+## [3.1.1](https://github.com/vuejs/repl/compare/v3.1.0...v3.1.1) (2024-01-02)
+
+
+### Bug Fixes
+
+* pass sfc template options to sfc parse ([d72dfdf](https://github.com/vuejs/repl/commit/d72dfdfd2e2670592c957616fcf4e694609912a0))
+
+
+
 # [3.1.0](https://github.com/vuejs/repl/compare/v3.0.1...v3.1.0) (2023-12-21)
 
 
