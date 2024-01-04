@@ -117,6 +117,8 @@ export interface StoreOptions {
   defaultVueRuntimeProdURL?: string
   defaultVueServerRendererURL?: string
   customElement?: boolean | string | RegExp | (string | RegExp)[]
+  welcomeFileTemplate?: string
+  newSFCTemplate?: string
 }
 
 export class ReplStore implements Store {
@@ -134,6 +136,8 @@ export class ReplStore implements Store {
   private defaultVueRuntimeProdURL: string
   private defaultVueServerRendererURL: string
   private pendingCompiler: Promise<any> | null = null
+  private welcomeFileTemplate?: string
+  private newSFCTemplate?: string
 
   constructor({
     serializedState = '',
@@ -144,8 +148,12 @@ export class ReplStore implements Store {
     outputMode = 'preview',
     productionMode = false,
     customElement = /\.ce\.vue$/,
+    welcomeFileTemplate = welcomeCode,
+    newSFCTemplate = newSFCCode,
   }: StoreOptions = {}) {
     const files: StoreState['files'] = {}
+    this.welcomeFileTemplate = welcomeFileTemplate
+    this.newSFCTemplate = newSFCTemplate
 
     if (serializedState) {
       const saved = JSON.parse(atou(serializedState))
@@ -153,7 +161,7 @@ export class ReplStore implements Store {
         setFile(files, filename, saved[filename])
       }
     } else {
-      setFile(files, defaultMainFile, welcomeCode)
+      setFile(files, defaultMainFile, this.welcomeFileTemplate)
     }
 
     this.productionMode = productionMode
@@ -250,7 +258,7 @@ export class ReplStore implements Store {
     if (typeof fileOrFilename === 'string') {
       file = new File(
         fileOrFilename,
-        fileOrFilename.endsWith('.vue') ? newSFCCode : ''
+        fileOrFilename.endsWith('.vue') ? this.newSFCTemplate : ''
       )
     } else {
       file = fileOrFilename
