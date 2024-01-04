@@ -117,8 +117,8 @@ export interface StoreOptions {
   defaultVueRuntimeProdURL?: string
   defaultVueServerRendererURL?: string
   customElement?: boolean | string | RegExp | (string | RegExp)[]
-  defaultWelcomeTpl?: string
-  defaultSFCTpl?: string
+  welcomeFileTemplate?: string
+  newSFCTemplate?: string
 }
 
 export class ReplStore implements Store {
@@ -136,8 +136,8 @@ export class ReplStore implements Store {
   private defaultVueRuntimeProdURL: string
   private defaultVueServerRendererURL: string
   private pendingCompiler: Promise<any> | null = null
-  private defaultWelcomeTpl?: string
-  private defaultSFCTpl?: string
+  private welcomeFileTemplate?: string
+  private newSFCTemplate?: string
 
   constructor({
     serializedState = '',
@@ -148,12 +148,12 @@ export class ReplStore implements Store {
     outputMode = 'preview',
     productionMode = false,
     customElement = /\.ce\.vue$/,
-    defaultWelcomeTpl = welcomeCode,
-    defaultSFCTpl = newSFCCode,
+    welcomeFileTemplate = welcomeCode,
+    newSFCTemplate = newSFCCode,
   }: StoreOptions = {}) {
     const files: StoreState['files'] = {}
-    this.defaultWelcomeTpl = defaultWelcomeTpl
-    this.defaultSFCTpl = defaultSFCTpl
+    this.welcomeFileTemplate = welcomeFileTemplate
+    this.newSFCTemplate = newSFCTemplate
 
     if (serializedState) {
       const saved = JSON.parse(atou(serializedState))
@@ -161,7 +161,7 @@ export class ReplStore implements Store {
         setFile(files, filename, saved[filename])
       }
     } else {
-      setFile(files, defaultMainFile, this.defaultWelcomeTpl)
+      setFile(files, defaultMainFile, this.welcomeFileTemplate)
     }
 
     this.productionMode = productionMode
@@ -258,7 +258,7 @@ export class ReplStore implements Store {
     if (typeof fileOrFilename === 'string') {
       file = new File(
         fileOrFilename,
-        fileOrFilename.endsWith('.vue') ? this.defaultSFCTpl : ''
+        fileOrFilename.endsWith('.vue') ? this.newSFCTemplate : ''
       )
     } else {
       file = fileOrFilename
