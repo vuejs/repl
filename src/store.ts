@@ -318,7 +318,7 @@ export class ReplStore implements Store {
     const files = this.getFiles()
     const importMap = files[importMapFile]
     if (importMap) {
-      const { imports } = JSON.parse(importMap)
+      const { imports, ...restImportMap } = JSON.parse(importMap)
       if (imports['vue'] === this.defaultVueRuntimeURL) {
         delete imports['vue']
       }
@@ -328,7 +328,11 @@ export class ReplStore implements Store {
       if (!Object.keys(imports).length) {
         delete files[importMapFile]
       } else {
-        files[importMapFile] = JSON.stringify({ imports }, null, 2)
+        files[importMapFile] = JSON.stringify(
+          { imports, ...restImportMap },
+          null,
+          2
+        )
       }
     }
     return '#' + utoa(JSON.stringify(files))
@@ -400,7 +404,7 @@ export class ReplStore implements Store {
           )
         }
         map.code = JSON.stringify(json, null, 2)
-      } catch (e) {}
+      } catch {}
     }
   }
 
