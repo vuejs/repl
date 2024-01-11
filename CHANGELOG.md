@@ -1,3 +1,21 @@
+# [3.3.0](https://github.com/vuejs/repl/compare/v3.2.0...v3.3.0) (2024-01-11)
+
+
+### Bug Fixes
+
+* default to white color on dark theme ([#202](https://github.com/vuejs/repl/issues/202)) ([481035a](https://github.com/vuejs/repl/commit/481035a443031e50de26b75c8e5b86fbb8ca96f2))
+* serialize import maps ([e085e30](https://github.com/vuejs/repl/commit/e085e3041a228fe0ec076056e23e8f55258120ab)), closes [#204](https://github.com/vuejs/repl/issues/204)
+
+
+### Features
+
+* add theme as classname to sandbox ([#203](https://github.com/vuejs/repl/issues/203)) ([7e9dc0f](https://github.com/vuejs/repl/commit/7e9dc0f3b1f2c488664ccfa22cdf21ba19926158))
+* apply theme to preview ([#200](https://github.com/vuejs/repl/issues/200)) ([7ae1061](https://github.com/vuejs/repl/commit/7ae106129274f13393808000fd25995d919ae0bd))
+* mutable sfc options ([9e83b09](https://github.com/vuejs/repl/commit/9e83b09344ecc90ad0e28024a9b260fff97ffccd))
+* support custom template ([#196](https://github.com/vuejs/repl/issues/196)) ([8038b49](https://github.com/vuejs/repl/commit/8038b49cc5fb76a7dc34acffcda5b3f55ff8aa11))
+
+
+
 # [3.2.0](https://github.com/vuejs/repl/compare/v3.1.1...v3.2.0) (2024-01-03)
 
 
