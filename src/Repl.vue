@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import SplitPane from './SplitPane.vue'
 import Output from './output/Output.vue'
-import { Store, ReplStore, SFCOptions } from './store'
-import { provide, ref, toRef, computed, watchEffect } from 'vue'
-import type { EditorComponentType } from './editor/types'
+import { ReplStore, type SFCOptions, type Store } from './store'
+import { computed, provide, ref, toRef, watchEffect } from 'vue'
+import type { EditorComponentType } from './types'
 import EditorContainer from './editor/EditorContainer.vue'
 
 export interface Props {
@@ -49,6 +49,8 @@ const props = withDefaults(defineProps<Props>(), {
       useCode: '',
     },
   }),
+  sfcOptions: () => ({}),
+  layout: 'horizontal',
 })
 
 if (!props.editor) {
@@ -99,13 +101,13 @@ defineExpose({ reload })
   <div class="vue-repl">
     <SplitPane :layout="layout">
       <template #[editorSlotName]>
-        <EditorContainer :editorComponent="editor" />
+        <EditorContainer :editor-component="editor" />
       </template>
       <template #[outputSlotName]>
         <Output
           ref="outputRef"
-          :editorComponent="editor"
-          :showCompileOutput="props.showCompileOutput"
+          :editor-component="editor"
+          :show-compile-output="props.showCompileOutput"
           :ssr="!!props.ssr"
         />
       </template>

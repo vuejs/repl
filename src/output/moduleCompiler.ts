@@ -1,14 +1,14 @@
-import { File, Store } from '../store'
+import type { File, Store } from '../store'
 import {
-  babelParse,
   MagicString,
-  walk,
-  walkIdentifiers,
+  babelParse,
   extractIdentifiers,
   isInDestructureAssignment,
   isStaticProperty,
+  walk,
+  walkIdentifiers,
 } from 'vue/compiler-sfc'
-import { ExportSpecifier, Identifier, Node } from '@babel/types'
+import type { ExportSpecifier, Identifier, Node } from '@babel/types'
 
 export function compileModulesForPreview(store: Store, isSSR = false) {
   const seen = new Set<File>()
@@ -18,7 +18,7 @@ export function compileModulesForPreview(store: Store, isSSR = false) {
     store.state.files[store.state.mainFile],
     processed,
     seen,
-    isSSR
+    isSSR,
   )
 
   if (!isSSR) {
@@ -28,7 +28,7 @@ export function compileModulesForPreview(store: Store, isSSR = false) {
         const file = store.state.files[filename]
         if (!seen.has(file)) {
           processed.push(
-            `\nwindow.__css__.push(${JSON.stringify(file.compiled.css)})`
+            `\nwindow.__css__.push(${JSON.stringify(file.compiled.css)})`,
           )
         }
       }
@@ -49,7 +49,7 @@ function processFile(
   file: File,
   processed: string[],
   seen: Set<File>,
-  isSSR: boolean
+  isSSR: boolean,
 ) {
   if (seen.has(file)) {
     return []
@@ -67,7 +67,7 @@ function processFile(
   } = processModule(
     store,
     isSSR ? file.compiled.ssr : file.compiled.js,
-    file.filename
+    file.filename,
   )
   processChildFiles(
     store,
@@ -75,7 +75,7 @@ function processFile(
     hasDynamicImport,
     processed,
     seen,
-    isSSR
+    isSSR,
   )
   // append css
   if (file.compiled.css && !isSSR) {
@@ -92,7 +92,7 @@ function processChildFiles(
   hasDynamicImport: boolean,
   processed: string[],
   seen: Set<File>,
-  isSSR: boolean
+  isSSR: boolean,
 ) {
   if (hasDynamicImport) {
     // process all files
@@ -144,7 +144,7 @@ function processModule(store: Store, src: string, filename: string) {
     importToIdMap.set(filename, id)
     s.appendLeft(
       node.start!,
-      `const ${id} = ${modulesKey}[${JSON.stringify(filename)}]\n`
+      `const ${id} = ${modulesKey}[${JSON.stringify(filename)}]\n`,
     )
     return id
   }
@@ -156,8 +156,8 @@ function processModule(store: Store, src: string, filename: string) {
   // 0. instantiate module
   s.prepend(
     `const ${moduleKey} = ${modulesKey}[${JSON.stringify(
-      filename
-    )}] = { [Symbol.toStringTag]: "Module" }\n\n`
+      filename,
+    )}] = { [Symbol.toStringTag]: "Module" }\n\n`,
   )
 
   // 1. check all import statements and record id -> importName map
@@ -173,7 +173,7 @@ function processModule(store: Store, src: string, filename: string) {
           if (spec.type === 'ImportSpecifier') {
             idToImportMap.set(
               spec.local.name,
-              `${importId}.${(spec.imported as Identifier).name}`
+              `${importId}.${(spec.imported as Identifier).name}`,
             )
           } else if (spec.type === 'ImportDefaultSpecifier') {
             idToImportMap.set(spec.local.name, `${importId}.default`)
@@ -213,7 +213,7 @@ function processModule(store: Store, src: string, filename: string) {
         for (const spec of node.specifiers) {
           defineExport(
             (spec.exported as Identifier).name,
-            `${importId}.${(spec as ExportSpecifier).local.name}`
+            `${importId}.${(spec as ExportSpecifier).local.name}`,
           )
         }
         s.remove(node.start!, node.end!)
@@ -301,7 +301,7 @@ function processModule(store: Store, src: string, filename: string) {
           s.overwrite(
             arg.start!,
             arg.end!,
-            JSON.stringify(arg.value.replace(/^\.\/+/, ''))
+            JSON.stringify(arg.value.replace(/^\.\/+/, '')),
           )
         }
       }
@@ -324,7 +324,7 @@ function processHtmlFile(
   src: string,
   filename: string,
   processed: string[],
-  seen: Set<File>
+  seen: Set<File>,
 ) {
   const deps: string[] = []
   let jsCode = ''
@@ -333,7 +333,7 @@ function processHtmlFile(
       const { code, importedFiles, hasDynamicImport } = processModule(
         store,
         content,
-        filename
+        filename,
       )
       processChildFiles(
         store,
@@ -341,7 +341,7 @@ function processHtmlFile(
         hasDynamicImport,
         deps,
         seen,
-        false
+        false,
       )
       jsCode += '\n' + code
       return ''

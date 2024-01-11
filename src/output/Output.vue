@@ -1,9 +1,8 @@
 <script setup lang="ts">
 import Preview from './Preview.vue'
-import { Store } from '../store'
-import { inject, ref, computed } from 'vue'
-import type { OutputModes } from './types'
-import type { EditorComponentType } from '../editor/types'
+import type { Store } from '../store'
+import { computed, inject, ref } from 'vue'
+import type { EditorComponentType, OutputModes } from '../types'
 
 const props = defineProps<{
   editorComponent: EditorComponentType
@@ -16,13 +15,13 @@ const previewRef = ref<InstanceType<typeof Preview>>()
 const modes = computed(() =>
   props.showCompileOutput
     ? (['preview', 'js', 'css', 'ssr'] as const)
-    : (['preview'] as const)
+    : (['preview'] as const),
 )
 
 const mode = ref<OutputModes>(
   (modes.value as readonly string[]).includes(store.initialOutputMode)
     ? (store.initialOutputMode as OutputModes)
-    : 'preview'
+    : 'preview',
 )
 
 function reload() {
@@ -36,6 +35,7 @@ defineExpose({ reload })
   <div class="tab-buttons">
     <button
       v-for="m of modes"
+      :key="m"
       :class="{ active: mode === m }"
       @click="mode = m"
     >

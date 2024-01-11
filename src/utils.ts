@@ -1,4 +1,4 @@
-import { zlibSync, unzlibSync, strToU8, strFromU8 } from 'fflate'
+import { strFromU8, strToU8, unzlibSync, zlibSync } from 'fflate'
 
 export function debounce(fn: Function, n = 100) {
   let handle: any

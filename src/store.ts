@@ -1,13 +1,13 @@
-import { version, reactive, watchEffect, watch } from 'vue'
+import { reactive, version, watch, watchEffect } from 'vue'
 import * as defaultCompiler from 'vue/compiler-sfc'
 import { compileFile } from './transform'
-import { utoa, atou } from './utils'
-import {
-  SFCScriptCompileOptions,
+import { atou, utoa } from './utils'
+import type {
   SFCAsyncStyleCompileOptions,
+  SFCScriptCompileOptions,
   SFCTemplateCompileOptions,
 } from 'vue/compiler-sfc'
-import { OutputModes } from './output/types'
+import type { OutputModes } from './types'
 import type { editor } from 'monaco-editor-core'
 import welcomeCode from './template/welcome.vue?raw'
 import newSFCCode from './template/new-sfc.vue?raw'
@@ -202,8 +202,8 @@ export class ReplStore implements Store {
   init() {
     watchEffect(() =>
       compileFile(this, this.state.activeFile).then(
-        (errs) => (this.state.errors = errs)
-      )
+        (errs) => (this.state.errors = errs),
+      ),
     )
 
     watch(
@@ -215,14 +215,14 @@ export class ReplStore implements Store {
         this.state.dependencyVersion,
       ],
       () => this.reloadLanguageTools?.(),
-      { deep: true }
+      { deep: true },
     )
 
     this.state.errors = []
     for (const file in this.state.files) {
       if (file !== defaultMainFile) {
         compileFile(this, this.state.files[file]).then((errs) =>
-          this.state.errors.push(...errs)
+          this.state.errors.push(...errs),
         )
       }
     }
@@ -237,7 +237,7 @@ export class ReplStore implements Store {
   setTsConfig(config: any) {
     this.state.files[tsconfigFile] = new File(
       tsconfigFile,
-      JSON.stringify(config, undefined, 2)
+      JSON.stringify(config, undefined, 2),
     )
   }
 
@@ -258,7 +258,7 @@ export class ReplStore implements Store {
     if (typeof fileOrFilename === 'string') {
       file = new File(
         fileOrFilename,
-        fileOrFilename.endsWith('.vue') ? this.newSFCTemplate : ''
+        fileOrFilename.endsWith('.vue') ? this.newSFCTemplate : '',
       )
     } else {
       file = fileOrFilename
@@ -331,7 +331,7 @@ export class ReplStore implements Store {
         files[importMapFile] = JSON.stringify(
           { imports, ...restImportMap },
           null,
-          2
+          2,
         )
       }
     }
@@ -385,8 +385,8 @@ export class ReplStore implements Store {
             },
           },
           null,
-          2
-        )
+          2,
+        ),
       )
     } else {
       try {
@@ -400,7 +400,7 @@ export class ReplStore implements Store {
           json.imports['vue/server-renderer'] = this.defaultVueServerRendererURL
         } else {
           json.imports['vue/server-renderer'] = fixURL(
-            json.imports['vue/server-renderer']
+            json.imports['vue/server-renderer'],
           )
         }
         map.code = JSON.stringify(json, null, 2)
@@ -481,7 +481,7 @@ export class ReplStore implements Store {
 function setFile(
   files: Record<string, File>,
   filename: string,
-  content: string
+  content: string,
 ) {
   // prefix user files with src/
   // for cleaner Volar path completion when using Monaco editor

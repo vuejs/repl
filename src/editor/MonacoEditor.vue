@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import Monaco from '../monaco/Monaco.vue'
-import type { EditorEmits, EditorProps } from './types'
+import type { EditorEmits, EditorProps } from '../types'
 
 defineProps<EditorProps>()
 const emit = defineEmits<EditorEmits>()
@@ -16,10 +16,10 @@ const onChange = (code: string) => {
 
 <template>
   <Monaco
-    @change="onChange"
     :filename="filename"
     :value="value"
     :readonly="readonly"
     :mode="mode"
+    @change="onChange"
   />
 </template>

@@ -143,12 +143,12 @@
           try {
             parent.postMessage(
               { action: 'unhandledrejection', value: event.reason },
-              '*'
+              '*',
             )
           } catch (e) {
             parent.postMessage(
               { action: 'unhandledrejection', value: event.reason.message },
-              '*'
+              '*',
             )
           }
         })
@@ -179,7 +179,7 @@
               ) {
                 parent.postMessage(
                   { action: 'console', level, duplicate: true },
-                  '*'
+                  '*',
                 )
               } else {
                 previous = { level, args: stringifiedArgs }
@@ -189,12 +189,12 @@
                 } catch (err) {
                   parent.postMessage(
                     { action: 'console', level, args: args.map(toString) },
-                    '*'
+                    '*',
                   )
                 }
               }
             }
-          }
+          },
         )
         ;[
           { method: 'group', action: 'console_group' },
@@ -228,7 +228,7 @@
                 level: 'system-log',
                 args: [`${label}: ${now - timers.get(label)}ms`],
               },
-              '*'
+              '*',
             )
           } else {
             parent.postMessage(
@@ -237,7 +237,7 @@
                 level: 'system-warn',
                 args: [`Timer '${label}' does not exist`],
               },
-              '*'
+              '*',
             )
           }
         }
@@ -251,7 +251,7 @@
                 level: 'system-log',
                 args: [`${label}: ${now - timers.get(label)}ms`],
               },
-              '*'
+              '*',
             )
           } else {
             parent.postMessage(
@@ -260,7 +260,7 @@
                 level: 'system-warn',
                 args: [`Timer '${label}' does not exist`],
               },
-              '*'
+              '*',
             )
           }
           timers.delete(label)
@@ -272,7 +272,7 @@
             const stack = new Error().stack
             parent.postMessage(
               { action: 'console', level: 'assert', args, stack },
-              '*'
+              '*',
             )
           }
           original_assert(condition, ...args)
@@ -290,7 +290,7 @@
               level: 'system-log',
               args: `${label}: ${counter.get(label)}`,
             },
-            '*'
+            '*',
           )
           original_count(label)
         }
@@ -305,7 +305,7 @@
                 level: 'system-warn',
                 args: `Count for '${label}' does not exist`,
               },
-              '*'
+              '*',
             )
           }
           original_countreset(label)
@@ -317,7 +317,7 @@
           const stack = new Error().stack
           parent.postMessage(
             { action: 'console', level: 'trace', args, stack },
-            '*'
+            '*',
           )
           original_trace(...args)
         }

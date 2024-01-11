@@ -1,4 +1,4 @@
-// @ts-ignore
+// @ts-expect-error
 import * as worker from 'monaco-editor-core/esm/vs/editor/editor.worker'
 import type * as monaco from 'monaco-editor-core'
 import {
@@ -6,10 +6,10 @@ import {
   createJsDelivrUriResolver,
   decorateServiceEnvironment,
 } from '@volar/cdn'
-import { VueCompilerOptions, resolveConfig } from '@vue/language-service'
+import { type VueCompilerOptions, resolveConfig } from '@vue/language-service'
 import {
-  createLanguageService,
   createLanguageHost,
+  createLanguageService,
   createServiceEnvironment,
 } from '@volar/monaco/worker'
 import type { WorkerHost, WorkerMessage } from './env'
@@ -37,7 +37,7 @@ self.onmessage = async (msg: MessageEvent<WorkerMessage>) => {
       importTsFromCdn(msg.data.tsVersion),
       locale &&
         fetchJson(
-          `https://cdn.jsdelivr.net/npm/typescript@${msg.data.tsVersion}/lib/${locale}/diagnosticMessages.generated.json`
+          `https://cdn.jsdelivr.net/npm/typescript@${msg.data.tsVersion}/lib/${locale}/diagnosticMessages.generated.json`,
         ),
     ])
     self.postMessage('inited')
@@ -47,23 +47,23 @@ self.onmessage = async (msg: MessageEvent<WorkerMessage>) => {
   worker.initialize(
     (
       ctx: monaco.worker.IWorkerContext<WorkerHost>,
-      { tsconfig, dependencies }: CreateData
+      { tsconfig, dependencies }: CreateData,
     ) => {
       const { options: compilerOptions } = ts.convertCompilerOptionsFromJson(
         tsconfig?.compilerOptions || {},
-        ''
+        '',
       )
       const env = createServiceEnvironment()
       const host = createLanguageHost(
         ctx.getMirrorModels,
         env,
         '/src',
-        compilerOptions
+        compilerOptions,
       )
       const jsDelivrFs = createJsDelivrFs(ctx.host.onFetchCdnFile)
       const jsDelivrUriResolver = createJsDelivrUriResolver(
         '/node_modules',
-        dependencies
+        dependencies,
       )
 
       if (locale) {
@@ -82,11 +82,11 @@ self.onmessage = async (msg: MessageEvent<WorkerMessage>) => {
           ts as any,
           {},
           compilerOptions,
-          tsconfig.vueCompilerOptions || {}
+          tsconfig.vueCompilerOptions || {},
         ),
-        host
+        host,
       )
-    }
+    },
   )
 }
 

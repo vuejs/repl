@@ -1,31 +1,33 @@
 <script lang="ts" setup>
 import {
-  onMounted,
+  type Ref,
+  computed,
+  inject,
+  nextTick,
   onBeforeUnmount,
+  onMounted,
   ref,
   shallowRef,
-  nextTick,
-  inject,
   watch,
-  computed,
-  type Ref,
 } from 'vue'
 import * as monaco from 'monaco-editor-core'
 import { initMonaco } from './env'
 import { getOrCreateModel } from './utils'
-import { Store } from '../store'
-import type { PreviewMode } from '../editor/types'
+import type { Store } from '../store'
+import type { EditorMode } from '../types'
 
 const props = withDefaults(
   defineProps<{
     filename: string
     value?: string
     readonly?: boolean
-    mode?: PreviewMode
+    mode?: EditorMode
   }>(),
   {
     readonly: false,
-  }
+    value: '',
+    mode: undefined,
+  },
 )
 
 const emit = defineEmits<{
@@ -43,7 +45,7 @@ const lang = computed(() => (props.mode === 'css' ? 'css' : 'javascript'))
 
 const replTheme = inject<Ref<'dark' | 'light'>>('theme')!
 onMounted(async () => {
-  const theme = await import('./highlight').then(r => r.registerHighlighter())
+  const theme = await import('./highlight').then((r) => r.registerHighlighter())
   ready.value = true
   await nextTick()
 
@@ -76,7 +78,7 @@ onMounted(async () => {
   t.getTokenStyleMetadata = (
     type: string,
     modifiers: string[],
-    _language: string
+    _language: string,
   ) => {
     const _readonly = modifiers.includes('readonly')
     switch (type) {
@@ -99,11 +101,11 @@ onMounted(async () => {
       if (editorInstance.getValue() === value) return
       editorInstance.setValue(value || '')
     },
-    { immediate: true }
+    { immediate: true },
   )
 
   watch(lang, (lang) =>
-    monaco.editor.setModelLanguage(editorInstance.getModel()!, lang)
+    monaco.editor.setModelLanguage(editorInstance.getModel()!, lang),
   )
 
   if (!props.readonly) {
@@ -116,7 +118,7 @@ onMounted(async () => {
         const model = getOrCreateModel(
           monaco.Uri.parse(`file:///${props.filename}`),
           file.language,
-          file.code
+          file.code,
         )
 
         const oldFile = oldFilename ? store.state.files[oldFilename] : null
@@ -131,7 +133,7 @@ onMounted(async () => {
           editorInstance.focus()
         }
       },
-      { immediate: true }
+      { immediate: true },
     )
   }
 
@@ -157,7 +159,7 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <div class="editor" ref="containerRef"></div>
+  <div ref="containerRef" class="editor" />
 </template>
 
 <style>

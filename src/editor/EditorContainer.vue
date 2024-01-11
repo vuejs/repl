@@ -3,9 +3,9 @@ import FileSelector from './FileSelector.vue'
 import Message from '../Message.vue'
 import { debounce } from '../utils'
 import { inject, ref, watch } from 'vue'
-import { Store } from '../store'
+import type { Store } from '../store'
 import MessageToggle from './MessageToggle.vue'
-import type { EditorComponentType } from './types'
+import type { EditorComponentType } from '../types'
 
 const SHOW_ERROR_KEY = 'repl_show_error'
 
@@ -38,9 +38,9 @@ watch(showMessage, () => {
   <FileSelector />
   <div class="editor-container">
     <props.editorComponent
-      @change="onChange"
       :value="store.state.activeFile.code"
       :filename="store.state.activeFile.filename"
+      @change="onChange"
     />
     <Message v-show="showMessage" :err="store.state.errors[0]" />
     <MessageToggle v-model="showMessage" />

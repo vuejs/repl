@@ -1,4 +1,4 @@
-import { Plugin, mergeConfig } from 'vite'
+import { type Plugin, mergeConfig } from 'vite'
 import dts from 'vite-plugin-dts'
 import base from './vite.preview.config'
 import fs from 'node:fs'
@@ -28,7 +28,7 @@ const patchCssFiles: Plugin = {
     const outDir = path.resolve('dist')
     fs.renameSync(
       path.resolve(outDir, 'MonacoEditor.css'),
-      path.resolve(outDir, 'monaco-editor.css')
+      path.resolve(outDir, 'monaco-editor.css'),
     )
 
     // 2. inject css imports to the files
