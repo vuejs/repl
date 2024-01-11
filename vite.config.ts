@@ -1,4 +1,4 @@
-import { Plugin, mergeConfig } from 'vite'
+import { type Plugin, mergeConfig } from 'vite'
 import dts from 'vite-plugin-dts'
 import base from './vite.preview.config'
 import fs from 'node:fs'

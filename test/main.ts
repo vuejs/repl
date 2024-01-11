@@ -19,7 +19,7 @@ const App = {
         : `${location.origin}/src/vue-server-renderer-dev-proxy`,
     }))
 
-    console.log(store)
+    console.info(store)
 
     watchEffect(() => history.replaceState({}, '', store.serialize()))
 

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import CodeMirror, { type Props } from '../codemirror/CodeMirror.vue'
 import { computed } from 'vue'
-import type { EditorEmits, EditorProps } from './types'
+import type { EditorEmits, EditorProps } from '../types'
 
 defineOptions({
   editorType: 'codemirror',
@@ -39,5 +39,5 @@ const activeMode = computed(() => {
 </script>
 
 <template>
-  <CodeMirror @change="onChange" :value="value" :mode="activeMode" />
+  <CodeMirror :value="value" :mode="activeMode" @change="onChange" />
 </template>

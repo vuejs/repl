@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { ref, reactive, computed, inject } from 'vue'
-import { Store } from './store'
+import { computed, inject, reactive, ref } from 'vue'
+import type { Store } from './store'
 
 const props = defineProps<{ layout?: 'horizontal' | 'vertical' }>()
 const isVertical = computed(() => props.layout === 'vertical')

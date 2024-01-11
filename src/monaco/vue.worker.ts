@@ -1,4 +1,4 @@
-// @ts-ignore
+// @ts-expect-error
 import * as worker from 'monaco-editor-core/esm/vs/editor/editor.worker'
 import type * as monaco from 'monaco-editor-core'
 import {
@@ -6,10 +6,10 @@ import {
   createJsDelivrUriResolver,
   decorateServiceEnvironment,
 } from '@volar/cdn'
-import { VueCompilerOptions, resolveConfig } from '@vue/language-service'
+import { type VueCompilerOptions, resolveConfig } from '@vue/language-service'
 import {
-  createLanguageService,
   createLanguageHost,
+  createLanguageService,
   createServiceEnvironment,
 } from '@volar/monaco/worker'
 import type { WorkerHost, WorkerMessage } from './env'

@@ -1,14 +1,14 @@
-import { File, Store } from '../store'
+import type { File, Store } from '../store'
 import {
-  babelParse,
   MagicString,
-  walk,
-  walkIdentifiers,
+  babelParse,
   extractIdentifiers,
   isInDestructureAssignment,
   isStaticProperty,
+  walk,
+  walkIdentifiers,
 } from 'vue/compiler-sfc'
-import { ExportSpecifier, Identifier, Node } from '@babel/types'
+import type { ExportSpecifier, Identifier, Node } from '@babel/types'
 
 export function compileModulesForPreview(store: Store, isSSR = false) {
   const seen = new Set<File>()

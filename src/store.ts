@@ -1,13 +1,13 @@
-import { version, reactive, watchEffect, watch } from 'vue'
+import { reactive, version, watch, watchEffect } from 'vue'
 import * as defaultCompiler from 'vue/compiler-sfc'
 import { compileFile } from './transform'
-import { utoa, atou } from './utils'
-import {
-  SFCScriptCompileOptions,
+import { atou, utoa } from './utils'
+import type {
   SFCAsyncStyleCompileOptions,
+  SFCScriptCompileOptions,
   SFCTemplateCompileOptions,
 } from 'vue/compiler-sfc'
-import { OutputModes } from './output/types'
+import type { OutputModes } from './types'
 import type { editor } from 'monaco-editor-core'
 import welcomeCode from './template/welcome.vue?raw'
 import newSFCCode from './template/new-sfc.vue?raw'

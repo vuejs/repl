@@ -1,30 +1,32 @@
 <script lang="ts" setup>
 import {
-  onMounted,
+  type Ref,
+  computed,
+  inject,
+  nextTick,
   onBeforeUnmount,
+  onMounted,
   ref,
   shallowRef,
-  nextTick,
-  inject,
   watch,
-  computed,
-  type Ref,
 } from 'vue'
 import * as monaco from 'monaco-editor-core'
 import { initMonaco } from './env'
 import { getOrCreateModel } from './utils'
-import { Store } from '../store'
-import type { PreviewMode } from '../editor/types'
+import type { Store } from '../store'
+import type { EditorMode } from '../types'
 
 const props = withDefaults(
   defineProps<{
     filename: string
     value?: string
     readonly?: boolean
-    mode?: PreviewMode
+    mode?: EditorMode
   }>(),
   {
     readonly: false,
+    value: '',
+    mode: undefined,
   },
 )
 
@@ -157,7 +159,7 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <div class="editor" ref="containerRef"></div>
+  <div ref="containerRef" class="editor" />
 </template>
 
 <style>

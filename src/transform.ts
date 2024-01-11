@@ -1,11 +1,10 @@
-import { Store, File } from './store'
-import {
-  SFCDescriptor,
+import type { File, Store } from './store'
+import type {
   BindingMetadata,
   CompilerOptions,
+  SFCDescriptor,
 } from 'vue/compiler-sfc'
 import { transform } from 'sucrase'
-// @ts-ignore
 import hashId from 'hash-sum'
 
 export const COMP_IDENTIFIER = `__sfc__`
@@ -306,7 +305,6 @@ async function doCompileTemplate(
   let { code, errors } = store.compiler.compileTemplate({
     isProd: false,
     ...store.options?.template,
-    // @ts-ignore TODO remove ignore in 3.4
     ast: descriptor.template!.ast,
     source: descriptor.template!.content,
     filename: descriptor.filename,

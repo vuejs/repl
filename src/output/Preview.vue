@@ -1,20 +1,20 @@
 <script setup lang="ts">
 import Message from '../Message.vue'
 import {
-  ref,
+  type Ref,
+  type WatchStopHandle,
+  inject,
   onMounted,
   onUnmounted,
-  watchEffect,
+  ref,
   watch,
-  WatchStopHandle,
-  inject,
-  Ref,
+  watchEffect,
 } from 'vue'
 import srcdoc from './srcdoc.html?raw'
 import { PreviewProxy } from './PreviewProxy'
 import { compileModulesForPreview } from './moduleCompiler'
-import { Store } from '../store'
-import { Props } from '../Repl.vue'
+import type { Store } from '../store'
+import type { Props } from '../Repl.vue'
 
 const props = defineProps<{ show: boolean; ssr: boolean }>()
 
@@ -198,7 +198,7 @@ async function updatePreview() {
     // if SSR, generate the SSR bundle and eval it to render the HTML
     if (isSSR && mainFile.endsWith('.vue')) {
       const ssrModules = compileModulesForPreview(store, true)
-      console.log(
+      console.info(
         `[@vue/repl] successfully compiled ${ssrModules.length} modules for SSR.`,
       )
       await proxy.eval([
@@ -226,7 +226,7 @@ async function updatePreview() {
 
     // compile code to simulated module system
     const modules = compileModulesForPreview(store)
-    console.log(
+    console.info(
       `[@vue/repl] successfully compiled ${modules.length} module${
         modules.length > 1 ? `s` : ``
       }.`,
@@ -290,12 +290,7 @@ defineExpose({ reload })
 </script>
 
 <template>
-  <div
-    class="iframe-container"
-    :class="theme"
-    v-show="show"
-    ref="container"
-  ></div>
+  <div v-show="show" ref="container" class="iframe-container" :class="theme" />
   <Message :err="runtimeError" />
   <Message v-if="!runtimeError" :warn="runtimeWarning" />
 </template>

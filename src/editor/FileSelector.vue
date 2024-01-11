@@ -1,6 +1,11 @@
 <script setup lang="ts">
-import { Store, importMapFile, tsconfigFile, stripSrcPrefix } from '../store'
-import { computed, inject, ref, VNode, Ref } from 'vue'
+import {
+  type Store,
+  importMapFile,
+  stripSrcPrefix,
+  tsconfigFile,
+} from '../store'
+import { type Ref, type VNode, computed, inject, ref } from 'vue'
 
 const store = inject('store') as Store
 
@@ -108,12 +113,12 @@ function horizontalScroll(e: WheelEvent) {
 
 <template>
   <div
+    ref="fileSel"
     class="file-selector"
     :class="{ 'has-import-map': showImportMap }"
     @wheel="horizontalScroll"
-    ref="fileSel"
   >
-    <template v-for="(file, i) in files">
+    <template v-for="(file, i) in files" :key="file">
       <div
         v-if="pending !== file"
         class="file"
@@ -124,8 +129,8 @@ function horizontalScroll(e: WheelEvent) {
         <span class="label">{{ stripSrcPrefix(file) }}</span>
         <span v-if="i > 0" class="remove" @click.stop="store.deleteFile(file)">
           <svg class="icon" width="12" height="12" viewBox="0 0 24 24">
-            <line stroke="#999" x1="18" y1="6" x2="6" y2="18"></line>
-            <line stroke="#999" x1="6" y1="6" x2="18" y2="18"></line>
+            <line stroke="#999" x1="18" y1="6" x2="6" y2="18" />
+            <line stroke="#999" x1="6" y1="6" x2="18" y2="18" />
           </svg>
         </span>
       </div>

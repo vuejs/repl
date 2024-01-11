@@ -1,4 +1,4 @@
-import { Uri, editor } from 'monaco-editor-core'
+import { type Uri, editor } from 'monaco-editor-core'
 
 export function getOrCreateModel(
   uri: Uri,
