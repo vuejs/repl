@@ -28,7 +28,7 @@ const patchCssFiles: Plugin = {
     const outDir = path.resolve('dist')
     fs.renameSync(
       path.resolve(outDir, 'MonacoEditor.css'),
-      path.resolve(outDir, 'monaco-editor.css')
+      path.resolve(outDir, 'monaco-editor.css'),
     )
 
     // 2. inject css imports to the files

@@ -37,7 +37,7 @@ self.onmessage = async (msg: MessageEvent<WorkerMessage>) => {
       importTsFromCdn(msg.data.tsVersion),
       locale &&
         fetchJson(
-          `https://cdn.jsdelivr.net/npm/typescript@${msg.data.tsVersion}/lib/${locale}/diagnosticMessages.generated.json`
+          `https://cdn.jsdelivr.net/npm/typescript@${msg.data.tsVersion}/lib/${locale}/diagnosticMessages.generated.json`,
         ),
     ])
     self.postMessage('inited')
@@ -47,23 +47,23 @@ self.onmessage = async (msg: MessageEvent<WorkerMessage>) => {
   worker.initialize(
     (
       ctx: monaco.worker.IWorkerContext<WorkerHost>,
-      { tsconfig, dependencies }: CreateData
+      { tsconfig, dependencies }: CreateData,
     ) => {
       const { options: compilerOptions } = ts.convertCompilerOptionsFromJson(
         tsconfig?.compilerOptions || {},
-        ''
+        '',
       )
       const env = createServiceEnvironment()
       const host = createLanguageHost(
         ctx.getMirrorModels,
         env,
         '/src',
-        compilerOptions
+        compilerOptions,
       )
       const jsDelivrFs = createJsDelivrFs(ctx.host.onFetchCdnFile)
       const jsDelivrUriResolver = createJsDelivrUriResolver(
         '/node_modules',
-        dependencies
+        dependencies,
       )
 
       if (locale) {
@@ -82,11 +82,11 @@ self.onmessage = async (msg: MessageEvent<WorkerMessage>) => {
           ts as any,
           {},
           compilerOptions,
-          tsconfig.vueCompilerOptions || {}
+          tsconfig.vueCompilerOptions || {},
         ),
-        host
+        host,
       )
-    }
+    },
   )
 }
 

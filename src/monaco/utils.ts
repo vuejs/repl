@@ -3,7 +3,7 @@ import { Uri, editor } from 'monaco-editor-core'
 export function getOrCreateModel(
   uri: Uri,
   lang: string | undefined,
-  value: string
+  value: string,
 ) {
   const model = editor.getModel(uri)
   if (model) {

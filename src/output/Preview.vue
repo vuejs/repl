@@ -45,7 +45,7 @@ watch(
       store.state.errors = [e as Error]
       return
     }
-  }
+  },
 )
 
 // reset sandbox when version changes
@@ -59,7 +59,7 @@ watch(
     if (html) {
       html.className = value
     }
-  }
+  },
 )
 
 onUnmounted(() => {
@@ -86,7 +86,7 @@ function createSandbox() {
       'allow-same-origin',
       'allow-scripts',
       'allow-top-navigation-by-user-activation',
-    ].join(' ')
+    ].join(' '),
   )
 
   const importMap = store.getImportMap()
@@ -101,11 +101,11 @@ function createSandbox() {
     .replace(/<!--IMPORT_MAP-->/, JSON.stringify(importMap))
     .replace(
       /<!-- PREVIEW-OPTIONS-HEAD-HTML -->/,
-      previewOptions?.headHTML || ''
+      previewOptions?.headHTML || '',
     )
     .replace(
       /<!--PREVIEW-OPTIONS-PLACEHOLDER-HTML-->/,
-      previewOptions?.placeholderHTML || ''
+      previewOptions?.placeholderHTML || '',
     )
   sandbox.srcdoc = sandboxSrc
   container.value.appendChild(sandbox)
@@ -186,7 +186,7 @@ async function updatePreview() {
     if (major === 3 && (minor < 2 || (minor === 2 && patch < 27))) {
       alert(
         `The selected version of Vue (${store.vueVersion}) does not support in-browser SSR.` +
-          ` Rendering in client mode instead.`
+          ` Rendering in client mode instead.`,
       )
       isSSR = false
     }
@@ -199,7 +199,7 @@ async function updatePreview() {
     if (isSSR && mainFile.endsWith('.vue')) {
       const ssrModules = compileModulesForPreview(store, true)
       console.log(
-        `[@vue/repl] successfully compiled ${ssrModules.length} modules for SSR.`
+        `[@vue/repl] successfully compiled ${ssrModules.length} modules for SSR.`,
       )
       await proxy.eval([
         `const __modules__ = {};`,
@@ -229,7 +229,7 @@ async function updatePreview() {
     console.log(
       `[@vue/repl] successfully compiled ${modules.length} module${
         modules.length > 1 ? `s` : ``
-      }.`
+      }.`,
     )
 
     const codeToEval = [
@@ -267,7 +267,7 @@ async function updatePreview() {
           window.__ssr_promise__.then(_mount)
         } else {
           _mount()
-        }`
+        }`,
       )
     }
 

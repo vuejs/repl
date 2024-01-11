@@ -18,7 +18,7 @@ async function transformTS(src: string) {
 
 export async function compileFile(
   store: Store,
-  { filename, code, compiled }: File
+  { filename, code, compiled }: File,
 ): Promise<(string | Error)[]> {
   if (!code.trim()) {
     return []
@@ -98,7 +98,7 @@ export async function compileFile(
       descriptor,
       id,
       false,
-      isTS
+      isTS,
     )
   } catch (e: any) {
     return [e.stack.split('\n').slice(0, 12).join('\n')]
@@ -116,7 +116,7 @@ export async function compileFile(
         descriptor,
         id,
         true,
-        isTS
+        isTS,
       )
       ssrCode += ssrScriptResult[0]
     } catch (e) {
@@ -139,7 +139,7 @@ export async function compileFile(
       id,
       bindings,
       false,
-      isTS
+      isTS,
     )
     if (Array.isArray(clientTemplateResult)) {
       return clientTemplateResult
@@ -152,7 +152,7 @@ export async function compileFile(
       id,
       bindings,
       true,
-      isTS
+      isTS,
     )
     if (typeof ssrTemplateResult === 'string') {
       // ssr compile failure is fine
@@ -164,7 +164,7 @@ export async function compileFile(
 
   if (hasScoped) {
     appendSharedCode(
-      `\n${COMP_IDENTIFIER}.__scopeId = ${JSON.stringify(`data-v-${id}`)}`
+      `\n${COMP_IDENTIFIER}.__scopeId = ${JSON.stringify(`data-v-${id}`)}`,
     )
   }
 
@@ -235,7 +235,7 @@ export async function compileFile(
     appendSharedCode(
       `\n${COMP_IDENTIFIER}.__file = ${JSON.stringify(filename)}` +
         ceStyles +
-        `\nexport default ${COMP_IDENTIFIER}`
+        `\nexport default ${COMP_IDENTIFIER}`,
     )
     compiled.js = clientCode.trimStart()
     compiled.ssr = ssrCode.trimStart()
@@ -249,7 +249,7 @@ async function doCompileScript(
   descriptor: SFCDescriptor,
   id: string,
   ssr: boolean,
-  isTS: boolean
+  isTS: boolean,
 ): Promise<[code: string, bindings: BindingMetadata | undefined]> {
   if (descriptor.script || descriptor.scriptSetup) {
     const expressionPlugins: CompilerOptions['expressionPlugins'] = isTS
@@ -274,7 +274,7 @@ async function doCompileScript(
       code += `\n/* Analyzed bindings: ${JSON.stringify(
         compiledScript.bindings,
         null,
-        2
+        2,
       )} */`
     }
     code +=
@@ -282,7 +282,7 @@ async function doCompileScript(
       store.compiler.rewriteDefault(
         compiledScript.content,
         COMP_IDENTIFIER,
-        expressionPlugins
+        expressionPlugins,
       )
 
     if ((descriptor.script || descriptor.scriptSetup)!.lang === 'ts') {
@@ -301,7 +301,7 @@ async function doCompileTemplate(
   id: string,
   bindingMetadata: BindingMetadata | undefined,
   ssr: boolean,
-  isTS: boolean
+  isTS: boolean,
 ) {
   let { code, errors } = store.compiler.compileTemplate({
     isProd: false,
@@ -330,7 +330,7 @@ async function doCompileTemplate(
   code =
     `\n${code.replace(
       /\nexport (function|const) (render|ssrRender)/,
-      `$1 ${fnName}`
+      `$1 ${fnName}`,
     )}` + `\n${COMP_IDENTIFIER}.${fnName} = ${fnName}`
 
   if ((descriptor.script || descriptor.scriptSetup)?.lang === 'ts') {

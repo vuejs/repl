@@ -16,13 +16,13 @@ const previewRef = ref<InstanceType<typeof Preview>>()
 const modes = computed(() =>
   props.showCompileOutput
     ? (['preview', 'js', 'css', 'ssr'] as const)
-    : (['preview'] as const)
+    : (['preview'] as const),
 )
 
 const mode = ref<OutputModes>(
   (modes.value as readonly string[]).includes(store.initialOutputMode)
     ? (store.initialOutputMode as OutputModes)
-    : 'preview'
+    : 'preview',
 )
 
 function reload() {

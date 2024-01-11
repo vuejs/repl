@@ -21,9 +21,9 @@ const files = computed(() =>
   Object.entries(store.state.files)
     .filter(
       ([name, file]) =>
-        name !== importMapFile && name !== tsconfigFile && !file.hidden
+        name !== importMapFile && name !== tsconfigFile && !file.hidden,
     )
-    .map(([name]) => name)
+    .map(([name]) => name),
 )
 
 function startAddFile() {

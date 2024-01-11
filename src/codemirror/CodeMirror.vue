@@ -70,7 +70,7 @@ onMounted(() => {
       'resize',
       debounce(() => {
         editor.refresh()
-      })
+      }),
     )
   }
 })

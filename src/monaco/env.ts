@@ -21,7 +21,7 @@ export function initMonaco(store: Store) {
       getOrCreateModel(
         Uri.parse(`file:///${filename}`),
         file.language,
-        file.code
+        file.code,
       )
     }
 
@@ -107,26 +107,26 @@ export async function reloadLanguageTools(store: Store) {
   const languageId = ['vue', 'javascript', 'typescript']
   const getSyncUris = () =>
     Object.keys(store.state.files).map((filename) =>
-      Uri.parse(`file:///${filename}`)
+      Uri.parse(`file:///${filename}`),
     )
   const { dispose: disposeMarkers } = volar.editor.activateMarkers(
     worker,
     languageId,
     'vue',
     getSyncUris,
-    editor
+    editor,
   )
   const { dispose: disposeAutoInsertion } = volar.editor.activateAutoInsertion(
     worker,
     languageId,
     getSyncUris,
-    editor
+    editor,
   )
   const { dispose: disposeProvides } = await volar.languages.registerProvides(
     worker,
     languageId,
     getSyncUris,
-    languages
+    languages,
   )
 
   disposeVue = () => {
