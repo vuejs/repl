@@ -74,6 +74,14 @@ export function useStore(
       { deep: true },
     )
 
+    watch(
+      builtinImportMap,
+      () => {
+        setImportMap(mergeImportMap(getImportMap(), builtinImportMap.value))
+      },
+      { deep: true, immediate: true },
+    )
+
     watch(vueVersion, async (version) => {
       if (version) {
         const compilerUrl = `https://cdn.jsdelivr.net/npm/@vue/compiler-sfc@${version}/dist/compiler-sfc.esm-browser.js`
@@ -85,15 +93,6 @@ export function useStore(
         console.info(`[@vue/repl] Now using default Vue version`)
       }
     })
-
-    applyBuiltinImportMap()
-    watch(
-      builtinImportMap,
-      () => {
-        setImportMap(mergeImportMap(getImportMap(), builtinImportMap.value))
-      },
-      { deep: true },
-    )
 
     // init tsconfig
     if (!files.value[tsconfigFile]) {
@@ -286,6 +285,8 @@ export function useStore(
     mainFile.value = Object.keys(files.value)[0]
   }
   activeFile ||= ref(files.value[mainFile.value])
+
+  applyBuiltinImportMap()
 
   const store: ReplStore = reactive({
     files,
