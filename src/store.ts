@@ -94,6 +94,24 @@ export function useStore(
       }
     })
 
+    watch(
+      sfcOptions,
+      () => {
+        sfcOptions.value.script ||= {}
+        sfcOptions.value.script.fs = {
+          fileExists(file: string) {
+            if (file.startsWith('/')) file = file.slice(1)
+            return !!store.files[file]
+          },
+          readFile(file: string) {
+            if (file.startsWith('/')) file = file.slice(1)
+            return store.files[file].code
+          },
+        }
+      },
+      { immediate: true },
+    )
+
     // init tsconfig
     if (!files.value[tsconfigFile]) {
       files.value[tsconfigFile] = new File(

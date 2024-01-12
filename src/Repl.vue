@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import SplitPane from './SplitPane.vue'
 import Output from './output/Output.vue'
-import { type SFCOptions, type Store, useStore } from './store'
-import { computed, provide, ref, toRef, watchEffect } from 'vue'
+import { type Store, useStore } from './store'
+import { computed, provide, ref, toRef } from 'vue'
 import { type EditorComponentType, injectKeyStore } from './types'
 import EditorContainer from './editor/EditorContainer.vue'
 
@@ -15,7 +15,6 @@ export interface Props {
   showImportMap?: boolean
   showTsConfig?: boolean
   clearConsole?: boolean
-  sfcOptions?: SFCOptions
   layout?: 'horizontal' | 'vertical'
   layoutReverse?: boolean
   ssr?: boolean
@@ -49,7 +48,6 @@ const props = withDefaults(defineProps<Props>(), {
       useCode: '',
     },
   }),
-  sfcOptions: () => ({}),
   layout: 'horizontal',
 })
 
@@ -58,22 +56,6 @@ if (!props.editor) {
 }
 
 const outputRef = ref<InstanceType<typeof Output>>()
-
-watchEffect(() => {
-  const { store } = props
-  const sfcOptions = (store.sfcOptions = props.sfcOptions || store.sfcOptions)
-  sfcOptions.script ||= {}
-  sfcOptions.script.fs = {
-    fileExists(file: string) {
-      if (file.startsWith('/')) file = file.slice(1)
-      return !!store.files[file]
-    },
-    readFile(file: string) {
-      if (file.startsWith('/')) file = file.slice(1)
-      return store.files[file].code
-    },
-  }
-})
 
 props.store.init()
 
