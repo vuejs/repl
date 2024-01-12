@@ -154,7 +154,7 @@ function horizontalScroll(e: WheelEvent) {
 
     <div class="import-map-wrapper">
       <div
-        v-if="showTsConfig"
+        v-if="showTsConfig && store.state.files[tsconfigFile]"
         class="file"
         :class="{ active: store.state.activeFile.filename === tsconfigFile }"
         @click="store.setActive(tsconfigFile)"
