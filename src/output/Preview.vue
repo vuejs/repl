@@ -48,9 +48,6 @@ watch(
   },
 )
 
-// reset sandbox when version changes
-// watch(() => store.resetFlip, createSandbox)
-
 // reset theme
 watch(
   () => theme.value,

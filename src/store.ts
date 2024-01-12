@@ -50,12 +50,12 @@ export function useStore(
   }: Partial<StoreState> = {},
   serializedState?: string,
 ): ReplStore {
-  function setFile(filename: string, content: string) {
-    const normalized = addSrcPrefix(filename)
-    files.value[normalized] = new File(normalized, content)
+  function applyBuiltinImportMap() {
+    const importMap = mergeImportMap(builtinImportMap.value, getImportMap())
+    setImportMap(importMap)
   }
 
-  const init = () => {
+  function init() {
     watchEffect(() =>
       compileFile(store, activeFile.value).then(
         (errs) => (errors.value = errs),
@@ -86,9 +86,7 @@ export function useStore(
       }
     })
 
-    // init import map
-    const importMap = mergeImportMap(builtinImportMap.value, getImportMap())
-    setImportMap(importMap)
+    applyBuiltinImportMap()
     watch(
       builtinImportMap,
       () => {
@@ -113,6 +111,20 @@ export function useStore(
       }
     }
   }
+
+  function setImportMap(map: ImportMap) {
+    if (map.imports)
+      for (const [key, value] of Object.entries(map.imports)) {
+        if (value) {
+          map.imports![key] = fixURL(value)
+        }
+      }
+    files.value[importMapFile] = new File(
+      importMapFile,
+      JSON.stringify(map, undefined, 2),
+    )
+  }
+
   const setActive: Store['setActive'] = (filename) => {
     activeFile.value = files.value[filename]
   }
@@ -191,14 +203,6 @@ export function useStore(
       return {}
     }
   }
-  const getFiles = () => {
-    const exported: Record<string, string> = {}
-    for (const [filename, file] of Object.entries(files.value)) {
-      const normalized = stripSrcPrefix(filename)
-      exported[normalized] = file.code
-    }
-    return exported
-  }
   const serialize: ReplStore['serialize'] = () => {
     const files = getFiles()
     const importMap = files[importMapFile]
@@ -227,37 +231,63 @@ export function useStore(
     }
     return '#' + utoa(JSON.stringify(files))
   }
-  const deserialize = (serializedState: string) => {
+  const deserialize: ReplStore['deserialize'] = (serializedState: string) => {
     if (serializedState.startsWith('#'))
       serializedState = serializedState.slice(1)
     const saved = JSON.parse(atou(serializedState))
     for (const filename in saved) {
-      setFile(filename, saved[filename])
+      setFile(files.value, filename, saved[filename])
     }
   }
-  const setImportMap = (map: ImportMap) => {
-    if (map.imports)
-      for (const [key, value] of Object.entries(map.imports)) {
-        if (value) {
-          map.imports![key] = fixURL(value)
-        }
-      }
-    files.value[importMapFile] = new File(
-      importMapFile,
-      JSON.stringify(map, undefined, 2),
-    )
+  const getFiles: ReplStore['getFiles'] = () => {
+    const exported: Record<string, string> = {}
+    for (const [filename, file] of Object.entries(files.value)) {
+      const normalized = stripSrcPrefix(filename)
+      exported[normalized] = file.code
+    }
+    return exported
+  }
+  const setFiles: ReplStore['setFiles'] = async (
+    newFiles,
+    mainFile = store.mainFile,
+  ) => {
+    const files: Record<string, File> = Object.create(null)
+
+    mainFile = addSrcPrefix(mainFile)
+    if (!newFiles[mainFile]) {
+      setFile(files, mainFile, template.value.welcomeSFC || welcomeSFCCode)
+    }
+    for (const [filename, file] of Object.entries(newFiles)) {
+      setFile(files, filename, file)
+    }
+
+    const errors = []
+    for (const file of Object.values(files)) {
+      errors.push(...(await compileFile(store, file)))
+    }
+
+    store.mainFile = mainFile
+    store.files = files
+    store.errors = errors
+    applyBuiltinImportMap()
+    setActive(store.mainFile)
   }
 
   if (serializedState) {
     deserialize(serializedState)
   } else {
-    setFile(mainFile.value, template.value.welcomeSFC || welcomeSFCCode)
+    setFile(
+      files.value,
+      mainFile.value,
+      template.value.welcomeSFC || welcomeSFCCode,
+    )
   }
-  activeFile ||= ref(
-    files.value[mainFile.value] || Object.values(files.value)[0],
-  )
+  if (!files.value[mainFile.value]) {
+    mainFile.value = Object.keys(files.value)[0]
+  }
+  activeFile ||= ref(files.value[mainFile.value])
 
-  const store = reactive({
+  const store: ReplStore = reactive({
     files,
     activeFile,
     mainFile,
@@ -285,6 +315,8 @@ export function useStore(
     getTsConfig,
     serialize,
     deserialize,
+    getFiles,
+    setFiles,
   })
   return store
 }
@@ -313,14 +345,21 @@ export interface SFCOptions {
 export type StoreState = ToRefs<{
   files: Record<string, File>
   activeFile: File
-  errors: (string | Error)[]
+  mainFile: string
+  template: {
+    welcomeSFC?: string
+    newSFC?: string
+  }
+  builtinImportMap: ImportMap
 
   // output
+  errors: (string | Error)[]
   showOutput: boolean
   outputMode: OutputModes
   sfcOptions: SFCOptions
   /** `@vue/compiler-sfc` */
   compiler: typeof defaultCompiler
+  /* only apply for compiler-sfc */
   vueVersion: string | undefined
 
   // volar-related
@@ -329,31 +368,27 @@ export type StoreState = ToRefs<{
   /** \{ dependencyName: version \} */
   dependencyVersion: Record<string, string>
   reloadLanguageTools?: (() => void) | undefined
-
-  mainFile: string
-  template: {
-    welcomeSFC?: string
-    newSFC?: string
-  }
-
-  builtinImportMap: ImportMap
 }>
 
 export interface ReplStore extends UnwrapRef<StoreState> {
-  init: () => void
-  setActive: (filename: string) => void
-  addFile: (filename: string | File) => void
-  deleteFile: (filename: string) => void
-  renameFile: (oldFilename: string, newFilename: string) => void
-  getImportMap: () => ImportMap
-  getTsConfig?: () => Record<string, any>
+  init(): void
+  setActive(filename: string): void
+  addFile(filename: string | File): void
+  deleteFile(filename: string): void
+  renameFile(oldFilename: string, newFilename: string): void
+  getImportMap(): ImportMap
+  getTsConfig(): Record<string, any>
   serialize(): string
+  deserialize(serializedState: string): void
+  getFiles(): Record<string, string>
+  setFiles(newFiles: Record<string, string>, mainFile?: string): Promise<void>
 }
 
 export type Store = Pick<
   ReplStore,
   | 'files'
   | 'activeFile'
+  | 'mainFile'
   | 'errors'
   | 'showOutput'
   | 'outputMode'
@@ -364,7 +399,6 @@ export type Store = Pick<
   | 'typescriptVersion'
   | 'dependencyVersion'
   | 'reloadLanguageTools'
-  | 'mainFile'
   | 'init'
   | 'setActive'
   | 'addFile'
@@ -419,4 +453,13 @@ export function stripSrcPrefix(file: string) {
 
 function fixURL(url: string) {
   return url.replace('https://sfc.vuejs', 'https://play.vuejs')
+}
+
+function setFile(
+  files: Record<string, File>,
+  filename: string,
+  content: string,
+) {
+  const normalized = addSrcPrefix(filename)
+  files[normalized] = new File(normalized, content)
 }

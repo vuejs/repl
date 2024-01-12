@@ -2,23 +2,30 @@ import { computed, version as currentVersion, ref } from 'vue'
 
 export function useVueImportMap(
   defaults: {
-    runtimeDev?: string
-    runtimeProd?: string
-    serverRenderer?: string
+    runtimeDev?: string | (() => string)
+    runtimeProd?: string | (() => string)
+    serverRenderer?: string | (() => string)
   } = {},
 ) {
+  function normalizeDefaults(defaults?: string | (() => string)) {
+    if (!defaults) return
+    return typeof defaults === 'string' ? defaults : defaults()
+  }
+
   const productionMode = ref(false)
   const vueVersion = ref<string | undefined>()
   const importMap = computed<ImportMap>(() => {
     const vue =
       (!vueVersion.value &&
-        (productionMode.value ? defaults.runtimeProd : defaults.runtimeDev)) ||
+        normalizeDefaults(
+          productionMode.value ? defaults.runtimeProd : defaults.runtimeDev,
+        )) ||
       `https://cdn.jsdelivr.net/npm/@vue/runtime-dom@${
         vueVersion.value || currentVersion
       }/dist/runtime-dom.esm-browser${productionMode.value ? `.prod` : ``}.js`
 
     const serverRenderer =
-      (!vueVersion.value && defaults.serverRenderer) ||
+      (!vueVersion.value && normalizeDefaults(defaults.serverRenderer)) ||
       `https://cdn.jsdelivr.net/npm/@vue/server-renderer@${
         vueVersion.value || currentVersion
       }/dist/server-renderer.esm-browser.js`
@@ -32,8 +39,9 @@ export function useVueImportMap(
 
   return {
     productionMode,
-    vueVersion,
     importMap,
+    vueVersion,
+    defaultVersion: currentVersion,
   }
 }
 
