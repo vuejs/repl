@@ -3,9 +3,8 @@ import FileSelector from './FileSelector.vue'
 import Message from '../Message.vue'
 import { debounce } from '../utils'
 import { inject, ref, watch } from 'vue'
-import type { Store } from '../store'
 import MessageToggle from './MessageToggle.vue'
-import type { EditorComponentType } from '../types'
+import { type EditorComponentType, injectKeyStore } from '../types'
 
 const SHOW_ERROR_KEY = 'repl_show_error'
 
@@ -13,11 +12,11 @@ const props = defineProps<{
   editorComponent: EditorComponentType
 }>()
 
-const store = inject('store') as Store
+const store = inject(injectKeyStore)!
 const showMessage = ref(getItem())
 
 const onChange = debounce((code: string) => {
-  store.state.activeFile.code = code
+  store.activeFile.code = code
 }, 250)
 
 function setItem() {
@@ -38,11 +37,11 @@ watch(showMessage, () => {
   <FileSelector />
   <div class="editor-container">
     <props.editorComponent
-      :value="store.state.activeFile.code"
-      :filename="store.state.activeFile.filename"
+      :value="store.activeFile.code"
+      :filename="store.activeFile.filename"
       @change="onChange"
     />
-    <Message v-show="showMessage" :err="store.state.errors[0]" />
+    <Message v-show="showMessage" :err="store.errors[0]" />
     <MessageToggle v-model="showMessage" />
   </div>
 </template>

@@ -1,24 +1,31 @@
-import { createApp, h, watchEffect } from 'vue'
-import { Repl, ReplStore } from '../src'
+import { createApp, h, ref, watchEffect } from 'vue'
+import { type OutputModes, Repl, useStore, useVueImportMap } from '../src'
 import MonacoEditor from '../src/editor/MonacoEditor.vue'
 // import CodeMirrorEditor from '../src/editor/CodeMirrorEditor.vue'
-;(window as any).process = { env: {} }
+
+const window = globalThis.window as any
+window.process = { env: {} }
 
 const App = {
   setup() {
     const query = new URLSearchParams(location.search)
-    const store = ((window as any).store = new ReplStore({
-      serializedState: location.hash.slice(1),
-      showOutput: query.has('so'),
-      outputMode: query.get('om') || 'preview',
-      defaultVueRuntimeURL: import.meta.env.PROD
+    const { importMap: builtinImportMap, vueVersion } = useVueImportMap({
+      runtimeDev: import.meta.env.PROD
         ? undefined
         : `${location.origin}/src/vue-dev-proxy`,
-      defaultVueServerRendererURL: import.meta.env.PROD
+      serverRenderer: import.meta.env.PROD
         ? undefined
         : `${location.origin}/src/vue-server-renderer-dev-proxy`,
-    }))
-
+    })
+    const store = (window.store = useStore(
+      {
+        builtinImportMap,
+        vueVersion,
+        showOutput: ref(query.has('so')),
+        outputMode: ref((query.get('om') as OutputModes) || 'preview'),
+      },
+      location.hash,
+    ))
     console.info(store)
 
     watchEffect(() => history.replaceState({}, '', store.serialize()))
@@ -36,7 +43,7 @@ const App = {
     // )
     // }, 1000);
 
-    // store.setVueVersion('3.2.8')
+    store.vueVersion = '3.4.1'
 
     return () =>
       h(Repl, {

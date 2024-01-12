@@ -56,7 +56,7 @@ export async function compileFile(
   const { errors, descriptor } = store.compiler.parse(code, {
     filename,
     sourceMap: true,
-    templateParseOptions: store.options?.template?.compilerOptions,
+    templateParseOptions: store.sfcOptions?.template?.compilerOptions,
   })
   if (errors.length) {
     return errors
@@ -130,7 +130,8 @@ export async function compileFile(
   // only need dedicated compilation if not using <script setup>
   if (
     descriptor.template &&
-    (!descriptor.scriptSetup || store.options?.script?.inlineTemplate === false)
+    (!descriptor.scriptSetup ||
+      store.sfcOptions?.script?.inlineTemplate === false)
   ) {
     const clientTemplateResult = await doCompileTemplate(
       store,
@@ -168,27 +169,15 @@ export async function compileFile(
   }
 
   // styles
-  const ceFilter = store.customElement
+  const ceFilter = store.sfcOptions.script?.customElement || /\.ce\.vue$/
   function isCustomElement(filters: typeof ceFilter): boolean {
     if (typeof filters === 'boolean') {
       return filters
     }
-
-    if (typeof filters === 'string') {
-      return filters.includes(filename)
-    } else if (
-      !Array.isArray(filters) &&
-      Object.prototype.toString.call(filters) === '[object RegExp]'
-    ) {
-      return filters.test(filename)
+    if (typeof filters === 'function') {
+      return filters(filename)
     }
-
-    if (Array.isArray(filters)) {
-      return filters.some((filter) => {
-        return isCustomElement(filter)
-      })
-    }
-    return false
+    return filters.test(filename)
   }
   let isCE = isCustomElement(ceFilter)
 
@@ -200,7 +189,7 @@ export async function compileFile(
     }
 
     const styleResult = await store.compiler.compileStyleAsync({
-      ...store.options?.style,
+      ...store.sfcOptions?.style,
       source: style.content,
       filename,
       id,
@@ -211,7 +200,7 @@ export async function compileFile(
       // postcss uses pathToFileURL which isn't polyfilled in the browser
       // ignore these errors for now
       if (!styleResult.errors[0].message.includes('pathToFileURL')) {
-        store.state.errors = styleResult.errors
+        store.errors = styleResult.errors
       }
       // proceed even if css compile errors
     } else {
@@ -256,14 +245,14 @@ async function doCompileScript(
       : undefined
     const compiledScript = store.compiler.compileScript(descriptor, {
       inlineTemplate: true,
-      ...store.options?.script,
+      ...store.sfcOptions?.script,
       id,
       templateOptions: {
-        ...store.options?.template,
+        ...store.sfcOptions?.template,
         ssr,
         ssrCssVars: descriptor.cssVars,
         compilerOptions: {
-          ...store.options?.template?.compilerOptions,
+          ...store.sfcOptions?.template?.compilerOptions,
           expressionPlugins,
         },
       },
@@ -304,7 +293,7 @@ async function doCompileTemplate(
 ) {
   let { code, errors } = store.compiler.compileTemplate({
     isProd: false,
-    ...store.options?.template,
+    ...store.sfcOptions?.template,
     ast: descriptor.template!.ast,
     source: descriptor.template!.content,
     filename: descriptor.filename,
@@ -314,7 +303,7 @@ async function doCompileTemplate(
     ssr,
     ssrCssVars: descriptor.cssVars,
     compilerOptions: {
-      ...store.options?.template?.compilerOptions,
+      ...store.sfcOptions?.template?.compilerOptions,
       bindingMetadata,
       expressionPlugins: isTS ? ['typescript'] : undefined,
     },

@@ -13,8 +13,7 @@ import {
 import * as monaco from 'monaco-editor-core'
 import { initMonaco } from './env'
 import { getOrCreateModel } from './utils'
-import type { Store } from '../store'
-import type { EditorMode } from '../types'
+import { type EditorMode, injectKeyStore } from '../types'
 
 const props = withDefaults(
   defineProps<{
@@ -37,7 +36,7 @@ const emit = defineEmits<{
 const containerRef = ref<HTMLDivElement>()
 const ready = ref(false)
 const editor = shallowRef<monaco.editor.IStandaloneCodeEditor>()
-const store = inject<Store>('store')!
+const store = inject(injectKeyStore)!
 
 initMonaco(store)
 
@@ -113,7 +112,7 @@ onMounted(async () => {
       () => props.filename,
       (_, oldFilename) => {
         if (!editorInstance) return
-        const file = store.state.files[props.filename]
+        const file = store.files[props.filename]
         if (!file) return null
         const model = getOrCreateModel(
           monaco.Uri.parse(`file:///${props.filename}`),
@@ -121,7 +120,7 @@ onMounted(async () => {
           file.code,
         )
 
-        const oldFile = oldFilename ? store.state.files[oldFilename] : null
+        const oldFile = oldFilename ? store.files[oldFilename] : null
         if (oldFile) {
           oldFile.editorViewState = editorInstance.saveViewState()
         }

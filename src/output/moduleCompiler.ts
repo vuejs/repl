@@ -13,19 +13,13 @@ import type { ExportSpecifier, Identifier, Node } from '@babel/types'
 export function compileModulesForPreview(store: Store, isSSR = false) {
   const seen = new Set<File>()
   const processed: string[] = []
-  processFile(
-    store,
-    store.state.files[store.state.mainFile],
-    processed,
-    seen,
-    isSSR,
-  )
+  processFile(store, store.files[store.mainFile], processed, seen, isSSR)
 
   if (!isSSR) {
     // also add css files that are not imported
-    for (const filename in store.state.files) {
+    for (const filename in store.files) {
       if (filename.endsWith('.css')) {
-        const file = store.state.files[filename]
+        const file = store.files[filename]
         if (!seen.has(file)) {
           processed.push(
             `\nwindow.__css__.push(${JSON.stringify(file.compiled.css)})`,
@@ -96,14 +90,14 @@ function processChildFiles(
 ) {
   if (hasDynamicImport) {
     // process all files
-    for (const file of Object.values(store.state.files)) {
+    for (const file of Object.values(store.files)) {
       if (seen.has(file)) continue
       processFile(store, file, processed, seen, isSSR)
     }
   } else if (importedFiles.size > 0) {
     // crawl child imports
     for (const imported of importedFiles) {
-      processFile(store, store.state.files[imported], processed, seen, isSSR)
+      processFile(store, store.files[imported], processed, seen, isSSR)
     }
   }
 }
@@ -122,7 +116,7 @@ function processModule(store: Store, src: string, filename: string) {
   const importToIdMap = new Map<string, string>()
 
   function resolveImport(raw: string): string | undefined {
-    const files = store.state.files
+    const files = store.files
     let resolved = raw
     const file =
       files[resolved] ||

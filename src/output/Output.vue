@@ -1,8 +1,11 @@
 <script setup lang="ts">
 import Preview from './Preview.vue'
-import type { Store } from '../store'
 import { computed, inject, ref } from 'vue'
-import type { EditorComponentType, OutputModes } from '../types'
+import {
+  type EditorComponentType,
+  type OutputModes,
+  injectKeyStore,
+} from '../types'
 
 const props = defineProps<{
   editorComponent: EditorComponentType
@@ -10,7 +13,7 @@ const props = defineProps<{
   ssr: boolean
 }>()
 
-const store = inject('store') as Store
+const store = inject(injectKeyStore)!
 const previewRef = ref<InstanceType<typeof Preview>>()
 const modes = computed(() =>
   props.showCompileOutput
@@ -18,11 +21,17 @@ const modes = computed(() =>
     : (['preview'] as const),
 )
 
-const mode = ref<OutputModes>(
-  (modes.value as readonly string[]).includes(store.initialOutputMode)
-    ? (store.initialOutputMode as OutputModes)
-    : 'preview',
-)
+const mode = computed<OutputModes>({
+  get: () =>
+    (modes.value as readonly string[]).includes(store.outputMode)
+      ? store.outputMode
+      : 'preview',
+  set(value) {
+    if ((modes.value as readonly string[]).includes(store.outputMode)) {
+      store.outputMode = value
+    }
+  },
+})
 
 function reload() {
   previewRef.value?.reload()
@@ -48,8 +57,8 @@ defineExpose({ reload })
     <props.editorComponent
       v-if="mode !== 'preview'"
       readonly
-      :filename="store.state.activeFile.filename"
-      :value="store.state.activeFile.compiled[mode]"
+      :filename="store.activeFile.filename"
+      :value="store.activeFile.compiled[mode]"
       :mode="mode"
     />
   </div>
