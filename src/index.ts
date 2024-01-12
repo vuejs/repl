@@ -6,6 +6,7 @@ export {
   type SFCOptions,
   type StoreState,
   type Store,
+  type ReplStore,
 } from './store'
 export { useVueImportMap, type ImportMap } from './import-map'
 export { compileFile } from './transform'
