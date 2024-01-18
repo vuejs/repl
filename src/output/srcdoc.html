@@ -89,7 +89,8 @@
                   el.hasAttribute('download') ||
                   el.getAttribute('rel') === 'external' ||
                   el.target ||
-                  el.href.startsWith('javascript:')
+                  el.href.startsWith('javascript:') ||
+                  !el.href
                 )
                   return
 
@@ -102,9 +103,8 @@
                     return
                   }
                 }
-                if(el.href){
-                  window.open(el.href, '_blank')
-                }
+
+                window.open(el.href, '_blank')
               })
               send_ok()
             } catch (e) {
