@@ -102,8 +102,9 @@
                     return
                   }
                 }
-
-                window.open(el.href, '_blank')
+                if(el.href){
+                  window.open(el.href, '_blank')
+                }
               })
               send_ok()
             } catch (e) {
