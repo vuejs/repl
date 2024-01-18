@@ -26,6 +26,7 @@
       "import": "./dist/codemirror-editor.js",
       "require": null
     },
+    "./package.json": "./package.json",
     "./style.css": "./dist/vue-repl.css",
     "./dist/style.css": "./dist/vue-repl.css"
   },
