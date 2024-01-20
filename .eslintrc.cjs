@@ -13,6 +13,7 @@ module.exports = {
     'no-debugger': 'error',
     'no-console': ['error', { allow: ['warn', 'error', 'info', 'clear'] }],
     'sort-imports': ['error', { ignoreDeclarationSort: true }],
+    'no-duplicate-imports': 'error',
 
     // This rule enforces the preference for using '@ts-expect-error' comments in TypeScript
     // code to indicate intentional type errors, improving code clarity and maintainability.
