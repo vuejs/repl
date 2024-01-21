@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { computed, inject, reactive, ref } from 'vue'
-import type { Store } from './store'
+import { computed, inject, reactive, ref, toRef } from 'vue'
+import { injectKeyStore } from './types'
 
 const props = defineProps<{ layout?: 'horizontal' | 'vertical' }>()
 const isVertical = computed(() => props.layout === 'vertical')
@@ -8,8 +8,8 @@ const isVertical = computed(() => props.layout === 'vertical')
 const container = ref()
 
 // mobile only
-const store = inject('store') as Store
-const showOutput = ref(store.initialShowOutput)
+const store = inject(injectKeyStore)!
+const showOutput = toRef(store, 'showOutput')
 
 const state = reactive({
   dragging: false,

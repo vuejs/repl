@@ -15,8 +15,8 @@ export function initMonaco(store: Store) {
 
   watchEffect(() => {
     // create a model for each file in the store
-    for (const filename in store.state.files) {
-      const file = store.state.files[filename]
+    for (const filename in store.files) {
+      const file = store.files[filename]
       if (editor.getModel(Uri.parse(`file:///${filename}`))) continue
       getOrCreateModel(
         Uri.parse(`file:///${filename}`),
@@ -28,7 +28,7 @@ export function initMonaco(store: Store) {
     // dispose of any models that are not in the store
     for (const model of editor.getModels()) {
       const uri = model.uri.toString()
-      if (store.state.files[uri.substring('file:///'.length)]) continue
+      if (store.files[uri.substring('file:///'.length)]) continue
       if (uri.startsWith(jsDelivrUriBase + '/')) continue
       if (uri.startsWith('inmemory://')) continue
 
@@ -46,7 +46,7 @@ export function initMonaco(store: Store) {
       const path = resource.path
       if (/^\//.test(path)) {
         const fileName = path.replace('/', '')
-        if (fileName !== store.state.activeFile.filename) {
+        if (fileName !== store.activeFile.filename) {
           store.setActive(fileName)
           return true
         }
@@ -70,7 +70,7 @@ export async function reloadLanguageTools(store: Store) {
   disposeVue?.()
 
   let dependencies: Record<string, string> = {
-    ...store.state.dependencyVersion,
+    ...store.dependencyVersion,
   }
 
   if (store.vueVersion) {
@@ -88,10 +88,10 @@ export async function reloadLanguageTools(store: Store) {
     }
   }
 
-  if (store.state.typescriptVersion) {
+  if (store.typescriptVersion) {
     dependencies = {
       ...dependencies,
-      typescript: store.state.typescriptVersion,
+      typescript: store.typescriptVersion,
     }
   }
 
@@ -106,9 +106,7 @@ export async function reloadLanguageTools(store: Store) {
   })
   const languageId = ['vue', 'javascript', 'typescript']
   const getSyncUris = () =>
-    Object.keys(store.state.files).map((filename) =>
-      Uri.parse(`file:///${filename}`),
-    )
+    Object.keys(store.files).map((filename) => Uri.parse(`file:///${filename}`))
   const { dispose: disposeMarkers } = volar.editor.activateMarkers(
     worker,
     languageId,
@@ -155,8 +153,8 @@ export function loadMonacoEnv(store: Store) {
           })
           worker.postMessage({
             event: 'init',
-            tsVersion: store.state.typescriptVersion,
-            tsLocale: store.state.typescriptLocale || store.state.locale,
+            tsVersion: store.typescriptVersion,
+            tsLocale: store.locale,
           } satisfies WorkerMessage)
         })
         await init

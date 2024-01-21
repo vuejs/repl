@@ -13,16 +13,16 @@ import {
 import srcdoc from './srcdoc.html?raw'
 import { PreviewProxy } from './PreviewProxy'
 import { compileModulesForPreview } from './moduleCompiler'
-import type { Store } from '../store'
 import type { Props } from '../Repl.vue'
+import { injectKeyStore } from '../../src/types'
 
 const props = defineProps<{ show: boolean; ssr: boolean }>()
 
-const store = inject('store') as Store
-const clearConsole = inject('clear-console') as Ref<boolean>
-const theme = inject('theme') as Ref<'dark' | 'light'>
+const store = inject(injectKeyStore)!
+const clearConsole = inject<Ref<boolean>>('clear-console')!
+const theme = inject<Ref<'dark' | 'light'>>('theme')!
 
-const previewOptions = inject('preview-options') as Props['previewOptions']
+const previewOptions = inject<Props['previewOptions']>('preview-options')
 
 const container = ref()
 const runtimeError = ref()
@@ -42,14 +42,11 @@ watch(
     try {
       createSandbox()
     } catch (e: any) {
-      store.state.errors = [e as Error]
+      store.errors = [e as Error]
       return
     }
   },
 )
-
-// reset sandbox when version changes
-watch(() => store.state.resetFlip, createSandbox)
 
 // reset theme
 watch(
@@ -90,12 +87,6 @@ function createSandbox() {
   )
 
   const importMap = store.getImportMap()
-  if (!importMap.imports) {
-    importMap.imports = {}
-  }
-  if (!importMap.imports.vue) {
-    importMap.imports.vue = store.state.vueRuntimeURL
-  }
   const sandboxSrc = srcdoc
     .replace(/<html>/, `<html class="${theme.value}">`)
     .replace(/<!--IMPORT_MAP-->/, JSON.stringify(importMap))
@@ -193,7 +184,7 @@ async function updatePreview() {
   }
 
   try {
-    const mainFile = store.state.mainFile
+    const mainFile = store.mainFile
 
     // if SSR, generate the SSR bundle and eval it to render the HTML
     if (isSSR && mainFile.endsWith('.vue')) {

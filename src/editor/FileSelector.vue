@@ -1,13 +1,9 @@
 <script setup lang="ts">
-import {
-  type Store,
-  importMapFile,
-  stripSrcPrefix,
-  tsconfigFile,
-} from '../store'
+import { injectKeyStore } from '../../src/types'
+import { importMapFile, stripSrcPrefix, tsconfigFile } from '../store'
 import { type Ref, type VNode, computed, inject, ref } from 'vue'
 
-const store = inject('store') as Store
+const store = inject(injectKeyStore)!
 
 /**
  * When `true`: indicates adding a new file
@@ -23,7 +19,7 @@ const pendingFilename = ref('Comp.vue')
 const showTsConfig = inject<Ref<boolean>>('tsconfig')
 const showImportMap = inject<Ref<boolean>>('import-map')
 const files = computed(() =>
-  Object.entries(store.state.files)
+  Object.entries(store.files)
     .filter(
       ([name, file]) =>
         name !== importMapFile && name !== tsconfigFile && !file.hidden,
@@ -37,7 +33,7 @@ function startAddFile() {
 
   while (true) {
     let hasConflict = false
-    for (const filename in store.state.files) {
+    for (const filename in store.files) {
       if (stripSrcPrefix(filename) === name) {
         hasConflict = true
         name = `Comp${++i}.vue`
@@ -68,18 +64,18 @@ function doneNameFile() {
   const oldFilename = pending.value === true ? '' : pending.value
 
   if (!/\.(vue|js|ts|css|json)$/.test(filename)) {
-    store.state.errors = [
+    store.errors = [
       `Playground only supports *.vue, *.js, *.ts, *.css, *.json files.`,
     ]
     return
   }
 
-  if (filename !== oldFilename && filename in store.state.files) {
-    store.state.errors = [`File "${filename}" already exists.`]
+  if (filename !== oldFilename && filename in store.files) {
+    store.errors = [`File "${filename}" already exists.`]
     return
   }
 
-  store.state.errors = []
+  store.errors = []
   cancelNameFile()
 
   if (filename === oldFilename) {
@@ -122,7 +118,7 @@ function horizontalScroll(e: WheelEvent) {
       <div
         v-if="pending !== file"
         class="file"
-        :class="{ active: store.state.activeFile.filename === file }"
+        :class="{ active: store.activeFile.filename === file }"
         @click="store.setActive(file)"
         @dblclick="i > 0 && editFileName(file)"
       >
@@ -154,9 +150,9 @@ function horizontalScroll(e: WheelEvent) {
 
     <div class="import-map-wrapper">
       <div
-        v-if="showTsConfig && store.state.files[tsconfigFile]"
+        v-if="showTsConfig && store.files[tsconfigFile]"
         class="file"
-        :class="{ active: store.state.activeFile.filename === tsconfigFile }"
+        :class="{ active: store.activeFile.filename === tsconfigFile }"
         @click="store.setActive(tsconfigFile)"
       >
         <span class="label">tsconfig.json</span>
@@ -164,7 +160,7 @@ function horizontalScroll(e: WheelEvent) {
       <div
         v-if="showImportMap"
         class="file"
-        :class="{ active: store.state.activeFile.filename === importMapFile }"
+        :class="{ active: store.activeFile.filename === importMapFile }"
         @click="store.setActive(importMapFile)"
       >
         <span class="label">Import Map</span>

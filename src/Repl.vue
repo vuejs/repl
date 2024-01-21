@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import SplitPane from './SplitPane.vue'
 import Output from './output/Output.vue'
-import { ReplStore, type SFCOptions, type Store } from './store'
-import { computed, provide, ref, toRef, watchEffect } from 'vue'
-import type { EditorComponentType } from './types'
+import { type Store, useStore } from './store'
+import { computed, provide, ref, toRef } from 'vue'
+import { type EditorComponentType, injectKeyStore } from './types'
 import EditorContainer from './editor/EditorContainer.vue'
 
 export interface Props {
@@ -15,7 +15,6 @@ export interface Props {
   showImportMap?: boolean
   showTsConfig?: boolean
   clearConsole?: boolean
-  sfcOptions?: SFCOptions
   layout?: 'horizontal' | 'vertical'
   layoutReverse?: boolean
   ssr?: boolean
@@ -32,7 +31,7 @@ export interface Props {
 
 const props = withDefaults(defineProps<Props>(), {
   theme: 'light',
-  store: () => new ReplStore(),
+  store: () => useStore(),
   autoResize: true,
   showCompileOutput: true,
   showImportMap: true,
@@ -49,7 +48,6 @@ const props = withDefaults(defineProps<Props>(), {
       useCode: '',
     },
   }),
-  sfcOptions: () => ({}),
   layout: 'horizontal',
 })
 
@@ -59,28 +57,12 @@ if (!props.editor) {
 
 const outputRef = ref<InstanceType<typeof Output>>()
 
-watchEffect(() => {
-  const { store } = props
-  const sfcOptions = (store.options = props.sfcOptions || {})
-  sfcOptions.script ||= {}
-  sfcOptions.script.fs = {
-    fileExists(file: string) {
-      if (file.startsWith('/')) file = file.slice(1)
-      return !!store.state.files[file]
-    },
-    readFile(file: string) {
-      if (file.startsWith('/')) file = file.slice(1)
-      return store.state.files[file].code
-    },
-  }
-})
-
 props.store.init()
 
 const editorSlotName = computed(() => (props.layoutReverse ? 'right' : 'left'))
 const outputSlotName = computed(() => (props.layoutReverse ? 'left' : 'right'))
 
-provide('store', props.store)
+provide(injectKeyStore, props.store)
 provide('autoresize', props.autoResize)
 provide('import-map', toRef(props, 'showImportMap'))
 provide('tsconfig', toRef(props, 'showTsConfig'))
