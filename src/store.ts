@@ -1,6 +1,7 @@
 import {
   type ToRefs,
   type UnwrapRef,
+  computed,
   reactive,
   ref,
   shallowRef,
@@ -28,7 +29,7 @@ export const tsconfigFile = 'tsconfig.json'
 export function useStore(
   {
     files = ref(Object.create(null)),
-    activeFile = undefined!, // set later
+    activeFilename = undefined!, // set later
     mainFile = ref('src/App.vue'),
     template = ref({
       welcomeSFC: welcomeSFCCode,
@@ -143,7 +144,7 @@ export function useStore(
   }
 
   const setActive: Store['setActive'] = (filename) => {
-    activeFile.value = files.value[filename]
+    activeFilename.value = filename
   }
   const addFile: Store['addFile'] = (fileOrFilename) => {
     let file: File
@@ -165,8 +166,8 @@ export function useStore(
       return
     }
 
-    if (activeFile.value.filename === filename) {
-      activeFile.value = files.value[mainFile.value]
+    if (activeFilename.value === filename) {
+      activeFilename.value = mainFile.value
     }
     delete files.value[filename]
   }
@@ -302,13 +303,15 @@ export function useStore(
   if (!files.value[mainFile.value]) {
     mainFile.value = Object.keys(files.value)[0]
   }
-  activeFile ||= ref(files.value[mainFile.value])
+  activeFilename ||= ref(mainFile.value)
+  const activeFile = computed(() => files.value[activeFilename.value])
 
   applyBuiltinImportMap()
 
   const store: ReplStore = reactive({
     files,
     activeFile,
+    activeFilename,
     mainFile,
     template,
     builtinImportMap,
@@ -363,7 +366,7 @@ export interface SFCOptions {
 
 export type StoreState = ToRefs<{
   files: Record<string, File>
-  activeFile: File
+  activeFilename: string
   mainFile: string
   template: {
     welcomeSFC?: string
@@ -390,6 +393,7 @@ export type StoreState = ToRefs<{
 }>
 
 export interface ReplStore extends UnwrapRef<StoreState> {
+  activeFile: File
   init(): void
   setActive(filename: string): void
   addFile(filename: string | File): void

@@ -1,7 +1,10 @@
+/* eslint-disable @typescript-eslint/prefer-ts-expect-error */
 import { createApp, h, ref, watchEffect } from 'vue'
 import { type OutputModes, Repl, useStore, useVueImportMap } from '../src'
+// @ts-ignore
 import MonacoEditor from '../src/editor/MonacoEditor.vue'
-// import CodeMirrorEditor from '../src/editor/CodeMirrorEditor.vue'
+// @ts-ignore
+import CodeMirrorEditor from '../src/editor/CodeMirrorEditor.vue'
 
 const window = globalThis.window as any
 window.process = { env: {} }
@@ -43,7 +46,7 @@ const App = {
     //   )
     // }, 1000)
 
-    store.vueVersion = '3.4.1'
+    // store.vueVersion = '3.4.1'
 
     return () =>
       h(Repl, {
