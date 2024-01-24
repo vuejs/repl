@@ -137,10 +137,13 @@ export function useStore(
           map.imports![key] = fixURL(value)
         }
       }
-    files.value[importMapFile] = new File(
-      importMapFile,
-      JSON.stringify(map, undefined, 2),
-    )
+
+    const code = JSON.stringify(map, undefined, 2)
+    if (files.value[importMapFile]) {
+      files.value[importMapFile].code = code
+    } else {
+      files.value[importMapFile] = new File(importMapFile, code)
+    }
   }
 
   const setActive: Store['setActive'] = (filename) => {
