@@ -1,3 +1,19 @@
+# [3.4.0](https://github.com/vuejs/repl/compare/v3.3.0...v3.4.0) (2024-01-24)
+
+
+### Bug Fixes
+
+* add corresponding black theme background ([#206](https://github.com/vuejs/repl/issues/206)) ([3921c85](https://github.com/vuejs/repl/commit/3921c85f90a40a871838f9740fa3588e2cfa4758))
+* don't overwrite `a` tag without href ([#209](https://github.com/vuejs/repl/issues/209)) ([c7fcf38](https://github.com/vuejs/repl/commit/c7fcf381f195ffce6284cc92c26f8a90e09b484a))
+* don't show tsconfig if not present ([ca548b2](https://github.com/vuejs/repl/commit/ca548b240addd4f58851a545622684a00eb09a0a))
+
+
+### Features
+
+* export `package.json` ([79a22de](https://github.com/vuejs/repl/commit/79a22deb84aa50e31cf6506a67e93f69291fb82f))
+
+
+
 # [3.3.0](https://github.com/vuejs/repl/compare/v3.2.0...v3.3.0) (2024-01-11)
 
 
