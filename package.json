@@ -38,6 +38,9 @@
       ]
     }
   },
+  "publishConfig": {
+    "tag": "alpha"
+  },
   "scripts": {
     "dev": "vite",
     "build": "vite build",
