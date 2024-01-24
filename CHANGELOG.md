@@ -1,3 +1,12 @@
+# [4.0.0-alpha.1](https://github.com/vuejs/repl/compare/v4.0.0-alpha.0...v4.0.0-alpha.1) (2024-01-24)
+
+
+### Bug Fixes
+
+* don't re-create import map file ([9e6f078](https://github.com/vuejs/repl/commit/9e6f078206883821d9bc618a194cf50333f38d3d))
+
+
+
 # [4.0.0-alpha.0](https://github.com/vuejs/repl/compare/v3.3.0...v4.0.0-alpha.0) (2024-01-21)
 
 
