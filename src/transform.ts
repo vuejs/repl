@@ -75,13 +75,24 @@ export async function compileFile(
     return errors
   }
 
-  if (
-    descriptor.styles.some((s) => s.lang) ||
-    (descriptor.template && descriptor.template.lang)
-  ) {
+  const styleLang = descriptor.styles.map((s) => s.lang).filter(Boolean)
+  const templateLang = descriptor.template?.lang
+  if (styleLang.length && templateLang) {
     return [
-      `lang="x" pre-processors for <template> or <style> are currently not ` +
-        `supported.`,
+      `lang="${styleLang.join(
+        ',',
+      )}" pre-processors for <style> and lang="${templateLang}" for <template> are currently not supported.`,
+    ]
+  }
+  if (styleLang.length) {
+    return [
+      `lang="${styleLang.join(
+        ',',
+      )}" pre-processors for <style> are currently not supported.`,
+    ]
+  } else if (templateLang) {
+    return [
+      `lang="${templateLang}" pre-processors for <template> are currently not supported.`,
     ]
   }
 
