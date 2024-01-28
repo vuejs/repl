@@ -295,7 +295,7 @@ function processModule(store: Store, src: string, filename: string) {
           s.overwrite(
             arg.start!,
             arg.end!,
-            JSON.stringify(arg.value.replace(/^\.\/+/, '')),
+            JSON.stringify(arg.value.replace(/^\.\/+/, 'src/')),
           )
         }
       }
