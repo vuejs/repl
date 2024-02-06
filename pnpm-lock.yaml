@@ -11,6 +11,9 @@ devDependencies:
   '@rollup/plugin-replace':
     specifier: ^5.0.5
     version: 5.0.5
+  '@shikijs/monaco':
+    specifier: ^1.0.0-rc.0
+    version: 1.0.0-rc.0
   '@types/codemirror':
     specifier: ^5.60.15
     version: 5.60.15
@@ -68,12 +71,9 @@ devDependencies:
   prettier:
     specifier: ^3.1.1
     version: 3.1.1
-  shikiji:
-    specifier: ^0.9.17
-    version: 0.9.17
-  shikiji-monaco:
-    specifier: ^0.9.17
-    version: 0.9.17
+  shiki:
+    specifier: ^1.0.0-rc.0
+    version: 1.0.0-rc.0
   simple-git-hooks:
     specifier: ^2.9.0
     version: 2.9.0
@@ -722,6 +722,16 @@ packages:
       argparse: 1.0.10
       colors: 1.2.5
       string-argv: 0.3.2
+    dev: true
+
+  /@shikijs/core@1.0.0-rc.0:
+    resolution: {integrity: sha512-j/7te+hvEYlQTvk/wPoA+1rOklZTz8QuyqVvV81KcEN/g1WXKVnqp9WZ7jFuv0ZVLqBtDx/V8viRDROJniyMLA==}
+    dev: true
+
+  /@shikijs/monaco@1.0.0-rc.0:
+    resolution: {integrity: sha512-vR10MkTN2jUVqauSGm1lZwmoemjKbqINzkmuGVjSL6SpPMdaXEzN0aX48Wok20n2TWStDAbcTDiCXMcL9DItzw==}
+    dependencies:
+      '@shikijs/core': 1.0.0-rc.0
     dev: true
 
   /@types/argparse@1.0.38:
@@ -3041,20 +3051,10 @@ packages:
     engines: {node: '>=8'}
     dev: true
 
-  /shikiji-core@0.9.17:
-    resolution: {integrity: sha512-r1FWTXk6SO2aYqfWgcsJ11MuVQ1ymPSdXzJjK7q8EXuyqu8yc2N5qrQy5+BL6gTVOaF4yLjbxFjF+KTRM1Sp8Q==}
-    dev: true
-
-  /shikiji-monaco@0.9.17:
-    resolution: {integrity: sha512-5HLHQSLtg8QdOU+dkLxIiWovkqqKacYLuuJtVMYBayviZKTTBdY9IxvUSFq0Maj/LDC2OI0HEEs51DqwPSCRow==}
+  /shiki@1.0.0-rc.0:
+    resolution: {integrity: sha512-aeEjERF5qeK+YChgEv94LOjcEcjZBLd0acPaHginz0N8FvyTn2iSLhO0AtoqfvlZ8cWGCJRKLWtDApnQVQB6/Q==}
     dependencies:
-      shikiji-core: 0.9.17
-    dev: true
-
-  /shikiji@0.9.17:
-    resolution: {integrity: sha512-0z/1NfkhBkm3ijrfFeHg3G9yDNuHhXdAGbQm7tRxj4WQ5z2y0XDbnagFyKyuV2ebCTS1Mwy1I3n0Fzcc/4xdmw==}
-    dependencies:
-      shikiji-core: 0.9.17
+      '@shikijs/core': 1.0.0-rc.0
     dev: true
 
   /signal-exit@3.0.7:
