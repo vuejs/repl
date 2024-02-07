@@ -1,20 +1,19 @@
 import * as monaco from 'monaco-editor-core'
-import { getHighlighterCore } from 'shikiji/core'
-import { getWasmInlined } from 'shikiji/wasm'
-import { shikijiToMonaco } from 'shikiji-monaco'
+import { getHighlighterCore } from 'shiki/core'
+import { shikiToMonaco } from '@shikijs/monaco'
 
-import langVue from 'shikiji/langs/vue.mjs'
-import themeDark from 'shikiji/themes/dark-plus.mjs'
-import themeLight from 'shikiji/themes/light-plus.mjs'
+import langVue from 'shiki/langs/vue.mjs'
+import themeDark from 'shiki/themes/dark-plus.mjs'
+import themeLight from 'shiki/themes/light-plus.mjs'
 
 export async function registerHighlighter() {
   const highlighter = await getHighlighterCore({
     themes: [themeDark, themeLight],
     langs: [langVue],
-    loadWasm: getWasmInlined,
+    loadWasm: import('shiki/wasm'),
   })
   monaco.languages.register({ id: 'vue' })
-  shikijiToMonaco(highlighter, monaco)
+  shikiToMonaco(highlighter, monaco)
   return {
     light: themeLight.name!,
     dark: themeDark.name!,
