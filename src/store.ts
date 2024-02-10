@@ -255,6 +255,7 @@ export function useStore(
         delete files[importMapFile]
       }
     }
+    if (vueVersion.value) files._version = vueVersion.value
     return '#' + utoa(JSON.stringify(files))
   }
   const deserialize: ReplStore['deserialize'] = (serializedState: string) => {
@@ -275,7 +276,6 @@ export function useStore(
       const normalized = stripSrcPrefix(filename)
       exported[normalized] = file.code
     }
-    if (vueVersion.value) exported._version = vueVersion.value
     return exported
   }
   const setFiles: ReplStore['setFiles'] = async (
