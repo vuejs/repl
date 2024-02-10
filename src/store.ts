@@ -85,20 +85,24 @@ export function useStore(
       { deep: true, immediate: true },
     )
 
-    watch(vueVersion, async (version) => {
-      if (version) {
-        const compilerUrl = `https://cdn.jsdelivr.net/npm/@vue/compiler-sfc@${version}/dist/compiler-sfc.esm-browser.js`
-        loading.value = true
-        compiler.value = await import(/* @vite-ignore */ compilerUrl).finally(
-          () => (loading.value = false),
-        )
-        console.info(`[@vue/repl] Now using Vue version: ${version}`)
-      } else {
-        // reset to default
-        compiler.value = defaultCompiler
-        console.info(`[@vue/repl] Now using default Vue version`)
-      }
-    })
+    watch(
+      vueVersion,
+      async (version) => {
+        if (version) {
+          const compilerUrl = `https://cdn.jsdelivr.net/npm/@vue/compiler-sfc@${version}/dist/compiler-sfc.esm-browser.js`
+          loading.value = true
+          compiler.value = await import(/* @vite-ignore */ compilerUrl).finally(
+            () => (loading.value = false),
+          )
+          console.info(`[@vue/repl] Now using Vue version: ${version}`)
+        } else {
+          // reset to default
+          compiler.value = defaultCompiler
+          console.info(`[@vue/repl] Now using default Vue version`)
+        }
+      },
+      { immediate: true },
+    )
 
     watch(
       sfcOptions,
