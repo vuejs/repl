@@ -51,6 +51,8 @@ export function useStore(
   }: Partial<StoreState> = {},
   serializedState?: string,
 ): ReplStore {
+  const loading = ref(false)
+
   function applyBuiltinImportMap() {
     const importMap = mergeImportMap(builtinImportMap.value, getImportMap())
     setImportMap(importMap)
@@ -86,7 +88,10 @@ export function useStore(
     watch(vueVersion, async (version) => {
       if (version) {
         const compilerUrl = `https://cdn.jsdelivr.net/npm/@vue/compiler-sfc@${version}/dist/compiler-sfc.esm-browser.js`
-        compiler.value = await import(/* @vite-ignore */ compilerUrl)
+        loading.value = true
+        compiler.value = await import(/* @vite-ignore */ compilerUrl).finally(
+          () => (loading.value = false),
+        )
         console.info(`[@vue/repl] Now using Vue version: ${version}`)
       } else {
         // reset to default
@@ -329,6 +334,7 @@ export function useStore(
     outputMode,
     sfcOptions,
     compiler,
+    loading,
     vueVersion,
 
     locale,
@@ -402,6 +408,8 @@ export type StoreState = ToRefs<{
 
 export interface ReplStore extends UnwrapRef<StoreState> {
   activeFile: File
+  /** Loading compiler */
+  loading: boolean
   init(): void
   setActive(filename: string): void
   addFile(filename: string | File): void
