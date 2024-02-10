@@ -39,7 +39,7 @@
     }
   },
   "publishConfig": {
-    "tag": "alpha"
+    "tag": "latest"
   },
   "scripts": {
     "dev": "vite",
