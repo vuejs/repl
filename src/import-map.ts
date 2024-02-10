@@ -13,7 +13,7 @@ export function useVueImportMap(
   }
 
   const productionMode = ref(false)
-  const vueVersion = ref<string | undefined>()
+  const vueVersion = ref<string | null>(null)
   const importMap = computed<ImportMap>(() => {
     const vue =
       (!vueVersion.value &&

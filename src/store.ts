@@ -42,7 +42,7 @@ export function useStore(
     outputMode = ref('preview'),
     sfcOptions = ref({}),
     compiler = shallowRef(defaultCompiler),
-    vueVersion = ref(),
+    vueVersion = ref(null),
 
     locale = ref(),
     typescriptVersion = ref('latest'),
@@ -257,7 +257,11 @@ export function useStore(
       serializedState = serializedState.slice(1)
     const saved = JSON.parse(atou(serializedState))
     for (const filename in saved) {
-      setFile(files.value, filename, saved[filename])
+      if (filename === '_version') {
+        vueVersion.value = saved[filename]
+      } else {
+        setFile(files.value, filename, saved[filename])
+      }
     }
   }
   const getFiles: ReplStore['getFiles'] = () => {
@@ -266,6 +270,7 @@ export function useStore(
       const normalized = stripSrcPrefix(filename)
       exported[normalized] = file.code
     }
+    if (vueVersion.value) exported._version = vueVersion.value
     return exported
   }
   const setFiles: ReplStore['setFiles'] = async (
@@ -385,7 +390,7 @@ export type StoreState = ToRefs<{
   /** `@vue/compiler-sfc` */
   compiler: typeof defaultCompiler
   /* only apply for compiler-sfc */
-  vueVersion: string | undefined
+  vueVersion: string | null
 
   // volar-related
   locale: string | undefined
