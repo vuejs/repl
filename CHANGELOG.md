@@ -1,3 +1,12 @@
+# [4.0.0-beta.0](https://github.com/vuejs/repl/compare/v4.0.0-alpha.1...v4.0.0-beta.0) (2024-02-10)
+
+
+### Bug Fixes
+
+* pass readonly in code mirror editor ([1100158](https://github.com/vuejs/repl/commit/1100158aec97dae9cf47ac04ff2bb9ec00d05e58))
+
+
+
 # [4.0.0-alpha.1](https://github.com/vuejs/repl/compare/v4.0.0-alpha.0...v4.0.0-alpha.1) (2024-01-24)
 
 
