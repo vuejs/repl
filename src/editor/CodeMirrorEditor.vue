@@ -39,5 +39,10 @@ const activeMode = computed(() => {
 </script>
 
 <template>
-  <CodeMirror :value="value" :mode="activeMode" @change="onChange" />
+  <CodeMirror
+    :value="value"
+    :mode="activeMode"
+    :readonly="readonly"
+    @change="onChange"
+  />
 </template>
