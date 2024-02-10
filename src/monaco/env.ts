@@ -7,6 +7,7 @@ import type { Store } from '../store'
 import { getOrCreateModel } from './utils'
 import type { CreateData } from './vue.worker'
 import vueWorker from './vue.worker?worker'
+import * as languageConfigs from './language-configs'
 
 let initted = false
 export function initMonaco(store: Store) {
@@ -34,26 +35,6 @@ export function initMonaco(store: Store) {
 
       model.dispose()
     }
-  })
-
-  // Support for go to definition
-  editor.registerEditorOpener({
-    openCodeEditor(_, resource) {
-      if (resource.toString().startsWith(jsDelivrUriBase + '/')) {
-        return true
-      }
-
-      const path = resource.path
-      if (/^\//.test(path)) {
-        const fileName = path.replace('/', '')
-        if (fileName !== store.activeFile.filename) {
-          store.setActive(fileName)
-          return true
-        }
-      }
-
-      return false
-    },
   })
 
   initted = true
@@ -166,7 +147,32 @@ export function loadMonacoEnv(store: Store) {
   languages.register({ id: 'vue', extensions: ['.vue'] })
   languages.register({ id: 'javascript', extensions: ['.js'] })
   languages.register({ id: 'typescript', extensions: ['.ts'] })
+  languages.register({ id: 'css', extensions: ['.css'] })
+  languages.setLanguageConfiguration('vue', languageConfigs.vue)
+  languages.setLanguageConfiguration('javascript', languageConfigs.js)
+  languages.setLanguageConfiguration('typescript', languageConfigs.ts)
+  languages.setLanguageConfiguration('css', languageConfigs.css)
 
   store.reloadLanguageTools = () => reloadLanguageTools(store)
   languages.onLanguage('vue', () => store.reloadLanguageTools!())
+
+  // Support for go to definition
+  editor.registerEditorOpener({
+    openCodeEditor(_, resource) {
+      if (resource.toString().startsWith(jsDelivrUriBase + '/')) {
+        return true
+      }
+
+      const path = resource.path
+      if (/^\//.test(path)) {
+        const fileName = path.replace('/', '')
+        if (fileName !== store.activeFile.filename) {
+          store.setActive(fileName)
+          return true
+        }
+      }
+
+      return false
+    },
+  })
 }
