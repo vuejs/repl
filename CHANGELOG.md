@@ -1,3 +1,17 @@
+## [4.0.1](https://github.com/vuejs/repl/compare/v4.0.0...v4.0.1) (2024-02-10)
+
+
+### Bug Fixes
+
+* save version only when serialize ([d3ee13d](https://github.com/vuejs/repl/commit/d3ee13ded3c5a162bf990ef83cb9a38991792170))
+
+
+### Features
+
+* register language configuration ([3ad7035](https://github.com/vuejs/repl/commit/3ad7035e26cb02626b06e58f53e12ffb5443a5fc))
+
+
+
 # [4.0.0](https://github.com/vuejs/repl/compare/v4.0.0-beta.0...v4.0.0) (2024-02-10)
 
 
