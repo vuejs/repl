@@ -1,3 +1,12 @@
+## [4.0.2](https://github.com/vuejs/repl/compare/v4.0.1...v4.0.2) (2024-02-10)
+
+
+### Bug Fixes
+
+* respect vue version at initialization ([ef22052](https://github.com/vuejs/repl/commit/ef22052055590dbbe6e85e26ce368938b0c93266))
+
+
+
 ## [4.0.1](https://github.com/vuejs/repl/compare/v4.0.0...v4.0.1) (2024-02-10)
 
 
