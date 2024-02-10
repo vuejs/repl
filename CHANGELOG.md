@@ -1,3 +1,13 @@
+# [4.0.0](https://github.com/vuejs/repl/compare/v4.0.0-beta.0...v4.0.0) (2024-02-10)
+
+
+### Features
+
+* expose loading status ([eee6bb3](https://github.com/vuejs/repl/commit/eee6bb38ddecbe8bf7ba3ab77d6a549e654b6313))
+* save vue version ([08b4492](https://github.com/vuejs/repl/commit/08b4492fe883bdd4bbe7fd972cd3fbbd8f6416cf))
+
+
+
 # [4.0.0-beta.0](https://github.com/vuejs/repl/compare/v4.0.0-alpha.1...v4.0.0-beta.0) (2024-02-10)
 
 
