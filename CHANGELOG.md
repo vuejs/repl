@@ -1,3 +1,12 @@
+# [4.1.0](https://github.com/vuejs/repl/compare/v4.0.2...v4.1.0) (2024-02-11)
+
+
+### Features
+
+* add `previewTheme` prop ([c830fc4](https://github.com/vuejs/repl/commit/c830fc434a1781523af332d289957bc485f51a0b))
+
+
+
 ## [4.0.2](https://github.com/vuejs/repl/compare/v4.0.1...v4.0.2) (2024-02-10)
 
 
