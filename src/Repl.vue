@@ -8,6 +8,7 @@ import EditorContainer from './editor/EditorContainer.vue'
 
 export interface Props {
   theme?: 'dark' | 'light'
+  previewTheme?: boolean
   editor: EditorComponentType
   store?: Store
   autoResize?: boolean
@@ -31,6 +32,7 @@ export interface Props {
 
 const props = withDefaults(defineProps<Props>(), {
   theme: 'light',
+  previewTheme: false,
   store: () => useStore(),
   autoResize: true,
   showCompileOutput: true,
@@ -69,6 +71,7 @@ provide('tsconfig', toRef(props, 'showTsConfig'))
 provide('clear-console', toRef(props, 'clearConsole'))
 provide('preview-options', props.previewOptions)
 provide('theme', toRef(props, 'theme'))
+provide('preview-theme', toRef(props, 'previewTheme'))
 /**
  * Reload the preview iframe
  */

@@ -21,6 +21,7 @@ const props = defineProps<{ show: boolean; ssr: boolean }>()
 const store = inject(injectKeyStore)!
 const clearConsole = inject<Ref<boolean>>('clear-console')!
 const theme = inject<Ref<'dark' | 'light'>>('theme')!
+const previewTheme = inject<Ref<boolean>>('preview-theme')!
 
 const previewOptions = inject<Props['previewOptions']>('preview-options')
 
@@ -49,15 +50,16 @@ watch(
 )
 
 // reset theme
-watch(
-  () => theme.value,
-  (value) => {
-    const html = sandbox.contentDocument?.documentElement
-    if (html) {
-      html.className = value
-    }
-  },
-)
+watch([theme, previewTheme], ([theme, previewTheme]) => {
+  if (!previewTheme) return
+
+  const html = sandbox.contentDocument?.documentElement
+  if (html) {
+    html.className = theme
+  } else {
+    createSandbox()
+  }
+})
 
 onUnmounted(() => {
   proxy.destroy()
@@ -88,7 +90,10 @@ function createSandbox() {
 
   const importMap = store.getImportMap()
   const sandboxSrc = srcdoc
-    .replace(/<html>/, `<html class="${theme.value}">`)
+    .replace(
+      /<html>/,
+      `<html class="${previewTheme.value ? theme.value : ''}">`,
+    )
     .replace(/<!--IMPORT_MAP-->/, JSON.stringify(importMap))
     .replace(
       /<!-- PREVIEW-OPTIONS-HEAD-HTML -->/,
@@ -281,7 +286,12 @@ defineExpose({ reload })
 </script>
 
 <template>
-  <div v-show="show" ref="container" class="iframe-container" :class="theme" />
+  <div
+    v-show="show"
+    ref="container"
+    class="iframe-container"
+    :class="{ [theme]: previewTheme }"
+  />
   <Message :err="runtimeError" />
   <Message v-if="!runtimeError" :warn="runtimeWarning" />
 </template>

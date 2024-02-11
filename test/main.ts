@@ -47,11 +47,16 @@ const App = {
     // }, 1000)
 
     // store.vueVersion = '3.4.1'
+    const theme = ref<'light' | 'dark'>('dark')
+    window.theme = theme
+    const previewTheme = ref(false)
+    window.previewTheme = previewTheme
 
     return () =>
       h(Repl, {
         store,
-        theme: 'dark',
+        theme: theme.value,
+        previewTheme: previewTheme.value,
         editor: MonacoEditor,
         // layout: 'vertical',
         ssr: true,
