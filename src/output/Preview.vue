@@ -49,17 +49,20 @@ watch(
   },
 )
 
-// reset theme
-watch([theme, previewTheme], ([theme, previewTheme]) => {
-  if (!previewTheme) return
+function switchPreviewTheme() {
+  if (!previewTheme.value) return
 
   const html = sandbox.contentDocument?.documentElement
   if (html) {
-    html.className = theme
+    html.className = theme.value
   } else {
+    // re-create sandbox
     createSandbox()
   }
-})
+}
+
+// reset theme
+watch([theme, previewTheme], switchPreviewTheme)
 
 onUnmounted(() => {
   proxy.destroy()
@@ -164,6 +167,7 @@ function createSandbox() {
   sandbox.addEventListener('load', () => {
     proxy.handle_links()
     stopUpdateWatcher = watchEffect(updatePreview)
+    switchPreviewTheme()
   })
 }
 
