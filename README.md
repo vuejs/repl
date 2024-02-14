@@ -44,6 +44,8 @@ import Monaco from '@vue/repl/monaco-editor'
 
 Customize the behavior of the REPL by manually initializing the store.
 
+See [v4 Migration Guide](https://github.com/vuejs/repl/releases/tag/v4.0.0)
+
 ```vue
 <script setup>
 import { watchEffect, ref } from 'vue'
