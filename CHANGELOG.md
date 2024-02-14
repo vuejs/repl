@@ -1,3 +1,13 @@
+## [4.1.1](https://github.com/vuejs/repl/compare/v4.1.0...v4.1.1) (2024-02-14)
+
+
+### Bug Fixes
+
+* add vue import maps for default import map ([c74673f](https://github.com/vuejs/repl/commit/c74673fb55d2232de55562e62a818142681bdc8b))
+* reload preview style error after switching theme ([#214](https://github.com/vuejs/repl/issues/214)) ([bc4c76c](https://github.com/vuejs/repl/commit/bc4c76c3f143b5edc3546d80002cb813704b8351))
+
+
+
 # [4.1.0](https://github.com/vuejs/repl/compare/v4.0.2...v4.1.0) (2024-02-11)
 
 
