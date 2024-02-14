@@ -53,7 +53,11 @@ import Monaco from '@vue/repl/monaco-editor'
 // retrieve some configuration options from the URL
 const query = new URLSearchParams(location.search)
 
-const { importMap: builtinImportMap, vueVersion } = useVueImportMap({
+const {
+  importMap: builtinImportMap,
+  vueVersion,
+  productionMode,
+} = useVueImportMap({
   // specify the default URL to import Vue runtime from in the sandbox
   // default is the CDN link from jsdelivr.com with version matching Vue's version
   // from peerDependency
@@ -82,6 +86,8 @@ watchEffect(() => history.replaceState({}, '', store.serialize()))
 
 // use a specific version of Vue
 vueVersion.value = '3.2.8'
+// production mode is enabled
+productionMode.value = true
 </script>
 
 <template>
