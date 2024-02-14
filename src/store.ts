@@ -18,7 +18,7 @@ import type {
 } from 'vue/compiler-sfc'
 import type { OutputModes } from './types'
 import type { editor } from 'monaco-editor-core'
-import { type ImportMap, mergeImportMap } from './import-map'
+import { type ImportMap, mergeImportMap, useVueImportMap } from './import-map'
 
 import welcomeSFCCode from './template/welcome.vue?raw'
 import newSFCCode from './template/new-sfc.vue?raw'
@@ -35,7 +35,7 @@ export function useStore(
       welcomeSFC: welcomeSFCCode,
       newSFC: newSFCCode,
     }),
-    builtinImportMap = ref({}),
+    builtinImportMap = undefined!, // set later
 
     errors = ref([]),
     showOutput = ref(false),
@@ -51,6 +51,11 @@ export function useStore(
   }: Partial<StoreState> = {},
   serializedState?: string,
 ): ReplStore {
+  if (!builtinImportMap) {
+    ;({ importMap: builtinImportMap, vueVersion } = useVueImportMap({
+      vueVersion: vueVersion.value,
+    }))
+  }
   const loading = ref(false)
 
   function applyBuiltinImportMap() {

@@ -5,6 +5,7 @@ export function useVueImportMap(
     runtimeDev?: string | (() => string)
     runtimeProd?: string | (() => string)
     serverRenderer?: string | (() => string)
+    vueVersion?: string | null
   } = {},
 ) {
   function normalizeDefaults(defaults?: string | (() => string)) {
@@ -13,7 +14,7 @@ export function useVueImportMap(
   }
 
   const productionMode = ref(false)
-  const vueVersion = ref<string | null>(null)
+  const vueVersion = ref<string | null>(defaults.vueVersion || null)
   const importMap = computed<ImportMap>(() => {
     const vue =
       (!vueVersion.value &&
