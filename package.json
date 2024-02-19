@@ -76,7 +76,7 @@
     "@types/codemirror": "^5.60.15",
     "@types/hash-sum": "^1.0.2",
     "@types/node": "^20.11.17",
-    "@typescript-eslint/eslint-plugin": "^6.21.0",
+    "@typescript-eslint/eslint-plugin": "^7.0.1",
     "@vitejs/plugin-vue": "^5.0.4",
     "@volar/cdn": "~1.11.1",
     "@volar/monaco": "~1.11.1",
