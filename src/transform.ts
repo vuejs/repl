@@ -265,6 +265,12 @@ async function doCompileScript(
         2,
       )} */`
     }
+    if (ssr) {
+      compiledScript.content = compiledScript.content.replaceAll(
+        /'vue'/g,
+        "'vue-esm'",
+      )
+    }
     code +=
       `\n` +
       store.compiler.rewriteDefault(
