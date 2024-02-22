@@ -266,9 +266,9 @@ async function doCompileScript(
       )} */`
     }
     if (ssr) {
-      compiledScript.content = compiledScript.content.replaceAll(
-        /'vue'/g,
-        "'vue-esm'",
+      compiledScript.content = compiledScript.content.replace(
+        /(['"])vue\1/g,
+        '$1vue-esm$1',
       )
     }
     code +=
