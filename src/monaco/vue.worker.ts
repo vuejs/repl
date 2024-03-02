@@ -2,17 +2,17 @@
 import * as worker from 'monaco-editor-core/esm/vs/editor/editor.worker'
 import type * as monaco from 'monaco-editor-core'
 import {
-  createJsDelivrFs,
-  createJsDelivrUriResolver,
-  decorateServiceEnvironment,
-} from '@volar/cdn'
-import { type VueCompilerOptions, resolveConfig } from '@vue/language-service'
-import {
-  createLanguageHost,
-  createLanguageService,
-  createServiceEnvironment,
+  type ServiceEnvironment,
+  activateAutomaticTypeAcquisition,
+  createTypeScriptWorkerService,
 } from '@volar/monaco/worker'
-import type { WorkerHost, WorkerMessage } from './env'
+import {
+  type VueCompilerOptions,
+  getVueLanguageServicePlugins,
+  createVueLanguagePlugin,
+  resolveVueCompilerOptions,
+} from '@vue/language-service'
+import type { WorkerMessage } from './env'
 
 export interface CreateData {
   tsconfig: {
@@ -22,70 +22,66 @@ export interface CreateData {
   dependencies: Record<string, string>
 }
 
-let locale: string
-
 let ts: typeof import('typescript')
-let tsLocalized: any
+let locale: string | undefined
 
 self.onmessage = async (msg: MessageEvent<WorkerMessage>) => {
   if (msg.data?.event === 'init') {
-    if (msg.data.tsLocale) {
-      locale = msg.data.tsLocale
-    }
-
-    ;[ts, tsLocalized] = await Promise.all([
-      importTsFromCdn(msg.data.tsVersion),
-      locale &&
-        fetchJson(
-          `https://cdn.jsdelivr.net/npm/typescript@${msg.data.tsVersion}/lib/${locale}/diagnosticMessages.generated.json`,
-        ),
-    ])
+    locale = msg.data.tsLocale
+    ts = await importTsFromCdn(msg.data.tsVersion)
     self.postMessage('inited')
     return
   }
 
   worker.initialize(
     (
-      ctx: monaco.worker.IWorkerContext<WorkerHost>,
-      { tsconfig, dependencies }: CreateData,
+      ctx: monaco.worker.IWorkerContext,
+      {
+        tsconfig,
+        // TODO
+        dependencies,
+      }: CreateData,
     ) => {
+      const uriToFileName = (uri: string) => uri.substring('file://'.length)
+      const env: ServiceEnvironment = {
+        workspaceFolder: 'file:///',
+        locale,
+        typescript: {
+          uriToFileName,
+          fileNameToUri: (fileName) => 'file://' + fileName,
+        },
+      }
+
       const { options: compilerOptions } = ts.convertCompilerOptionsFromJson(
         tsconfig?.compilerOptions || {},
         '',
       )
-      const env = createServiceEnvironment()
-      const host = createLanguageHost(
-        ctx.getMirrorModels,
-        env,
-        '/src',
+      const vueCompilerOptions = resolveVueCompilerOptions(
+        tsconfig.vueCompilerOptions || {},
+      )
+
+      activateAutomaticTypeAcquisition(env)
+      return createTypeScriptWorkerService({
+        typescript: ts,
         compilerOptions,
-      )
-      const jsDelivrFs = createJsDelivrFs(ctx.host.onFetchCdnFile)
-      const jsDelivrUriResolver = createJsDelivrUriResolver(
-        '/node_modules',
-        dependencies,
-      )
-
-      if (locale) {
-        env.locale = locale
-      }
-      if (tsLocalized) {
-        host.getLocalizedDiagnosticMessages = () => tsLocalized
-      }
-
-      decorateServiceEnvironment(env, jsDelivrUriResolver, jsDelivrFs)
-
-      return createLanguageService(
-        { typescript: ts as any },
+        workerContext: ctx,
         env,
-        resolveConfig(
-          ts as any,
-          {},
-          compilerOptions,
-          tsconfig.vueCompilerOptions || {},
+        languagePlugins: [
+          createVueLanguagePlugin(
+            ts,
+            env.typescript!.uriToFileName,
+            true,
+            () => '', // TODO getProjectVersion
+            () => ctx.getMirrorModels().map((model) => model.uri.toString()),
+            compilerOptions,
+            vueCompilerOptions,
+          ),
+        ],
+        servicePlugins: getVueLanguageServicePlugins(
+          ts,
+          () => vueCompilerOptions,
         ),
-        host,
-      )
+      })
     },
   )
 }
@@ -98,15 +94,4 @@ async function importTsFromCdn(tsVersion: string) {
   const ts = globalThis.module.exports
   globalThis.module = _module
   return ts as typeof import('typescript')
-}
-
-async function fetchJson<T>(url: string) {
-  try {
-    const res = await fetch(url)
-    if (res.status === 200) {
-      return await res.json()
-    }
-  } catch {
-    // ignore
-  }
 }
