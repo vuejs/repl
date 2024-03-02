@@ -1,0 +1,13 @@
+diff --git a/lib/utils.js b/lib/utils.js
+index 7f144fe51e4f28eb778d2fc7ce5d3e71f46a9131..a0f4e041f47c3452de4b790299725f7daa88f0ee 100644
+--- a/lib/utils.js
++++ b/lib/utils.js
+@@ -1,7 +1,7 @@
+ "use strict";
+ Object.defineProperty(exports, "__esModule", { value: true });
+ exports.getProject = exports.projects = exports.pipeTable = void 0;
+-exports.pipeTable = process.platform === 'win32'
++exports.pipeTable = false
+     ? `\\\\.\\pipe\\vue-tsp-table.json`
+     : `/tmp/vue-tsp-table.json`;
+ exports.projects = new Map();
