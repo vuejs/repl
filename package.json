@@ -79,9 +79,9 @@
     "@types/node": "^20.11.25",
     "@typescript-eslint/eslint-plugin": "^7.1.1",
     "@vitejs/plugin-vue": "^5.0.4",
-    "@volar/monaco": "~2.1.0",
-    "@volar/typescript": "~2.1.0",
-    "@vue/language-service": "2.0.1",
+    "@volar/monaco": "~2.1.2",
+    "@volar/typescript": "~2.1.2",
+    "@vue/language-service": "2.0.6",
     "bumpp": "^9.4.0",
     "codemirror": "^5.65.16",
     "conventional-changelog-cli": "^4.1.0",
@@ -100,11 +100,5 @@
     "vite-plugin-dts": "^3.7.3",
     "vue": "^3.4.21",
     "vue-tsc": "^2.0.6"
-  },
-  "pnpm": {
-    "patchedDependencies": {
-      "@volar/monaco@2.1.0": "patches/@volar__monaco@2.1.0.patch",
-      "@vue/typescript-plugin@2.0.1": "patches/@vue__typescript-plugin@2.0.1.patch"
-    }
   }
 }

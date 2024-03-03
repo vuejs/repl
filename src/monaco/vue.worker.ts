@@ -33,15 +33,6 @@ self.onmessage = async (msg: MessageEvent<WorkerMessage>) => {
     return
   }
 
-  const env: ServiceEnvironment = {
-    workspaceFolder: 'file:///',
-    locale,
-    typescript: {
-      uriToFileName: (uri) => uri.substring('file://'.length),
-      fileNameToUri: (fileName) => 'file://' + fileName,
-    },
-  }
-
   worker.initialize(
     (
       ctx: monaco.worker.IWorkerContext,
@@ -51,6 +42,16 @@ self.onmessage = async (msg: MessageEvent<WorkerMessage>) => {
         dependencies,
       }: CreateData,
     ) => {
+      const uriToFileName = (uri: string) => uri.substring('file://'.length)
+      const env: ServiceEnvironment = {
+        workspaceFolder: 'file:///',
+        locale,
+        typescript: {
+          uriToFileName,
+          fileNameToUri: (fileName) => 'file://' + fileName,
+        },
+      }
+
       const { options: compilerOptions } = ts.convertCompilerOptionsFromJson(
         tsconfig?.compilerOptions || {},
         '',
@@ -69,6 +70,7 @@ self.onmessage = async (msg: MessageEvent<WorkerMessage>) => {
           createVueLanguagePlugin(
             ts,
             env.typescript!.uriToFileName,
+            () => false,
             compilerOptions,
             vueCompilerOptions,
           ),
