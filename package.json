@@ -100,6 +100,6 @@
     "vite": "^5.1.5",
     "vite-plugin-dts": "^3.7.3",
     "vue": "^3.4.21",
-    "vue-tsc": "1.9.0-alpha.3"
+    "vue-tsc": "2.0.6"
   }
 }
