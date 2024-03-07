@@ -30,10 +30,16 @@ export function useVueImportMap(
       `https://cdn.jsdelivr.net/npm/@vue/server-renderer@${
         vueVersion.value || currentVersion
       }/dist/server-renderer.esm-browser.js`
+
+    const vueEsm = `https://cdn.jsdelivr.net/npm/@vue/runtime-dom@${
+      vueVersion.value || currentVersion
+    }/dist/runtime-dom.esm-bundler.js/+esm`
+
     return {
       imports: {
         vue,
         'vue/server-renderer': serverRenderer,
+        'vue-esm': vueEsm,
       },
     }
   })
