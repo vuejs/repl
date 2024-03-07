@@ -73,6 +73,7 @@
   "devDependencies": {
     "@babel/types": "^7.24.0",
     "@rollup/plugin-replace": "^5.0.5",
+    "@shikijs/monaco": "^1.1.7",
     "@types/codemirror": "^5.60.15",
     "@types/hash-sum": "^1.0.2",
     "@types/node": "^20.11.25",
@@ -93,13 +94,12 @@
     "monaco-editor-core": "^0.46.0",
     "prettier": "^3.2.5",
     "shiki": "^1.1.7",
-    "@shikijs/monaco": "^1.1.7",
     "simple-git-hooks": "^2.10.0",
     "sucrase": "^3.35.0",
     "typescript": "^5.4.2",
     "vite": "^5.1.5",
     "vite-plugin-dts": "^3.7.3",
     "vue": "^3.4.21",
-    "vue-tsc": "1.9.0-alpha.3"
+    "vue-tsc": "^2.0.6"
   }
 }
