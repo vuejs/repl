@@ -36,8 +36,8 @@ devDependencies:
     specifier: ~1.11.1
     version: 1.11.1
   '@volar/typescript':
-    specifier: ~1.11.1
-    version: 1.11.1
+    specifier: ~2.1.6
+    version: 2.1.6
   '@vue/language-service':
     specifier: 1.9.0-alpha.3
     version: 1.9.0-alpha.3(typescript@5.4.2)
@@ -941,6 +941,12 @@ packages:
       '@volar/source-map': 2.1.2
     dev: true
 
+  /@volar/language-core@2.1.6:
+    resolution: {integrity: sha512-pAlMCGX/HatBSiDFMdMyqUshkbwWbLxpN/RL7HCQDOo2gYBE+uS+nanosLc1qR6pTQ/U8q00xt8bdrrAFPSC0A==}
+    dependencies:
+      '@volar/source-map': 2.1.6
+    dev: true
+
   /@volar/language-service@1.11.1:
     resolution: {integrity: sha512-dKo8z1UzQRPHnlXxwfONGrasS1wEWXMoLQiohZ8KgWqZALbekZCwdGImLZD4DeFGNjk3HTTdfeCzo3KjwohjEQ==}
     dependencies:
@@ -970,6 +976,12 @@ packages:
       muggle-string: 0.4.1
     dev: true
 
+  /@volar/source-map@2.1.6:
+    resolution: {integrity: sha512-TeyH8pHHonRCHYI91J7fWUoxi0zWV8whZTVRlsWHSYfjm58Blalkf9LrZ+pj6OiverPTmrHRkBsG17ScQyWECw==}
+    dependencies:
+      muggle-string: 0.4.1
+    dev: true
+
   /@volar/typescript@1.11.1:
     resolution: {integrity: sha512-iU+t2mas/4lYierSnoFOeRFQUhAEMgsFuQxoxvwn5EdQopw43j+J27a4lt9LMInx1gLJBC6qL14WYGlgymaSMQ==}
     dependencies:
@@ -977,10 +989,10 @@ packages:
       path-browserify: 1.0.1
     dev: true
 
-  /@volar/typescript@2.1.2:
-    resolution: {integrity: sha512-lhTancZqamvaLvoz0u/uth8dpudENNt2LFZOWCw9JZiX14xRFhdhfzmphiCRb7am9E6qAJSbdS/gMt1utXAoHQ==}
+  /@volar/typescript@2.1.6:
+    resolution: {integrity: sha512-JgPGhORHqXuyC3r6skPmPHIZj4LoMmGlYErFTuPNBq9Nhc9VTv7ctHY7A3jMN3ngKEfRrfnUcwXHztvdSQqNfw==}
     dependencies:
-      '@volar/language-core': 2.1.2
+      '@volar/language-core': 2.1.6
       path-browserify: 1.0.1
     dev: true
 
@@ -3745,7 +3757,7 @@ packages:
     peerDependencies:
       typescript: '*'
     dependencies:
-      '@volar/typescript': 2.1.2
+      '@volar/typescript': 2.1.6
       '@vue/language-core': 2.0.6(typescript@5.4.2)
       semver: 7.6.0
       typescript: 5.4.2
