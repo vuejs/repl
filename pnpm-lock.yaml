@@ -33,8 +33,8 @@ devDependencies:
     specifier: ~1.11.1
     version: 1.11.1
   '@volar/monaco':
-    specifier: ~1.11.1
-    version: 1.11.1
+    specifier: ~2.1.6
+    version: 2.1.6
   '@volar/typescript':
     specifier: ~1.11.1
     version: 1.11.1
@@ -941,6 +941,12 @@ packages:
       '@volar/source-map': 2.1.2
     dev: true
 
+  /@volar/language-core@2.1.6:
+    resolution: {integrity: sha512-pAlMCGX/HatBSiDFMdMyqUshkbwWbLxpN/RL7HCQDOo2gYBE+uS+nanosLc1qR6pTQ/U8q00xt8bdrrAFPSC0A==}
+    dependencies:
+      '@volar/source-map': 2.1.6
+    dev: true
+
   /@volar/language-service@1.11.1:
     resolution: {integrity: sha512-dKo8z1UzQRPHnlXxwfONGrasS1wEWXMoLQiohZ8KgWqZALbekZCwdGImLZD4DeFGNjk3HTTdfeCzo3KjwohjEQ==}
     dependencies:
@@ -951,10 +957,22 @@ packages:
       vscode-uri: 3.0.8
     dev: true
 
-  /@volar/monaco@1.11.1:
-    resolution: {integrity: sha512-abxU5R/H4pV06iE/y8b5g3x3b2EvmqXbBQdI+t+sqdTxU/HU09qpumc/J0Z/RKeMba+d55u/e/Ko8i98PcNi5Q==}
+  /@volar/language-service@2.1.6:
+    resolution: {integrity: sha512-1OpbbPQ6wUIumwMP5r45y8utVEmvq1n6BC8JHqGKsuFr9RGFIldDBlvA/xuO3MDKhjmmPGPHKb54kg1/YN78ow==}
     dependencies:
-      '@volar/language-service': 1.11.1
+      '@volar/language-core': 2.1.6
+      vscode-languageserver-protocol: 3.17.5
+      vscode-languageserver-textdocument: 1.0.11
+      vscode-uri: 3.0.8
+    dev: true
+
+  /@volar/monaco@2.1.6:
+    resolution: {integrity: sha512-juBLbDq8VV0ln01N9uZceewWHiePLEWGHO8BuJa08xXsLCiN40cMYEpLS1W7MP0jPetOdYUdZOg0IOd0ikO0pQ==}
+    dependencies:
+      '@volar/language-service': 2.1.6
+      '@volar/typescript': 2.1.6
+      monaco-languageserver-types: 0.3.3
+      monaco-types: 0.1.0
       vscode-uri: 3.0.8
     dev: true
 
@@ -970,6 +988,12 @@ packages:
       muggle-string: 0.4.1
     dev: true
 
+  /@volar/source-map@2.1.6:
+    resolution: {integrity: sha512-TeyH8pHHonRCHYI91J7fWUoxi0zWV8whZTVRlsWHSYfjm58Blalkf9LrZ+pj6OiverPTmrHRkBsG17ScQyWECw==}
+    dependencies:
+      muggle-string: 0.4.1
+    dev: true
+
   /@volar/typescript@1.11.1:
     resolution: {integrity: sha512-iU+t2mas/4lYierSnoFOeRFQUhAEMgsFuQxoxvwn5EdQopw43j+J27a4lt9LMInx1gLJBC6qL14WYGlgymaSMQ==}
     dependencies:
@@ -981,6 +1005,13 @@ packages:
     resolution: {integrity: sha512-lhTancZqamvaLvoz0u/uth8dpudENNt2LFZOWCw9JZiX14xRFhdhfzmphiCRb7am9E6qAJSbdS/gMt1utXAoHQ==}
     dependencies:
       '@volar/language-core': 2.1.2
+      path-browserify: 1.0.1
+    dev: true
+
+  /@volar/typescript@2.1.6:
+    resolution: {integrity: sha512-JgPGhORHqXuyC3r6skPmPHIZj4LoMmGlYErFTuPNBq9Nhc9VTv7ctHY7A3jMN3ngKEfRrfnUcwXHztvdSQqNfw==}
+    dependencies:
+      '@volar/language-core': 2.1.6
       path-browserify: 1.0.1
     dev: true
 
@@ -2671,6 +2702,18 @@ packages:
 
   /monaco-editor-core@0.46.0:
     resolution: {integrity: sha512-JA5BzCaC0nUB5zUhzGUfecNhVNxEXpJxp6YNBYLr0SPyv0DKSIeBpF21WVkpwYm00UJaVc4m3TTcwB9/Gzd/nw==}
+    dev: true
+
+  /monaco-languageserver-types@0.3.3:
+    resolution: {integrity: sha512-4uJ6XaVwVamOQ1SXfBGusAqL4fTn7ZJzaybEinr2U5ZX7AKSjsbXWlu0X3Ah+hyefn+85+Ca7GZwbI87g55C8Q==}
+    dependencies:
+      monaco-types: 0.1.0
+      vscode-languageserver-protocol: 3.17.5
+      vscode-uri: 3.0.8
+    dev: true
+
+  /monaco-types@0.1.0:
+    resolution: {integrity: sha512-aWK7SN9hAqNYi0WosPoMjenMeXJjwCxDibOqWffyQ/qXdzB/86xshGQobRferfmNz7BSNQ8GB0MD0oby9/5fTQ==}
     dev: true
 
   /ms@2.1.2:
