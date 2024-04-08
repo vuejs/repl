@@ -86,7 +86,7 @@
     "bumpp": "^9.4.0",
     "codemirror": "^5.65.16",
     "conventional-changelog-cli": "^4.1.0",
-    "eslint": "^8.57.0",
+    "eslint": "^9.0.0",
     "eslint-plugin-vue": "^9.22.0",
     "fflate": "^0.8.2",
     "hash-sum": "^2.0.0",
