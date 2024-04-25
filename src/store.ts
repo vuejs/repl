@@ -219,6 +219,10 @@ export function useStore(
       mainFile.value = newFilename
     }
 
+    if (activeFilename.value === oldFilename) {
+      activeFilename.value = mainFile.value
+    }
+
     compileFile(store, file).then((errs) => (errors.value = errs))
   }
   const getImportMap: Store['getImportMap'] = () => {
