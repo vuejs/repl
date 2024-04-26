@@ -1,3 +1,13 @@
+## [4.1.2](https://github.com/vuejs/repl/compare/v4.1.1...v4.1.2) (2024-04-26)
+
+
+### Bug Fixes
+
+* dynamic import ([#213](https://github.com/vuejs/repl/issues/213)) ([bb6f1fe](https://github.com/vuejs/repl/commit/bb6f1fe8599f1a11cd1b8aa40a630bea09d2b577))
+* fix file rename breaking ([caace63](https://github.com/vuejs/repl/commit/caace639bde964323a253bdcd252a18869973a1d))
+
+
+
 ## [4.1.1](https://github.com/vuejs/repl/compare/v4.1.0...v4.1.1) (2024-02-14)
 
 
