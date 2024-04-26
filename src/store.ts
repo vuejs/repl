@@ -64,11 +64,9 @@ export function useStore(
   }
 
   function init() {
-    watchEffect(() =>
-      compileFile(store, activeFile.value).then(
-        (errs) => (errors.value = errs),
-      ),
-    )
+    watchEffect(() => {
+      compileFile(store, activeFile.value).then((errs) => (errors.value = errs))
+    })
 
     watch(
       () => [
@@ -218,8 +216,11 @@ export function useStore(
     if (mainFile.value === oldFilename) {
       mainFile.value = newFilename
     }
-
-    compileFile(store, file).then((errs) => (errors.value = errs))
+    if (activeFilename.value === oldFilename) {
+      activeFilename.value = newFilename
+    } else {
+      compileFile(store, file).then((errs) => (errors.value = errs))
+    }
   }
   const getImportMap: Store['getImportMap'] = () => {
     try {
