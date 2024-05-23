@@ -37,7 +37,7 @@ function dragMove(e: MouseEvent) {
       ? container.value.offsetHeight
       : container.value.offsetWidth
     const dp = position - startPosition
-    state.split = startSplit + ~~((dp / totalSize) * 100)
+    state.split = startSplit + +((dp / totalSize) * 100).toFixed(2)
   }
 }
 
