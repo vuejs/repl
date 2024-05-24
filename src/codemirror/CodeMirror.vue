@@ -24,6 +24,7 @@ const emit = defineEmits<(e: 'change', value: string) => void>()
 
 const el = ref()
 const needAutoResize = inject('autoresize')
+const autoSave = inject('autosave')
 
 onMounted(() => {
   const addonOptions = props.readonly
@@ -44,10 +45,6 @@ onMounted(() => {
     lineWrapping: true,
     lineNumbers: true,
     ...addonOptions,
-  })
-
-  editor.on('change', () => {
-    emit('change', editor.getValue())
   })
 
   watchEffect(() => {
@@ -72,6 +69,19 @@ onMounted(() => {
         editor.refresh()
       }),
     )
+  }
+
+  if (autoSave) {
+    editor.on('change', () => {
+      emit('change', editor.getValue())
+    })
+  } else {
+    el.value!.addEventListener('keydown', (e: KeyboardEvent) => {
+      if (e.ctrlKey && e.key === 's') {
+        e.preventDefault()
+        emit('change', editor.getValue())
+      }
+    })
   }
 })
 </script>
