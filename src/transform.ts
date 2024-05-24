@@ -247,6 +247,7 @@ async function doCompileScript(
       inlineTemplate: true,
       ...store.sfcOptions?.script,
       id,
+      genDefaultAs: COMP_IDENTIFIER,
       templateOptions: {
         ...store.sfcOptions?.template,
         ssr,
@@ -265,13 +266,7 @@ async function doCompileScript(
         2,
       )} */`
     }
-    code +=
-      `\n` +
-      store.compiler.rewriteDefault(
-        compiledScript.content,
-        COMP_IDENTIFIER,
-        expressionPlugins,
-      )
+    code += `\n${compiledScript.content}`
 
     if ((descriptor.script || descriptor.scriptSetup)!.lang === 'ts') {
       code = await transformTS(code)
