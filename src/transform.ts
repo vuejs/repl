@@ -281,21 +281,20 @@ async function doCompileScript(
         },
       },
     })
-    let code = ''
-    if (compiledScript.bindings) {
-      code += `\n/* Analyzed bindings: ${JSON.stringify(
-        compiledScript.bindings,
-        null,
-        2,
-      )} */`
-    }
-    code += `\n${compiledScript.content}`
-
+    let code = compiledScript.content
     if (isTS) {
       code = await transformTS(code, isJSX)
     }
     if (isJSX) {
       code = await import('./jsx').then((m) => m.transformJSX(code))
+    }
+    if (compiledScript.bindings) {
+      code =
+        `/* Analyzed bindings: ${JSON.stringify(
+          compiledScript.bindings,
+          null,
+          2,
+        )} */\n` + code
     }
 
     return [code, compiledScript.bindings]
