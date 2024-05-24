@@ -4,14 +4,23 @@ import type {
   CompilerOptions,
   SFCDescriptor,
 } from 'vue/compiler-sfc'
-import { transform } from 'sucrase'
+import { type Transform, transform } from 'sucrase'
 import hashId from 'hash-sum'
 
 export const COMP_IDENTIFIER = `__sfc__`
 
-async function transformTS(src: string) {
+const REGEX_JS = /\.[jt]sx?/
+function testTs(filename: string | undefined | null) {
+  return !!(filename && /(\.|\b)tsx?$/.test(filename))
+}
+function testJsx(filename: string | undefined | null) {
+  return !!(filename && /(\.|\b)[jt]sx$/.test(filename))
+}
+
+async function transformTS(src: string, isJSX?: boolean) {
   return transform(src, {
-    transforms: ['typescript'],
+    transforms: ['typescript', ...(isJSX ? (['jsx'] as Transform[]) : [])],
+    jsxRuntime: 'preserve',
   }).code
 }
 
@@ -28,9 +37,13 @@ export async function compileFile(
     return []
   }
 
-  if (filename.endsWith('.js') || filename.endsWith('.ts')) {
-    if (filename.endsWith('.ts')) {
-      code = await transformTS(code)
+  if (REGEX_JS.test(filename)) {
+    const isJSX = testJsx(filename)
+    if (testTs(filename)) {
+      code = await transformTS(code, isJSX)
+    }
+    if (isJSX) {
+      code = await import('./jsx').then((m) => m.transformJSX(code))
     }
     compiled.js = compiled.ssr = code
     return []
@@ -72,12 +85,12 @@ export async function compileFile(
     ]
   }
 
-  const scriptLang =
-    (descriptor.script && descriptor.script.lang) ||
-    (descriptor.scriptSetup && descriptor.scriptSetup.lang)
-  const isTS = scriptLang === 'ts'
-  if (scriptLang && !isTS) {
-    return [`Only lang="ts" is supported for <script> blocks.`]
+  const scriptLang = descriptor.script?.lang || descriptor.scriptSetup?.lang
+  const isTS = testTs(scriptLang)
+  const isJSX = testJsx(scriptLang)
+
+  if (scriptLang && scriptLang !== 'js' && !isTS && !isJSX) {
+    return [`Unsupported lang "${scriptLang}" in <script> blocks.`]
   }
 
   const hasScoped = descriptor.styles.some((s) => s.scoped)
@@ -98,6 +111,7 @@ export async function compileFile(
       id,
       false,
       isTS,
+      isJSX,
     )
   } catch (e: any) {
     return [e.stack.split('\n').slice(0, 12).join('\n')]
@@ -116,6 +130,7 @@ export async function compileFile(
         id,
         true,
         isTS,
+        isJSX,
       )
       ssrCode += ssrScriptResult[0]
     } catch (e) {
@@ -140,6 +155,7 @@ export async function compileFile(
       bindings,
       false,
       isTS,
+      isJSX,
     )
     if (Array.isArray(clientTemplateResult)) {
       return clientTemplateResult
@@ -153,6 +169,7 @@ export async function compileFile(
       bindings,
       true,
       isTS,
+      isJSX,
     )
     if (typeof ssrTemplateResult === 'string') {
       // ssr compile failure is fine
@@ -238,11 +255,17 @@ async function doCompileScript(
   id: string,
   ssr: boolean,
   isTS: boolean,
+  isJSX: boolean,
 ): Promise<[code: string, bindings: BindingMetadata | undefined]> {
   if (descriptor.script || descriptor.scriptSetup) {
-    const expressionPlugins: CompilerOptions['expressionPlugins'] = isTS
-      ? ['typescript']
-      : undefined
+    const expressionPlugins: CompilerOptions['expressionPlugins'] = []
+    if (isTS) {
+      expressionPlugins.push('typescript')
+    }
+    if (isJSX) {
+      expressionPlugins.push('jsx')
+    }
+
     const compiledScript = store.compiler.compileScript(descriptor, {
       inlineTemplate: true,
       ...store.sfcOptions?.script,
@@ -258,18 +281,20 @@ async function doCompileScript(
         },
       },
     })
-    let code = ''
-    if (compiledScript.bindings) {
-      code += `\n/* Analyzed bindings: ${JSON.stringify(
-        compiledScript.bindings,
-        null,
-        2,
-      )} */`
+    let code = compiledScript.content
+    if (isTS) {
+      code = await transformTS(code, isJSX)
     }
-    code += `\n${compiledScript.content}`
-
-    if ((descriptor.script || descriptor.scriptSetup)!.lang === 'ts') {
-      code = await transformTS(code)
+    if (isJSX) {
+      code = await import('./jsx').then((m) => m.transformJSX(code))
+    }
+    if (compiledScript.bindings) {
+      code =
+        `/* Analyzed bindings: ${JSON.stringify(
+          compiledScript.bindings,
+          null,
+          2,
+        )} */\n` + code
     }
 
     return [code, compiledScript.bindings]
@@ -285,7 +310,16 @@ async function doCompileTemplate(
   bindingMetadata: BindingMetadata | undefined,
   ssr: boolean,
   isTS: boolean,
+  isJSX: boolean,
 ) {
+  const expressionPlugins: CompilerOptions['expressionPlugins'] = []
+  if (isTS) {
+    expressionPlugins.push('typescript')
+  }
+  if (isJSX) {
+    expressionPlugins.push('jsx')
+  }
+
   let { code, errors } = store.compiler.compileTemplate({
     isProd: false,
     ...store.sfcOptions?.template,
@@ -300,7 +334,7 @@ async function doCompileTemplate(
     compilerOptions: {
       ...store.sfcOptions?.template?.compilerOptions,
       bindingMetadata,
-      expressionPlugins: isTS ? ['typescript'] : undefined,
+      expressionPlugins,
     },
   })
   if (errors.length) {
@@ -315,8 +349,11 @@ async function doCompileTemplate(
       `$1 ${fnName}`,
     )}` + `\n${COMP_IDENTIFIER}.${fnName} = ${fnName}`
 
-  if ((descriptor.script || descriptor.scriptSetup)?.lang === 'ts') {
-    code = await transformTS(code)
+  if (isTS) {
+    code = await transformTS(code, isJSX)
+  }
+  if (isJSX) {
+    code = await import('./jsx').then((m) => m.transformJSX(code))
   }
 
   return code
