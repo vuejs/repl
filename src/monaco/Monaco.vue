@@ -37,6 +37,7 @@ const containerRef = ref<HTMLDivElement>()
 const ready = ref(false)
 const editor = shallowRef<monaco.editor.IStandaloneCodeEditor>()
 const store = inject(injectKeyStore)!
+const autoSave = inject('autosave')!
 
 initMonaco(store)
 
@@ -140,9 +141,18 @@ onMounted(async () => {
     // ignore save event
   })
 
-  editorInstance.onDidChangeModelContent(() => {
-    emit('change', editorInstance.getValue())
-  })
+  if (autoSave) {
+    editorInstance.onDidChangeModelContent(() => {
+      emit('change', editorInstance.getValue())
+    })
+  } else {
+    containerRef.value.addEventListener('keydown', (e: KeyboardEvent) => {
+      if (e.ctrlKey && e.key === 's') {
+        e.preventDefault()
+        emit('change', editorInstance.getValue())
+      }
+    })
+  }
 
   // update theme
   watch(replTheme, (n) => {

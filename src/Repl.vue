@@ -12,6 +12,7 @@ export interface Props {
   editor: EditorComponentType
   store?: Store
   autoResize?: boolean
+  autoSave?: boolean // auto save and compile, default to true, if false, user need to press ctrl + s to save and compile
   showCompileOutput?: boolean
   showImportMap?: boolean
   showTsConfig?: boolean
@@ -35,6 +36,7 @@ const props = withDefaults(defineProps<Props>(), {
   previewTheme: false,
   store: () => useStore(),
   autoResize: true,
+  autoSave: true,
   showCompileOutput: true,
   showImportMap: true,
   showTsConfig: true,
@@ -66,6 +68,7 @@ const outputSlotName = computed(() => (props.layoutReverse ? 'left' : 'right'))
 
 provide(injectKeyStore, props.store)
 provide('autoresize', props.autoResize)
+provide('autosave', props.autoSave)
 provide('import-map', toRef(props, 'showImportMap'))
 provide('tsconfig', toRef(props, 'showTsConfig'))
 provide('clear-console', toRef(props, 'clearConsole'))
