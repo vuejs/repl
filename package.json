@@ -74,6 +74,7 @@
     "@babel/types": "^7.24.5",
     "@rollup/plugin-replace": "^5.0.5",
     "@shikijs/monaco": "^1.6.0",
+    "@types/babel__standalone": "^7.1.7",
     "@types/codemirror": "^5.60.15",
     "@types/hash-sum": "^1.0.2",
     "@types/node": "^20.12.12",
@@ -101,5 +102,10 @@
     "vite-plugin-dts": "^3.9.1",
     "vue": "^3.4.27",
     "vue-tsc": "^2.0.19"
+  },
+  "dependencies": {
+    "@babel/standalone": "^7.24.5",
+    "@vue/babel-plugin-jsx": "^1.2.2",
+    "assert": "^2.1.0"
   }
 }

@@ -193,7 +193,7 @@ async function updatePreview() {
   }
 
   try {
-    const mainFile = store.mainFile
+    const { mainFile } = store
 
     // if SSR, generate the SSR bundle and eval it to render the HTML
     if (isSSR && mainFile.endsWith('.vue')) {
