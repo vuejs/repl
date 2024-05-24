@@ -7,17 +7,10 @@ settings:
 importers:
 
   .:
-    dependencies:
+    devDependencies:
       '@babel/standalone':
         specifier: ^7.24.5
         version: 7.24.5
-      '@vue/babel-plugin-jsx':
-        specifier: ^1.2.2
-        version: 1.2.2(@babel/core@7.24.5)
-      assert:
-        specifier: ^2.1.0
-        version: 2.1.0
-    devDependencies:
       '@babel/types':
         specifier: ^7.24.5
         version: 7.24.5
@@ -54,9 +47,15 @@ importers:
       '@volar/typescript':
         specifier: ~1.11.1
         version: 1.11.1
+      '@vue/babel-plugin-jsx':
+        specifier: ^1.2.2
+        version: 1.2.2(@babel/core@7.24.5)
       '@vue/language-service':
         specifier: 1.9.0-alpha.3
         version: 1.9.0-alpha.3(typescript@5.4.5)
+      assert:
+        specifier: ^2.1.0
+        version: 2.1.0
       bumpp:
         specifier: ^9.4.1
         version: 9.4.1
