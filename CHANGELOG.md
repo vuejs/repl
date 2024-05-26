@@ -1,3 +1,25 @@
+# [4.2.0](https://github.com/vuejs/repl/compare/v4.1.2...v4.2.0) (2024-05-26)
+
+
+### Bug Fixes
+
+* refine dragging view area ([#246](https://github.com/vuejs/repl/issues/246)) ([df14639](https://github.com/vuejs/repl/commit/df14639b85edc0e153ba2fd6f29656785a0af3aa))
+* specify unspported pre-processors lang ([#212](https://github.com/vuejs/repl/issues/212)) ([5cea974](https://github.com/vuejs/repl/commit/5cea974451ae23b82bea0c6270ad7ac726d831a4))
+
+
+### Features
+
+* `CodeMirror` support `autoSave` option ([#249](https://github.com/vuejs/repl/issues/249)) ([ae80c5b](https://github.com/vuejs/repl/commit/ae80c5b995ffa375013b665fd9a212c5607a1236))
+* add `autoSave` option ([#247](https://github.com/vuejs/repl/issues/247)) ([d47eca5](https://github.com/vuejs/repl/commit/d47eca5926dcac798171fc216fcee2e21f275dd4))
+* jsx for vue ([#248](https://github.com/vuejs/repl/issues/248)) ([d5b0d40](https://github.com/vuejs/repl/commit/d5b0d40ecc7f630b89e45ebe8472bc4e7563b3e2))
+
+
+### Performance Improvements
+
+* avoid parse repeatedly ([c6b7352](https://github.com/vuejs/repl/commit/c6b735298d5ab630cdc130aad7b8acaf7c9c41bb))
+
+
+
 ## [4.1.2](https://github.com/vuejs/repl/compare/v4.1.1...v4.1.2) (2024-04-26)
 
 
