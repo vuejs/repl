@@ -9,11 +9,11 @@ importers:
   .:
     devDependencies:
       '@babel/standalone':
-        specifier: ^7.24.5
-        version: 7.24.5
+        specifier: ^7.24.6
+        version: 7.24.6
       '@babel/types':
-        specifier: ^7.24.5
-        version: 7.24.5
+        specifier: ^7.24.6
+        version: 7.24.6
       '@rollup/plugin-replace':
         specifier: ^5.0.5
         version: 5.0.5(rollup@4.17.2)
@@ -78,11 +78,11 @@ importers:
         specifier: ^2.0.0
         version: 2.0.0
       lint-staged:
-        specifier: ^15.2.4
-        version: 15.2.4
+        specifier: ^15.2.5
+        version: 15.2.5
       monaco-editor-core:
-        specifier: ^0.48.0
-        version: 0.48.0
+        specifier: ^0.49.0
+        version: 0.49.0
       prettier:
         specifier: ^3.2.5
         version: 3.2.5
@@ -183,12 +183,16 @@ packages:
     resolution: {integrity: sha512-5CHncttXohrHk8GWOFCcCl4oRD9fKosWlIRgWm4ql9VYioKm52Mk2xsmoohvm7f3JoiLSM5ZgJuRaf5QZZYd3Q==}
     engines: {node: '>=6.9.0'}
 
-  '@babel/helper-string-parser@7.24.1':
-    resolution: {integrity: sha512-2ofRCjnnA9y+wk8b9IAREroeUP02KHp431N2mhKniy2yKIDKpbrHv9eXwm8cBeWQYcJmzv5qKCu65P47eCF7CQ==}
+  '@babel/helper-string-parser@7.24.6':
+    resolution: {integrity: sha512-WdJjwMEkmBicq5T9fm/cHND3+UlFa2Yj8ALLgmoSQAJZysYbBjw+azChSGPN4DSPLXOcooGRvDwZWMcF/mLO2Q==}
     engines: {node: '>=6.9.0'}
 
   '@babel/helper-validator-identifier@7.24.5':
     resolution: {integrity: sha512-3q93SSKX2TWCG30M2G2kwaKeTYgEUp5Snjuj8qm729SObL6nbtUldAi37qbxkD5gg3xnBio+f9nqpSepGZMvxA==}
+    engines: {node: '>=6.9.0'}
+
+  '@babel/helper-validator-identifier@7.24.6':
+    resolution: {integrity: sha512-4yA7s865JHaqUdRbnaxarZREuPTHrjpDT+pXoAZ1yhyo6uFnIEpS8VMu16siFOHDpZNKYv5BObhsB//ycbICyw==}
     engines: {node: '>=6.9.0'}
 
   '@babel/helper-validator-option@7.23.5':
@@ -223,8 +227,8 @@ packages:
     peerDependencies:
       '@babel/core': ^7.0.0-0
 
-  '@babel/standalone@7.24.5':
-    resolution: {integrity: sha512-Sl8oN9bGfRlNUA2jzfzoHEZxFBDliBlwi5mPVCAWKSlBNkXXJOHpu7SDOqjF6mRoTa6GNX/1kAWG3Tr+YQ3N7A==}
+  '@babel/standalone@7.24.6':
+    resolution: {integrity: sha512-ch8nbtobUPLvSLKdG2s8pVAqS1zUc+mt7UE9k8/xpupvETbAFOaoqo0QcpgVD/f0xkMkbUnqedVY5eeVWOqtjw==}
     engines: {node: '>=6.9.0'}
 
   '@babel/template@7.24.0':
@@ -235,8 +239,8 @@ packages:
     resolution: {integrity: sha512-7aaBLeDQ4zYcUFDUD41lJc1fG8+5IU9DaNSJAgal866FGvmD5EbWQgnEC6kO1gGLsX0esNkfnJSndbTXA3r7UA==}
     engines: {node: '>=6.9.0'}
 
-  '@babel/types@7.24.5':
-    resolution: {integrity: sha512-6mQNsaLeXTw0nxYUYu+NSa4Hx4BlF1x1x8/PMFbiR+GBSr+2DkECc69b8hgy2frEodNcvPffeH8YfWd3LI6jhQ==}
+  '@babel/types@7.24.6':
+    resolution: {integrity: sha512-WaMsgi6Q8zMgMth93GvWPXkhAIEobfsIkLTacoVZoK1J0CevIPGYY2Vo5YvJGqyHqXM6P4ppOYGsIRU8MM9pFQ==}
     engines: {node: '>=6.9.0'}
 
   '@conventional-changelog/git-client@1.0.1':
@@ -1656,8 +1660,8 @@ packages:
   lines-and-columns@1.2.4:
     resolution: {integrity: sha512-7ylylesZQ/PV29jhEDl3Ufjo6ZX7gCqJr5F7PKrqc93v7fzSymt1BpwEU8nAUXs8qzzvqhbjhK5QZg6Mt/HkBg==}
 
-  lint-staged@15.2.4:
-    resolution: {integrity: sha512-3F9KRQIS2fVDGtCkBp4Bx0jswjX7zUcKx6OF0ZeY1prksUyKPRIIUqZhIUYAstJfvj6i48VFs4dwVIbCYwvTYQ==}
+  lint-staged@15.2.5:
+    resolution: {integrity: sha512-j+DfX7W9YUvdzEZl3Rk47FhDF6xwDBV5wwsCPw6BwWZVPYJemusQmvb9bRsW23Sqsaa+vRloAWogbK4BUuU2zA==}
     engines: {node: '>=18.12.0'}
     hasBin: true
 
@@ -1718,8 +1722,8 @@ packages:
     resolution: {integrity: sha512-DMy+ERcEW2q8Z2Po+WNXuw3c5YaUSFjAO5GsJqfEl7UjvtIuFKO6ZrKvcItdy98dwFI2N1tg3zNIdKaQT+aNdA==}
     engines: {node: '>=8.6'}
 
-  micromatch@4.0.6:
-    resolution: {integrity: sha512-Y4Ypn3oujJYxJcMacVgcs92wofTHxp9FzfDpQON4msDefoC0lb3ETvQLOdLcbhSwU1bz8HrL/1sygfBIHudrkQ==}
+  micromatch@4.0.7:
+    resolution: {integrity: sha512-LPP/3KorzCwBxfeUuZmaR6bG2kdeHSbe0P2tY3FLRU4vYrjYz5hI4QZwV0njUx3jeuKe67YukQ1LSPZBKDqO/Q==}
     engines: {node: '>=8.6'}
 
   mimic-fn@2.1.0:
@@ -1771,8 +1775,8 @@ packages:
   mlly@1.6.1:
     resolution: {integrity: sha512-vLgaHvaeunuOXHSmEbZ9izxPx3USsk8KCQ8iC+aTlp5sKRSoZvwhHh5L9VbKSaVC6sJDqbyohIS76E2VmHIPAA==}
 
-  monaco-editor-core@0.48.0:
-    resolution: {integrity: sha512-HaGsPuwG+2LA9Ya2lmU7zEh8TdA33E8kh94+RplFDq+4ZjW+pa3NlxOIZGyrNrBybvicitByY3Ys9c//NLaDVQ==}
+  monaco-editor-core@0.49.0:
+    resolution: {integrity: sha512-MANZcpLnpcM5qceEMsdwndvyB9rlGu+Sd8mVLd6y4VpSZCQenpoUAYk0K+UAPtcnCOYhgIsR/ZS9PxzMnCFkYw==}
 
   ms@2.1.2:
     resolution: {integrity: sha512-sGkPx+VjMtmA6MX27oA4FBFELFCZZ4S4XqeGOXCv68tT+jb3vk/RyaKWP0PTKyWtmLSM0b+adUTEvbs1PEaH2w==}
@@ -1911,10 +1915,6 @@ packages:
   picomatch@2.3.1:
     resolution: {integrity: sha512-JU3teHTNjmE2VCGFzuY8EXzCDVwEqB2a8fsIvwaStHhAWJEeVd1o1QD80CU6+ZdEXXSLbSsuLwJjkCBWqRQUVA==}
     engines: {node: '>=8.6'}
-
-  picomatch@4.0.2:
-    resolution: {integrity: sha512-M7BAV6Rlcy5u+m6oPhAPFgJTzAioX/6B0DxyvDlo9l8+T3nLKbrczg2WLUyzd45L8RqfUMyGPzekbMvX2Ldkwg==}
-    engines: {node: '>=12'}
 
   pidtree@0.6.0:
     resolution: {integrity: sha512-eG2dWTVw5bzqGRztnHExczNxt5VGsE6OwTeCG3fdUf9KBsZzO3R5OIIIzWR+iZA0NtZ+RDVdaoE2dK1cn6jH4g==}
@@ -2506,7 +2506,7 @@ snapshots:
       '@babel/parser': 7.24.5
       '@babel/template': 7.24.0
       '@babel/traverse': 7.24.5
-      '@babel/types': 7.24.5
+      '@babel/types': 7.24.6
       convert-source-map: 2.0.0
       debug: 4.3.4
       gensync: 1.0.0-beta.2
@@ -2517,7 +2517,7 @@ snapshots:
 
   '@babel/generator@7.24.5':
     dependencies:
-      '@babel/types': 7.24.5
+      '@babel/types': 7.24.6
       '@jridgewell/gen-mapping': 0.3.5
       '@jridgewell/trace-mapping': 0.3.25
       jsesc: 2.5.2
@@ -2535,19 +2535,19 @@ snapshots:
   '@babel/helper-function-name@7.23.0':
     dependencies:
       '@babel/template': 7.24.0
-      '@babel/types': 7.24.5
+      '@babel/types': 7.24.6
 
   '@babel/helper-hoist-variables@7.22.5':
     dependencies:
-      '@babel/types': 7.24.5
+      '@babel/types': 7.24.6
 
   '@babel/helper-module-imports@7.22.15':
     dependencies:
-      '@babel/types': 7.24.5
+      '@babel/types': 7.24.6
 
   '@babel/helper-module-imports@7.24.3':
     dependencies:
-      '@babel/types': 7.24.5
+      '@babel/types': 7.24.6
 
   '@babel/helper-module-transforms@7.24.5(@babel/core@7.24.5)':
     dependencies:
@@ -2562,15 +2562,17 @@ snapshots:
 
   '@babel/helper-simple-access@7.24.5':
     dependencies:
-      '@babel/types': 7.24.5
+      '@babel/types': 7.24.6
 
   '@babel/helper-split-export-declaration@7.24.5':
     dependencies:
-      '@babel/types': 7.24.5
+      '@babel/types': 7.24.6
 
-  '@babel/helper-string-parser@7.24.1': {}
+  '@babel/helper-string-parser@7.24.6': {}
 
   '@babel/helper-validator-identifier@7.24.5': {}
+
+  '@babel/helper-validator-identifier@7.24.6': {}
 
   '@babel/helper-validator-option@7.23.5': {}
 
@@ -2578,7 +2580,7 @@ snapshots:
     dependencies:
       '@babel/template': 7.24.0
       '@babel/traverse': 7.24.5
-      '@babel/types': 7.24.5
+      '@babel/types': 7.24.6
     transitivePeerDependencies:
       - supports-color
 
@@ -2597,24 +2599,24 @@ snapshots:
 
   '@babel/parser@7.24.0':
     dependencies:
-      '@babel/types': 7.24.5
+      '@babel/types': 7.24.6
 
   '@babel/parser@7.24.5':
     dependencies:
-      '@babel/types': 7.24.5
+      '@babel/types': 7.24.6
 
   '@babel/plugin-syntax-jsx@7.24.1(@babel/core@7.24.5)':
     dependencies:
       '@babel/core': 7.24.5
       '@babel/helper-plugin-utils': 7.24.5
 
-  '@babel/standalone@7.24.5': {}
+  '@babel/standalone@7.24.6': {}
 
   '@babel/template@7.24.0':
     dependencies:
       '@babel/code-frame': 7.23.5
       '@babel/parser': 7.24.5
-      '@babel/types': 7.24.5
+      '@babel/types': 7.24.6
 
   '@babel/traverse@7.24.5':
     dependencies:
@@ -2625,16 +2627,16 @@ snapshots:
       '@babel/helper-hoist-variables': 7.22.5
       '@babel/helper-split-export-declaration': 7.24.5
       '@babel/parser': 7.24.5
-      '@babel/types': 7.24.5
+      '@babel/types': 7.24.6
       debug: 4.3.4
       globals: 11.12.0
     transitivePeerDependencies:
       - supports-color
 
-  '@babel/types@7.24.5':
+  '@babel/types@7.24.6':
     dependencies:
-      '@babel/helper-string-parser': 7.24.1
-      '@babel/helper-validator-identifier': 7.24.5
+      '@babel/helper-string-parser': 7.24.6
+      '@babel/helper-validator-identifier': 7.24.6
       to-fast-properties: 2.0.0
 
   '@conventional-changelog/git-client@1.0.1(conventional-commits-filter@5.0.0)(conventional-commits-parser@6.0.0)':
@@ -2954,14 +2956,14 @@ snapshots:
   '@types/babel__core@7.20.5':
     dependencies:
       '@babel/parser': 7.24.5
-      '@babel/types': 7.24.5
+      '@babel/types': 7.24.6
       '@types/babel__generator': 7.6.8
       '@types/babel__template': 7.4.4
       '@types/babel__traverse': 7.20.6
 
   '@types/babel__generator@7.6.8':
     dependencies:
-      '@babel/types': 7.24.5
+      '@babel/types': 7.24.6
 
   '@types/babel__standalone@7.1.7':
     dependencies:
@@ -2970,11 +2972,11 @@ snapshots:
   '@types/babel__template@7.4.4':
     dependencies:
       '@babel/parser': 7.24.5
-      '@babel/types': 7.24.5
+      '@babel/types': 7.24.6
 
   '@types/babel__traverse@7.20.6':
     dependencies:
-      '@babel/types': 7.24.5
+      '@babel/types': 7.24.6
 
   '@types/codemirror@5.60.15':
     dependencies:
@@ -3171,7 +3173,7 @@ snapshots:
       '@babel/plugin-syntax-jsx': 7.24.1(@babel/core@7.24.5)
       '@babel/template': 7.24.0
       '@babel/traverse': 7.24.5
-      '@babel/types': 7.24.5
+      '@babel/types': 7.24.6
       '@vue/babel-helper-vue-transform-on': 1.2.2
       '@vue/babel-plugin-resolve-type': 1.2.2(@babel/core@7.24.5)
       camelcase: 6.3.0
@@ -4151,7 +4153,7 @@ snapshots:
 
   lines-and-columns@1.2.4: {}
 
-  lint-staged@15.2.4:
+  lint-staged@15.2.5:
     dependencies:
       chalk: 5.3.0
       commander: 12.1.0
@@ -4159,7 +4161,7 @@ snapshots:
       execa: 8.0.1
       lilconfig: 3.1.1
       listr2: 8.2.1
-      micromatch: 4.0.6
+      micromatch: 4.0.7
       pidtree: 0.6.0
       string-argv: 0.3.2
       yaml: 2.4.2
@@ -4224,10 +4226,10 @@ snapshots:
       braces: 3.0.2
       picomatch: 2.3.1
 
-  micromatch@4.0.6:
+  micromatch@4.0.7:
     dependencies:
       braces: 3.0.3
-      picomatch: 4.0.2
+      picomatch: 2.3.1
 
   mimic-fn@2.1.0: {}
 
@@ -4273,7 +4275,7 @@ snapshots:
       pkg-types: 1.0.3
       ufo: 1.4.0
 
-  monaco-editor-core@0.48.0: {}
+  monaco-editor-core@0.49.0: {}
 
   ms@2.1.2: {}
 
@@ -4401,8 +4403,6 @@ snapshots:
   picocolors@1.0.1: {}
 
   picomatch@2.3.1: {}
-
-  picomatch@4.0.2: {}
 
   pidtree@0.6.0: {}
 
