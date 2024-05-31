@@ -85,7 +85,7 @@ export function useStore(
       () => {
         setImportMap(mergeImportMap(getImportMap(), builtinImportMap.value))
       },
-      { deep: true, immediate: true },
+      { deep: true },
     )
 
     watch(
