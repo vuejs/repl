@@ -1,3 +1,12 @@
+## [4.2.1](https://github.com/vuejs/repl/compare/v4.2.0...v4.2.1) (2024-05-31)
+
+
+### Bug Fixes
+
+* don't overwrite import map from initial state ([1410b8c](https://github.com/vuejs/repl/commit/1410b8cac4dd993c5ba6a94e299b261ed84c3f12)), closes [#252](https://github.com/vuejs/repl/issues/252)
+
+
+
 # [4.2.0](https://github.com/vuejs/repl/compare/v4.1.2...v4.2.0) (2024-05-26)
 
 
