@@ -1,11 +1,12 @@
 <script setup lang="ts">
-import { computed, inject, reactive, ref, toRef } from 'vue'
+import { computed, inject, reactive, ref, toRef, onMounted } from 'vue'
 import { injectKeyStore } from './types'
 
 const props = defineProps<{ layout?: 'horizontal' | 'vertical' }>()
 const isVertical = computed(() => props.layout === 'vertical')
 
 const container = ref()
+const rightView = ref()
 
 // mobile only
 const store = inject(injectKeyStore)!
@@ -40,15 +41,20 @@ function dragMove(e: MouseEvent) {
       : container.value.offsetWidth
     const dp = position - startPosition
     state.split = startSplit + +((dp / totalSize) * 100).toFixed(2)
-    const view = container.value.children[1]
-    state.viewHeight = view.offsetHeight
-    state.viewWidth = view.offsetWidth
+
+    state.viewHeight = rightView.value.offsetHeight
+    state.viewWidth = rightView.value.offsetWidth
   }
 }
 
 function dragEnd() {
   state.dragging = false
 }
+
+onMounted(() => {
+  state.viewHeight = rightView.value.offsetHeight
+  state.viewWidth = rightView.value.offsetWidth
+})
 </script>
 
 <template>
@@ -72,6 +78,7 @@ function dragEnd() {
       <div class="dragger" @mousedown.prevent="dragStart" />
     </div>
     <div
+      ref="rightView"
       class="right"
       :style="{ [isVertical ? 'height' : 'width']: 100 - boundSplit + '%' }"
     >
