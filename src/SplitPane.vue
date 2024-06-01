@@ -14,6 +14,8 @@ const showOutput = toRef(store, 'showOutput')
 const state = reactive({
   dragging: false,
   split: 50,
+  viewHeight: 0,
+  viewWidth: 0,
 })
 
 const boundSplit = computed(() => {
@@ -38,6 +40,9 @@ function dragMove(e: MouseEvent) {
       : container.value.offsetWidth
     const dp = position - startPosition
     state.split = startSplit + +((dp / totalSize) * 100).toFixed(2)
+    const view = container.value.children[1]
+    state.viewHeight = view.offsetHeight
+    state.viewWidth = view.offsetWidth
   }
 }
 
@@ -70,6 +75,9 @@ function dragEnd() {
       class="right"
       :style="{ [isVertical ? 'height' : 'width']: 100 - boundSplit + '%' }"
     >
+      <div class="view-size" v-show="state.dragging">
+        {{ `${state.viewWidth}px x ${state.viewHeight}px` }}
+      </div>
       <slot name="right" />
     </div>
 
@@ -96,6 +104,14 @@ function dragEnd() {
 .right {
   position: relative;
   height: 100%;
+}
+.view-size {
+  position: absolute;
+  top: 40px;
+  left: 10px;
+  font-size: 12px;
+  color: var(--text-light);
+  z-index: 100;
 }
 .left {
   border-right: 1px solid var(--border);
