@@ -37,7 +37,7 @@ const props = withDefaults(defineProps<Props>(), {
   store: () => useStore(),
   autoResize: true,
   autoSave: true,
-  showCompileOutput: true,
+  showCompileOutput: false, // 只展示 preview，隐藏 js，css，ssr
   showImportMap: true,
   showTsConfig: true,
   clearConsole: true,

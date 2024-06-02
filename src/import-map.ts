@@ -25,15 +25,15 @@ export function useVueImportMap(
         vueVersion.value || currentVersion
       }/dist/runtime-dom.esm-browser${productionMode.value ? `.prod` : ``}.js`
 
-    const serverRenderer =
-      (!vueVersion.value && normalizeDefaults(defaults.serverRenderer)) ||
-      `https://cdn.jsdelivr.net/npm/@vue/server-renderer@${
-        vueVersion.value || currentVersion
-      }/dist/server-renderer.esm-browser.js`
+    // const serverRenderer =
+    //   (!vueVersion.value && normalizeDefaults(defaults.serverRenderer)) ||
+    //   `https://cdn.jsdelivr.net/npm/@vue/server-renderer@${
+    //     vueVersion.value || currentVersion
+    //   }/dist/server-renderer.esm-browser.js`
     return {
       imports: {
         vue,
-        'vue/server-renderer': serverRenderer,
+        // 'vue/server-renderer': serverRenderer,
       },
     }
   })

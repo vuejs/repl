@@ -1,7 +1,11 @@
-<script setup></script>
+<script>
+export default {
+  data() {
+    return {}
+  },
+}
+</script>
 
 <template>
-  <div>
-    <slot />
-  </div>
+  <div>Comp</div>
 </template>

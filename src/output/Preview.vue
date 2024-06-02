@@ -234,12 +234,8 @@ async function updatePreview() {
 
     const codeToEval = [
       `window.__modules__ = {};window.__css__ = [];` +
-        `if (window.__app__) window.__app__.unmount();` +
-        (isSSR
-          ? ``
-          : `document.body.innerHTML = '<div id="app"></div>' + \`${
-              previewOptions?.bodyHTML || ''
-            }\``),
+        `if (window.__app__) window.__app__.$destroy();` +
+        `document.body.innerHTML = '<div id="app"></div>'`,
       ...modules,
       `document.querySelectorAll('style[css]').forEach(el => el.remove())
         document.head.insertAdjacentHTML('beforeend', window.__css__.map(s => \`<style css>\${s}</style>\`).join('\\n'))`,
@@ -248,20 +244,18 @@ async function updatePreview() {
     // if main file is a vue file, mount it.
     if (mainFile.endsWith('.vue')) {
       codeToEval.push(
-        `import { ${
-          isSSR ? `createSSRApp` : `createApp`
-        } as _createApp } from "vue"
-        ${previewOptions?.customCode?.importCode || ''}
+        `import Vue from "vue"\n
         const _mount = () => {
           const AppComponent = __modules__["${mainFile}"].default
           AppComponent.name = 'Repl'
-          const app = window.__app__ = _createApp(AppComponent)
-          if (!app.config.hasOwnProperty('unwrapInjectedRef')) {
-            app.config.unwrapInjectedRef = true
-          }
-          app.config.errorHandler = e => console.error(e)
-          ${previewOptions?.customCode?.useCode || ''}
-          app.mount('#app')
+          AppComponent.el = '#app'
+          const app = window.__app__ = new Vue(AppComponent)
+          Vue.config.errorHandler = e => console.error(e)
+          // if (!app.config.hasOwnProperty('unwrapInjectedRef')) {
+          //   app.config.unwrapInjectedRef = true
+          // }
+          // app.config.errorHandler = e => console.error(e)
+          // app.mount('#app')
         }
         if (window.__ssr_promise__) {
           window.__ssr_promise__.then(_mount)

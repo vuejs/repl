@@ -332,34 +332,38 @@ async function doCompileTemplate(
     expressionPlugins.push('jsx')
   }
 
-  let { code, errors } = store.compiler.compileTemplate({
-    isProd: false,
-    ...store.sfcOptions?.template,
-    ast: descriptor.template!.ast,
-    source: descriptor.template!.content,
-    filename: descriptor.filename,
-    id,
-    scoped: descriptor.styles.some((s) => s.scoped),
-    slotted: descriptor.slotted,
-    ssr,
-    ssrCssVars: descriptor.cssVars,
-    compilerOptions: {
-      ...store.sfcOptions?.template?.compilerOptions,
-      bindingMetadata,
-      expressionPlugins,
-    },
-  })
-  if (errors.length) {
-    return errors
-  }
+  let code = descriptor.template?.content!
 
-  const fnName = ssr ? `ssrRender` : `render`
+  // let { code, errors } = store.compiler.compileTemplate({
+  //   isProd: false,
+  //   ...store.sfcOptions?.template,
+  //   ast: descriptor.template!.ast,
+  //   source: descriptor.template!.content,
+  //   filename: descriptor.filename,
+  //   id,
+  //   scoped: descriptor.styles.some((s) => s.scoped),
+  //   slotted: descriptor.slotted,
+  //   ssr,
+  //   ssrCssVars: descriptor.cssVars,
+  //   compilerOptions: {
+  //     ...store.sfcOptions?.template?.compilerOptions,
+  //     bindingMetadata,
+  //     expressionPlugins,
+  //   },
+  // })
+  // if (errors.length) {
+  //   return errors
+  // }
 
-  code =
-    `\n${code.replace(
-      /\nexport (function|const) (render|ssrRender)/,
-      `$1 ${fnName}`,
-    )}` + `\n${COMP_IDENTIFIER}.${fnName} = ${fnName}`
+  // const fnName = ssr ? `ssrRender` : `render`
+
+  // code =
+  //   `\n${code.replace(
+  //     /\nexport (function|const) (render|ssrRender)/,
+  //     `$1 ${fnName}`,
+  //   )}` + `\n${COMP_IDENTIFIER}.${fnName} = ${fnName}`
+
+  code = `\n${COMP_IDENTIFIER}.template = \`${code}\``
 
   if (isTS) {
     code = await transformTS(code, isJSX)

@@ -13,12 +13,14 @@ const App = {
   setup() {
     const query = new URLSearchParams(location.search)
     const { importMap: builtinImportMap, vueVersion } = useVueImportMap({
-      runtimeDev: import.meta.env.PROD
-        ? undefined
-        : `${location.origin}/src/vue-dev-proxy`,
-      serverRenderer: import.meta.env.PROD
-        ? undefined
-        : `${location.origin}/src/vue-server-renderer-dev-proxy`,
+      // runtimeDev: import.meta.env.PROD
+      //   ? undefined
+      //   : `${location.origin}/src/vue-dev-proxy`,
+      // serverRenderer: import.meta.env.PROD
+      //   ? undefined
+      //   : `${location.origin}/src/vue-server-renderer-dev-proxy`,
+      runtimeDev:
+        'https://cdn.jsdelivr.net/npm/vue@2.7.16/dist/vue.esm.browser.js',
     })
     const store = (window.store = useStore(
       {
@@ -46,7 +48,7 @@ const App = {
     //   )
     // }, 1000)
 
-    // store.vueVersion = '3.4.1'
+    // store.vueVersion = '2.6.14'
     const theme = ref<'light' | 'dark'>('dark')
     window.theme = theme
     const previewTheme = ref(false)
@@ -59,12 +61,13 @@ const App = {
         previewTheme: previewTheme.value,
         editor: MonacoEditor,
         // layout: 'vertical',
-        ssr: true,
+        ssr: false,
         sfcOptions: {
           script: {
             // inlineTemplate: false
           },
         },
+        showTsConfig: false,
         // showCompileOutput: false,
         // showImportMap: false
       })
