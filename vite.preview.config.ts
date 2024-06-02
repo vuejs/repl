@@ -3,6 +3,7 @@ import vue from '@vitejs/plugin-vue'
 import replace from '@rollup/plugin-replace'
 
 export default defineConfig({
+  base: './',
   plugins: [
     vue({
       script: {
@@ -17,6 +18,7 @@ export default defineConfig({
     },
   },
   build: {
+    outDir: 'website',
     commonjsOptions: {
       ignore: ['typescript'],
     },
