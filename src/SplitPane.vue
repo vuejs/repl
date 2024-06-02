@@ -42,8 +42,9 @@ function dragMove(e: MouseEvent) {
     const dp = position - startPosition
     state.split = startSplit + +((dp / totalSize) * 100).toFixed(2)
 
-    state.viewHeight = rightView.value.offsetHeight - 38
-    state.viewWidth = rightView.value.offsetWidth
+    const viewElement = rightView.value.querySelector('iframe')
+    state.viewHeight = viewElement.offsetHeight
+    state.viewWidth = viewElement.offsetWidth
   }
 }
 
@@ -52,8 +53,9 @@ function dragEnd() {
 }
 
 onMounted(() => {
-  state.viewHeight = rightView.value.offsetHeight - 38
-  state.viewWidth = rightView.value.offsetWidth
+  const viewElement = rightView.value.querySelector('iframe')
+  state.viewHeight = viewElement.offsetHeight
+  state.viewWidth = viewElement.offsetWidth
 })
 </script>
 
