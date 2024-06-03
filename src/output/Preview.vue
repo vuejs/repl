@@ -286,7 +286,7 @@ function reload() {
   sandbox.contentWindow?.location.reload()
 }
 
-defineExpose({ reload })
+defineExpose({ reload, container })
 </script>
 
 <template>

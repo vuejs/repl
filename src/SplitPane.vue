@@ -1,12 +1,14 @@
 <script setup lang="ts">
-import { computed, inject, reactive, ref, toRef, onMounted } from 'vue'
+import { computed, inject, reactive, ref, toRef } from 'vue'
 import { injectKeyStore } from './types'
 
+const emit = defineEmits<{
+  (e: 'draggingChangeSize'): void
+}>()
 const props = defineProps<{ layout?: 'horizontal' | 'vertical' }>()
 const isVertical = computed(() => props.layout === 'vertical')
 
 const container = ref()
-const rightView = ref()
 
 // mobile only
 const store = inject(injectKeyStore)!
@@ -31,6 +33,8 @@ function dragStart(e: MouseEvent) {
   state.dragging = true
   startPosition = isVertical.value ? e.pageY : e.pageX
   startSplit = boundSplit.value
+
+  emit('draggingChangeSize')
 }
 
 function dragMove(e: MouseEvent) {
@@ -42,9 +46,7 @@ function dragMove(e: MouseEvent) {
     const dp = position - startPosition
     state.split = startSplit + +((dp / totalSize) * 100).toFixed(2)
 
-    const viewElement = rightView.value.querySelector('iframe')
-    state.viewHeight = viewElement.offsetHeight
-    state.viewWidth = viewElement.offsetWidth
+    emit('draggingChangeSize')
   }
 }
 
@@ -52,10 +54,13 @@ function dragEnd() {
   state.dragging = false
 }
 
-onMounted(() => {
-  const viewElement = rightView.value.querySelector('iframe')
-  state.viewHeight = viewElement.offsetHeight
-  state.viewWidth = viewElement.offsetWidth
+function changeViewSize(el: HTMLElement) {
+  state.viewHeight = el.offsetHeight
+  state.viewWidth = el.offsetWidth
+}
+
+defineExpose({
+  changeViewSize,
 })
 </script>
 
@@ -80,7 +85,6 @@ onMounted(() => {
       <div class="dragger" @mousedown.prevent="dragStart" />
     </div>
     <div
-      ref="rightView"
       class="right"
       :style="{ [isVertical ? 'height' : 'width']: 100 - boundSplit + '%' }"
     >

@@ -60,6 +60,7 @@ if (!props.editor) {
 }
 
 const outputRef = ref<InstanceType<typeof Output>>()
+const splitPaneRef = ref<InstanceType<typeof SplitPane>>()
 
 props.store.init()
 
@@ -75,6 +76,13 @@ provide('clear-console', toRef(props, 'clearConsole'))
 provide('preview-options', props.previewOptions)
 provide('theme', toRef(props, 'theme'))
 provide('preview-theme', toRef(props, 'previewTheme'))
+
+function changeSize() {
+  if (outputRef.value?.previewRef?.container) {
+    splitPaneRef.value?.changeViewSize(outputRef.value.previewRef.container)
+  }
+}
+
 /**
  * Reload the preview iframe
  */
@@ -87,7 +95,11 @@ defineExpose({ reload })
 
 <template>
   <div class="vue-repl">
-    <SplitPane :layout="layout">
+    <SplitPane
+      :layout="layout"
+      ref="splitPaneRef"
+      @draggingChangeSize="changeSize"
+    >
       <template #[editorSlotName]>
         <EditorContainer :editor-component="editor" />
       </template>
