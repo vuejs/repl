@@ -271,7 +271,14 @@ export function useStore(
   const deserialize: ReplStore['deserialize'] = (serializedState: string) => {
     if (serializedState.startsWith('#'))
       serializedState = serializedState.slice(1)
-    const saved = JSON.parse(atou(serializedState))
+    let saved: any
+    try {
+      saved = JSON.parse(atou(serializedState))
+    } catch (err) {
+      console.error(err)
+      alert('Failed to load code from URL.')
+      return setDefaultFile()
+    }
     for (const filename in saved) {
       if (filename === '_version') {
         vueVersion.value = saved[filename]
@@ -313,15 +320,18 @@ export function useStore(
     applyBuiltinImportMap()
     setActive(store.mainFile)
   }
-
-  if (serializedState) {
-    deserialize(serializedState)
-  } else {
+  const setDefaultFile = (): void => {
     setFile(
       files.value,
       mainFile.value,
       template.value.welcomeSFC || welcomeSFCCode,
     )
+  }
+
+  if (serializedState) {
+    deserialize(serializedState)
+  } else {
+    setDefaultFile()
   }
   if (!files.value[mainFile.value]) {
     mainFile.value = Object.keys(files.value)[0]
