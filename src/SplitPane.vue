@@ -1,14 +1,20 @@
 <script setup lang="ts">
-import { computed, inject, reactive, ref, toRef } from 'vue'
+import {
+  type MaybeRefOrGetter,
+  computed,
+  inject,
+  reactive,
+  ref,
+  toRef,
+  toValue,
+} from 'vue'
 import { injectKeyStore } from './types'
 
-const emit = defineEmits<{
-  (e: 'draggingChangeSize'): void
-}>()
 const props = defineProps<{ layout?: 'horizontal' | 'vertical' }>()
 const isVertical = computed(() => props.layout === 'vertical')
 
 const container = ref()
+const previewRef = inject<MaybeRefOrGetter<HTMLDivElement>>('preview-ref')!
 
 // mobile only
 const store = inject(injectKeyStore)!
@@ -34,7 +40,7 @@ function dragStart(e: MouseEvent) {
   startPosition = isVertical.value ? e.pageY : e.pageX
   startSplit = boundSplit.value
 
-  emit('draggingChangeSize')
+  changeViewSize()
 }
 
 function dragMove(e: MouseEvent) {
@@ -46,7 +52,7 @@ function dragMove(e: MouseEvent) {
     const dp = position - startPosition
     state.split = startSplit + +((dp / totalSize) * 100).toFixed(2)
 
-    emit('draggingChangeSize')
+    changeViewSize()
   }
 }
 
@@ -54,7 +60,8 @@ function dragEnd() {
   state.dragging = false
 }
 
-function changeViewSize(el: HTMLElement) {
+function changeViewSize() {
+  const el = toValue(previewRef)
   state.viewHeight = el.offsetHeight
   state.viewWidth = el.offsetWidth
 }
