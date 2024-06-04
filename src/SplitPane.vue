@@ -65,10 +65,6 @@ function changeViewSize() {
   state.viewHeight = el.offsetHeight
   state.viewWidth = el.offsetWidth
 }
-
-defineExpose({
-  changeViewSize,
-})
 </script>
 
 <template>
