@@ -1,11 +1,20 @@
 <script setup lang="ts">
-import { computed, inject, reactive, ref, toRef } from 'vue'
+import {
+  type MaybeRefOrGetter,
+  computed,
+  inject,
+  reactive,
+  ref,
+  toRef,
+  toValue,
+} from 'vue'
 import { injectKeyStore } from './types'
 
 const props = defineProps<{ layout?: 'horizontal' | 'vertical' }>()
 const isVertical = computed(() => props.layout === 'vertical')
 
 const container = ref()
+const previewRef = inject<MaybeRefOrGetter<HTMLDivElement>>('preview-ref')!
 
 // mobile only
 const store = inject(injectKeyStore)!
@@ -14,6 +23,8 @@ const showOutput = toRef(store, 'showOutput')
 const state = reactive({
   dragging: false,
   split: 50,
+  viewHeight: 0,
+  viewWidth: 0,
 })
 
 const boundSplit = computed(() => {
@@ -28,6 +39,8 @@ function dragStart(e: MouseEvent) {
   state.dragging = true
   startPosition = isVertical.value ? e.pageY : e.pageX
   startSplit = boundSplit.value
+
+  changeViewSize()
 }
 
 function dragMove(e: MouseEvent) {
@@ -38,12 +51,24 @@ function dragMove(e: MouseEvent) {
       : container.value.offsetWidth
     const dp = position - startPosition
     state.split = startSplit + +((dp / totalSize) * 100).toFixed(2)
+
+    changeViewSize()
   }
 }
 
 function dragEnd() {
   state.dragging = false
 }
+
+function changeViewSize() {
+  const el = toValue(previewRef)
+  state.viewHeight = el.offsetHeight
+  state.viewWidth = el.offsetWidth
+}
+
+defineExpose({
+  changeViewSize,
+})
 </script>
 
 <template>
@@ -70,6 +95,9 @@ function dragEnd() {
       class="right"
       :style="{ [isVertical ? 'height' : 'width']: 100 - boundSplit + '%' }"
     >
+      <div class="view-size" v-show="state.dragging">
+        {{ `${state.viewWidth}px x ${state.viewHeight}px` }}
+      </div>
       <slot name="right" />
     </div>
 
@@ -96,6 +124,14 @@ function dragEnd() {
 .right {
   position: relative;
   height: 100%;
+}
+.view-size {
+  position: absolute;
+  top: 40px;
+  left: 10px;
+  font-size: 12px;
+  color: var(--text-light);
+  z-index: 100;
 }
 .left {
   border-right: 1px solid var(--border);

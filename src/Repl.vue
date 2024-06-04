@@ -75,6 +75,8 @@ provide('clear-console', toRef(props, 'clearConsole'))
 provide('preview-options', props.previewOptions)
 provide('theme', toRef(props, 'theme'))
 provide('preview-theme', toRef(props, 'previewTheme'))
+provide('preview-ref', () => outputRef.value?.previewRef?.container)
+
 /**
  * Reload the preview iframe
  */

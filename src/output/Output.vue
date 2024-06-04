@@ -37,7 +37,7 @@ function reload() {
   previewRef.value?.reload()
 }
 
-defineExpose({ reload })
+defineExpose({ reload, previewRef })
 </script>
 
 <template>
