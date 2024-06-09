@@ -83,7 +83,7 @@
     "@vitejs/plugin-vue": "^5.0.4",
     "@volar/cdn": "~1.11.1",
     "@volar/monaco": "~1.11.1",
-    "@volar/typescript": "~1.11.1",
+    "@volar/typescript": "~2.3.0",
     "@vue/babel-plugin-jsx": "^1.2.2",
     "@vue/language-service": "1.9.0-alpha.3",
     "assert": "^2.1.0",
