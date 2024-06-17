@@ -85,7 +85,7 @@
     "@volar/monaco": "~1.11.1",
     "@volar/typescript": "~1.11.1",
     "@vue/babel-plugin-jsx": "^1.2.2",
-    "@vue/language-service": "1.9.0-alpha.3",
+    "@vue/language-service": "2.0.21",
     "assert": "^2.1.0",
     "bumpp": "^9.4.1",
     "codemirror": "^5.65.16",
