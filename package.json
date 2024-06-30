@@ -81,9 +81,9 @@
     "@types/node": "^20.14.2",
     "@typescript-eslint/eslint-plugin": "^7.13.0",
     "@vitejs/plugin-vue": "^5.0.5",
-    "@volar/monaco": "~2.2.5",
+    "@volar/monaco": "~2.4.0-alpha.3",
     "@vue/babel-plugin-jsx": "^1.2.2",
-    "@vue/language-service": "~2.0.19",
+    "@vue/language-service": "~2.0.24",
     "assert-plus": "^1.0.0",
     "bumpp": "^9.4.1",
     "codemirror": "^5.65.16",
@@ -101,7 +101,8 @@
     "typescript": "^5.4.5",
     "vite": "^5.3.1",
     "vite-plugin-dts": "^3.9.1",
+    "vscode-uri": "^3.0.8",
     "vue": "^3.4.29",
-    "vue-tsc": "^2.0.21"
+    "vue-tsc": "~2.0.24"
   }
 }

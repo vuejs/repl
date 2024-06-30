@@ -2,17 +2,18 @@
 import * as worker from 'monaco-editor-core/esm/vs/editor/editor.worker'
 import type * as monaco from 'monaco-editor-core'
 import {
-  type ServiceEnvironment,
+  type LanguageServiceEnvironment,
   activateAutomaticTypeAcquisition,
   createTypeScriptWorkerService,
 } from '@volar/monaco/worker'
 import {
   type VueCompilerOptions,
-  getVueLanguageServicePlugins,
+  getFullLanguageServicePlugins,
   createVueLanguagePlugin,
   resolveVueCompilerOptions,
 } from '@vue/language-service'
 import type { WorkerMessage } from './env'
+import { URI } from 'vscode-uri'
 
 export interface CreateData {
   tsconfig: {
@@ -42,14 +43,11 @@ self.onmessage = async (msg: MessageEvent<WorkerMessage>) => {
         dependencies,
       }: CreateData,
     ) => {
-      const uriToFileName = (uri: string) => uri.substring('file://'.length)
-      const env: ServiceEnvironment = {
-        workspaceFolder: 'file:///',
+      const asFileName = (uri: URI) => uri.path
+      const asUri = (fileName: string): URI => URI.file(fileName)
+      const env: LanguageServiceEnvironment = {
+        workspaceFolders: [URI.file('/')],
         locale,
-        typescript: {
-          uriToFileName,
-          fileNameToUri: (fileName) => 'file://' + fileName,
-        },
       }
 
       const { options: compilerOptions } = ts.convertCompilerOptionsFromJson(
@@ -60,27 +58,39 @@ self.onmessage = async (msg: MessageEvent<WorkerMessage>) => {
         tsconfig.vueCompilerOptions || {},
       )
 
-      activateAutomaticTypeAcquisition(env)
+      activateAutomaticTypeAcquisition(env, { asFileName })
+
       return createTypeScriptWorkerService({
         typescript: ts,
         compilerOptions,
         workerContext: ctx,
         env,
+        uriConverter: {
+          asFileName,
+          asUri,
+        },
         languagePlugins: [
           createVueLanguagePlugin(
             ts,
-            env.typescript!.uriToFileName,
-            true,
+            asFileName,
             () => '', // TODO getProjectVersion
-            () => ctx.getMirrorModels().map((model) => model.uri.toString()),
+            (fileName) => {
+              const uri = asUri(fileName)
+              for (const model of ctx.getMirrorModels()) {
+                if (model.uri.toString() === uri.toString()) {
+                  return true
+                }
+              }
+              return false
+            },
             compilerOptions,
             vueCompilerOptions,
           ),
         ],
-        servicePlugins: getVueLanguageServicePlugins(
-          ts,
-          () => vueCompilerOptions,
-        ),
+        servicePlugins: getFullLanguageServicePlugins(ts),
+        setup({ project }) {
+          project.vue = { compilerOptions: vueCompilerOptions }
+        },
       })
     },
   )
