@@ -41,6 +41,12 @@ export function initMonaco(store: Store) {
   initted = true
 }
 
+export class WorkerHost {
+  onFetchCdnFile(uri: string, text: string) {
+    getOrCreateModel(Uri.parse(uri), undefined, text)
+  }
+}
+
 let disposeVue: undefined | (() => void)
 export async function reloadLanguageTools(store: Store) {
   disposeVue?.()
@@ -74,6 +80,7 @@ export async function reloadLanguageTools(store: Store) {
   const worker = editor.createWebWorker<LanguageService>({
     moduleId: 'vs/language/vue/vueWorker',
     label: 'vue',
+    host: new WorkerHost(),
     createData: {
       tsconfig: store.getTsConfig?.() || {},
       dependencies,

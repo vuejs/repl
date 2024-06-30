@@ -12,7 +12,7 @@ import {
   createVueLanguagePlugin,
   resolveVueCompilerOptions,
 } from '@vue/language-service'
-import type { WorkerMessage } from './env'
+import type { WorkerHost, WorkerMessage } from './env'
 import { URI } from 'vscode-uri'
 
 export interface CreateData {
@@ -36,7 +36,7 @@ self.onmessage = async (msg: MessageEvent<WorkerMessage>) => {
 
   worker.initialize(
     (
-      ctx: monaco.worker.IWorkerContext,
+      ctx: monaco.worker.IWorkerContext<WorkerHost>,
       {
         tsconfig,
         // TODO
@@ -58,7 +58,12 @@ self.onmessage = async (msg: MessageEvent<WorkerMessage>) => {
         tsconfig.vueCompilerOptions || {},
       )
 
-      activateAutomaticTypeAcquisition(env, { asFileName })
+      activateAutomaticTypeAcquisition(env, { asFileName }, (path, content) => {
+        ctx.host.onFetchCdnFile(
+          asUri('/node_modules/' + path).toString(),
+          content,
+        )
+      })
 
       return createTypeScriptWorkerService({
         typescript: ts,
