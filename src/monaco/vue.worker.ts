@@ -3,7 +3,7 @@ import * as worker from 'monaco-editor-core/esm/vs/editor/editor.worker'
 import type * as monaco from 'monaco-editor-core'
 import {
   type LanguageServiceEnvironment,
-  activateAutomaticTypeAcquisition,
+  createJsDelivrNpmFileSystem,
   createTypeScriptWorkerService,
 } from '@volar/monaco/worker'
 import {
@@ -37,17 +37,31 @@ self.onmessage = async (msg: MessageEvent<WorkerMessage>) => {
   worker.initialize(
     (
       ctx: monaco.worker.IWorkerContext<WorkerHost>,
-      {
-        tsconfig,
-        // TODO
-        dependencies,
-      }: CreateData,
+      { tsconfig, dependencies }: CreateData,
     ) => {
       const asFileName = (uri: URI) => uri.path
       const asUri = (fileName: string): URI => URI.file(fileName)
       const env: LanguageServiceEnvironment = {
         workspaceFolders: [URI.file('/')],
         locale,
+        fs: createJsDelivrNpmFileSystem(
+          (uri) => {
+            if (uri.scheme === 'file') {
+              if (uri.path === '/node_modules') {
+                return ''
+              } else if (uri.path.startsWith('/node_modules/')) {
+                return uri.path.slice('/node_modules/'.length)
+              }
+            }
+          },
+          (pkgName) => dependencies[pkgName],
+          (path, content) => {
+            ctx.host.onFetchCdnFile(
+              asUri('/node_modules/' + path).toString(),
+              content,
+            )
+          },
+        ),
       }
 
       const { options: compilerOptions } = ts.convertCompilerOptionsFromJson(
@@ -57,13 +71,6 @@ self.onmessage = async (msg: MessageEvent<WorkerMessage>) => {
       const vueCompilerOptions = resolveVueCompilerOptions(
         tsconfig.vueCompilerOptions || {},
       )
-
-      activateAutomaticTypeAcquisition(env, { asFileName }, (path, content) => {
-        ctx.host.onFetchCdnFile(
-          asUri('/node_modules/' + path).toString(),
-          content,
-        )
-      })
 
       return createTypeScriptWorkerService({
         typescript: ts,
