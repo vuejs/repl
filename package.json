@@ -81,7 +81,7 @@
     "@types/node": "^20.14.2",
     "@typescript-eslint/eslint-plugin": "^7.13.0",
     "@vitejs/plugin-vue": "^5.0.5",
-    "@volar/monaco": "~2.4.0-alpha.5",
+    "@volar/monaco": "~2.4.0-alpha.6",
     "@vue/babel-plugin-jsx": "^1.2.2",
     "@vue/language-service": "~2.0.24",
     "assert-plus": "^1.0.0",
