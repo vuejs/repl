@@ -3,9 +3,9 @@ import * as worker from 'monaco-editor-core/esm/vs/editor/editor.worker'
 import type * as monaco from 'monaco-editor-core'
 import {
   type LanguageServiceEnvironment,
-  createJsDelivrNpmFileSystem,
   createTypeScriptWorkerService,
 } from '@volar/monaco/worker'
+import { createNpmFileSystem } from '@volar/jsdelivr'
 import {
   type VueCompilerOptions,
   getFullLanguageServicePlugins,
@@ -44,7 +44,7 @@ self.onmessage = async (msg: MessageEvent<WorkerMessage>) => {
       const env: LanguageServiceEnvironment = {
         workspaceFolders: [URI.file('/')],
         locale,
-        fs: createJsDelivrNpmFileSystem(
+        fs: createNpmFileSystem(
           (uri) => {
             if (uri.scheme === 'file') {
               if (uri.path === '/node_modules') {
