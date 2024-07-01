@@ -99,7 +99,7 @@ self.onmessage = async (msg: MessageEvent<WorkerMessage>) => {
             vueCompilerOptions,
           ),
         ],
-        servicePlugins: getFullLanguageServicePlugins(ts),
+        languageServicePlugins: getFullLanguageServicePlugins(ts),
         setup({ project }) {
           project.vue = { compilerOptions: vueCompilerOptions }
         },
