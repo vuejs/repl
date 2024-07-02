@@ -91,7 +91,7 @@ function changeViewSize() {
       class="right"
       :style="{ [isVertical ? 'height' : 'width']: 100 - boundSplit + '%' }"
     >
-      <div class="view-size" v-show="state.dragging">
+      <div v-show="state.dragging" class="view-size">
         {{ `${state.viewWidth}px x ${state.viewHeight}px` }}
       </div>
       <slot name="right" />
