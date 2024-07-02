@@ -18,7 +18,7 @@ importers:
         specifier: ^5.0.7
         version: 5.0.7(rollup@4.18.0)
       '@shikijs/monaco':
-        specifier: ^1.6.5
+        specifier: ^1.10.0
         version: 1.10.0
       '@types/babel__standalone':
         specifier: ^7.1.7
@@ -30,10 +30,10 @@ importers:
         specifier: ^1.0.2
         version: 1.0.2
       '@types/node':
-        specifier: ^20.14.2
+        specifier: ^20.14.9
         version: 20.14.9
       '@typescript-eslint/eslint-plugin':
-        specifier: ^7.13.0
+        specifier: ^7.15.0
         version: 7.15.0(@typescript-eslint/parser@7.15.0(eslint@9.6.0)(typescript@5.5.3))(eslint@9.6.0)(typescript@5.5.3)
       '@vitejs/plugin-vue':
         specifier: ^5.0.5
@@ -42,8 +42,8 @@ importers:
         specifier: ~2.4.0-alpha.8
         version: 2.4.0-alpha.8
       '@volar/monaco':
-        specifier: ~2.4.0-alpha.8
-        version: 2.4.0-alpha.8
+        specifier: ~2.4.0-alpha.11
+        version: 2.4.0-alpha.11
       '@vue/babel-plugin-jsx':
         specifier: ^1.2.2
         version: 1.2.2(@babel/core@7.24.7)
@@ -63,7 +63,7 @@ importers:
         specifier: ^5.0.0
         version: 5.0.0(conventional-commits-filter@5.0.0)
       eslint:
-        specifier: ^9.5.0
+        specifier: ^9.6.0
         version: 9.6.0
       eslint-plugin-vue:
         specifier: ^9.26.0
@@ -78,13 +78,13 @@ importers:
         specifier: ^15.2.7
         version: 15.2.7
       monaco-editor-core:
-        specifier: ^0.49.0
-        version: 0.49.0
+        specifier: ^0.50.0
+        version: 0.50.0
       prettier:
         specifier: ^3.3.2
         version: 3.3.2
       shiki:
-        specifier: ^1.6.5
+        specifier: ^1.10.0
         version: 1.10.0
       simple-git-hooks:
         specifier: ^2.11.1
@@ -93,10 +93,10 @@ importers:
         specifier: ^3.35.0
         version: 3.35.0
       typescript:
-        specifier: ^5.4.5
+        specifier: ^5.5.3
         version: 5.5.3
       vite:
-        specifier: ^5.3.1
+        specifier: ^5.3.2
         version: 5.3.2(@types/node@20.14.9)
       vite-plugin-dts:
         specifier: ^3.9.1
@@ -105,7 +105,7 @@ importers:
         specifier: ^3.0.8
         version: 3.0.8
       vue:
-        specifier: ^3.4.29
+        specifier: ^3.4.31
         version: 3.4.31(typescript@5.5.3)
       vue-tsc:
         specifier: ~2.0.24
@@ -725,23 +725,35 @@ packages:
   '@volar/language-core@1.11.1':
     resolution: {integrity: sha512-dOcNn3i9GgZAcJt43wuaEykSluAuOkQgzni1cuxLxTV0nJKanQztp7FxyswdRILaKH+P2XZMPRp2S4MV/pElCw==}
 
+  '@volar/language-core@2.4.0-alpha.11':
+    resolution: {integrity: sha512-DtftH0DtpksK1y+de/kLnu8CHcFQ7huKXi7cyxH9R0PbOOTSGXd31kijBeKNzyoXRp8dqGpu/7WhOlCWXQR62w==}
+
   '@volar/language-core@2.4.0-alpha.8':
     resolution: {integrity: sha512-iHRSw4BT4upJCHRDaT/lLejx2/A9Od1aW02HyQjZcNziXSLKHiAem/WmU6cUh75JTUfwAA/V+mApqMgVR+WTog==}
+
+  '@volar/language-service@2.4.0-alpha.11':
+    resolution: {integrity: sha512-gw2ZhZNHRG+WUWn5GoROKq94w+gj2Z19/E53ALaXcuALbwKFxkQilpjayYsbTJskGy8hOg8K0ogkY5e2EXJPmg==}
 
   '@volar/language-service@2.4.0-alpha.8':
     resolution: {integrity: sha512-dB3pqhKz8cSjCcR77Hhn1THFGsqxlbHm+q77zNPimdzF4UXrUS7iZDieQRV2NL/awHDyK7QnBtSJE3BsZquD3Q==}
 
-  '@volar/monaco@2.4.0-alpha.8':
-    resolution: {integrity: sha512-aIxwNyKxOZzuU1ihg2uD1YfoRvQRzLuIiHL0vrhZY0p9jJGzjQ0JFDiADivEECWCCqOFT/xHnVgJO2n/6G8Plw==}
+  '@volar/monaco@2.4.0-alpha.11':
+    resolution: {integrity: sha512-+1uORO8+wPSd3xhJQPDVjPs8BAeavs7p9vDiDcisXbUklKL0mIGijRvVPSBrGHiis4/cmqLWGLdIl711wJbyyw==}
 
   '@volar/source-map@1.11.1':
     resolution: {integrity: sha512-hJnOnwZ4+WT5iupLRnuzbULZ42L7BWWPMmruzwtLhJfpDVoZLjNBxHDi2sY2bgZXCKlpU5XcsMFoYrsQmPhfZg==}
+
+  '@volar/source-map@2.4.0-alpha.11':
+    resolution: {integrity: sha512-yyjmv8KUkTcxXzwme9qUMl6Szdji9JUQa8eadE4ib/spFXXZGq6QOX8cgSu5UQ0ooyBJFO1zdVH5otBJyZE3Ew==}
 
   '@volar/source-map@2.4.0-alpha.8':
     resolution: {integrity: sha512-ocaN3Ac30KzxceXqgGGLoO7atrLk9tR8+6F6fPZM+g5RrCgyHRogzpM3GGqQ1/gg+MKF+5SZAs0LhbaS3QEvqA==}
 
   '@volar/typescript@1.11.1':
     resolution: {integrity: sha512-iU+t2mas/4lYierSnoFOeRFQUhAEMgsFuQxoxvwn5EdQopw43j+J27a4lt9LMInx1gLJBC6qL14WYGlgymaSMQ==}
+
+  '@volar/typescript@2.4.0-alpha.11':
+    resolution: {integrity: sha512-N/v+wSddhtsNtfv2w0Bxj2QQWURN5budGzpyBTrlcXxz2dnvB0eAMqrEQbBi6rCOVHlRaXbh+wyTRdAcB/FHrg==}
 
   '@volar/typescript@2.4.0-alpha.8':
     resolution: {integrity: sha512-tyhApg+G8z+VsNSgYN1+9W/Wdr1HEnG97bFoAQjtjoxvegBbmlBfFrESxSpUpUdsH26bJld+N79KoZZ1igiheA==}
@@ -1681,8 +1693,8 @@ packages:
   mlly@1.7.1:
     resolution: {integrity: sha512-rrVRZRELyQzrIUAVMHxP97kv+G786pHmOKzuFII8zDYahFBS7qnHh2AlYSl1GAHhaMPCz6/oHjVMcfFYgFYHgA==}
 
-  monaco-editor-core@0.49.0:
-    resolution: {integrity: sha512-MANZcpLnpcM5qceEMsdwndvyB9rlGu+Sd8mVLd6y4VpSZCQenpoUAYk0K+UAPtcnCOYhgIsR/ZS9PxzMnCFkYw==}
+  monaco-editor-core@0.50.0:
+    resolution: {integrity: sha512-XKdublTat9qDKwJhMbm6nnTUKA75MU7jWVooZeXcZKP0/y2jscNWQ9FpCiRtWk33Teemihx155WQ7o7xgf89eA==}
 
   monaco-languageserver-types@0.3.4:
     resolution: {integrity: sha512-d58sP5yNhjs8uG1ESXs0hFnuX2YfdMhiGeWhdgTUZyG9aaWgyI4dDwrK1khf1mPF2u9Sljv42sfYqPFZnqYMYg==}
@@ -2975,9 +2987,20 @@ snapshots:
     dependencies:
       '@volar/source-map': 1.11.1
 
+  '@volar/language-core@2.4.0-alpha.11':
+    dependencies:
+      '@volar/source-map': 2.4.0-alpha.11
+
   '@volar/language-core@2.4.0-alpha.8':
     dependencies:
       '@volar/source-map': 2.4.0-alpha.8
+
+  '@volar/language-service@2.4.0-alpha.11':
+    dependencies:
+      '@volar/language-core': 2.4.0-alpha.11
+      vscode-languageserver-protocol: 3.17.5
+      vscode-languageserver-textdocument: 1.0.11
+      vscode-uri: 3.0.8
 
   '@volar/language-service@2.4.0-alpha.8':
     dependencies:
@@ -2986,10 +3009,10 @@ snapshots:
       vscode-languageserver-textdocument: 1.0.11
       vscode-uri: 3.0.8
 
-  '@volar/monaco@2.4.0-alpha.8':
+  '@volar/monaco@2.4.0-alpha.11':
     dependencies:
-      '@volar/language-service': 2.4.0-alpha.8
-      '@volar/typescript': 2.4.0-alpha.8
+      '@volar/language-service': 2.4.0-alpha.11
+      '@volar/typescript': 2.4.0-alpha.11
       monaco-languageserver-types: 0.3.4
       monaco-types: 0.1.0
       vscode-uri: 3.0.8
@@ -2998,12 +3021,20 @@ snapshots:
     dependencies:
       muggle-string: 0.3.1
 
+  '@volar/source-map@2.4.0-alpha.11': {}
+
   '@volar/source-map@2.4.0-alpha.8': {}
 
   '@volar/typescript@1.11.1':
     dependencies:
       '@volar/language-core': 1.11.1
       path-browserify: 1.0.1
+
+  '@volar/typescript@2.4.0-alpha.11':
+    dependencies:
+      '@volar/language-core': 2.4.0-alpha.11
+      path-browserify: 1.0.1
+      vscode-uri: 3.0.8
 
   '@volar/typescript@2.4.0-alpha.8':
     dependencies:
@@ -4051,7 +4082,7 @@ snapshots:
       pkg-types: 1.1.2
       ufo: 1.5.3
 
-  monaco-editor-core@0.49.0: {}
+  monaco-editor-core@0.50.0: {}
 
   monaco-languageserver-types@0.3.4:
     dependencies:
