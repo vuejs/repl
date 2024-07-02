@@ -75,6 +75,7 @@ onMounted(async () => {
 
   // Support for semantic highlighting
   const t = (editorInstance as any)._themeService._theme
+  t.semanticHighlighting = true
   t.getTokenStyleMetadata = (
     type: string,
     modifiers: string[],
@@ -89,7 +90,7 @@ onMounted(async () => {
         return { foreground: 11 }
       case 'variable':
       case 'property':
-        return { foreground: _readonly ? 21 : 9 }
+        return { foreground: _readonly ? 19 : 9 }
       default:
         return { foreground: 0 }
     }
