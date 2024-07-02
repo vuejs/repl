@@ -13,5 +13,10 @@
       depTypeList: ['peerDependencies'],
       enabled: false,
     },
+    {
+      matchPackageNames: ['codemirror'],
+      matchUpdateTypes: ['major'],
+      enabled: false,
+    },
   ],
 }
