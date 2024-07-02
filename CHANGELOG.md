@@ -1,3 +1,19 @@
+# [4.3.0](https://github.com/vuejs/repl/compare/v4.2.1...v4.3.0) (2024-07-02)
+
+
+### Bug Fixes
+
+* alert if deserialization fails ([071b1d1](https://github.com/vuejs/repl/commit/071b1d1216fa3df2e14c9c6e5453cfe85eed4b79)), closes [#256](https://github.com/vuejs/repl/issues/256)
+* move assert-plus to devDep ([dd9f1bb](https://github.com/vuejs/repl/commit/dd9f1bb74c17f19c25aa9b0e485366781094e818))
+
+
+### Features
+
+* show view size while dragging split pane ([#253](https://github.com/vuejs/repl/issues/253)) ([a6bbeea](https://github.com/vuejs/repl/commit/a6bbeea7b8ec7c1302ba08afa0c789ad198cc8e2))
+* volar 2.x ([#225](https://github.com/vuejs/repl/issues/225)) ([47030b6](https://github.com/vuejs/repl/commit/47030b66a6f1811a24d8292f9f3aa5185f7e8e23))
+
+
+
 ## [4.2.1](https://github.com/vuejs/repl/compare/v4.2.0...v4.2.1) (2024-05-31)
 
 
