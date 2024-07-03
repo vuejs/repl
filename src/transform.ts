@@ -9,7 +9,7 @@ import hashId from 'hash-sum'
 
 export const COMP_IDENTIFIER = `__sfc__`
 
-const REGEX_JS = /\.[jt]sx?/
+const REGEX_JS = /\.[jt]sx?$/
 function testTs(filename: string | undefined | null) {
   return !!(filename && /(\.|\b)tsx?$/.test(filename))
 }
