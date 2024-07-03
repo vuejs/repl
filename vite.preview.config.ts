@@ -14,7 +14,6 @@ export default defineConfig({
     alias: {
       '@vue/compiler-dom': '@vue/compiler-dom/dist/compiler-dom.cjs.js',
       '@vue/compiler-core': '@vue/compiler-core/dist/compiler-core.cjs.js',
-      assert: 'assert-plus',
     },
   },
   build: {
