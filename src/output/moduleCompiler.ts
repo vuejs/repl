@@ -257,7 +257,7 @@ function processModule(store: Store, src: string, filename: string) {
       if (!binding) {
         return
       }
-      if (isStaticProperty(parent) && parent.shorthand) {
+      if (parent && isStaticProperty(parent) && parent.shorthand) {
         // let binding used in a property shorthand
         // { foo } -> { foo: __import_x__.foo }
         // skip for destructure patterns
@@ -268,6 +268,7 @@ function processModule(store: Store, src: string, filename: string) {
           s.appendLeft(id.end!, `: ${binding}`)
         }
       } else if (
+        parent &&
         parent.type === 'ClassDeclaration' &&
         id === parent.superClass
       ) {
