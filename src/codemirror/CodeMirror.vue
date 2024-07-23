@@ -4,7 +4,7 @@
 
 <script setup lang="ts">
 import type { ModeSpec, ModeSpecOptions } from 'codemirror'
-import { inject, onMounted, ref, watchEffect } from 'vue'
+import { inject, onMounted, ref, watch, watchEffect } from 'vue'
 import { debounce } from '../utils'
 import CodeMirror from './codemirror'
 
@@ -22,9 +22,9 @@ const props = withDefaults(defineProps<Props>(), {
 
 const emit = defineEmits<(e: 'change', value: string) => void>()
 
-const el = ref()
+const el = ref<HTMLDivElement>()
 const needAutoResize = inject('autoresize')
-const autoSave = inject('autosave')
+const autoSave = inject<boolean>('autosave')
 
 onMounted(() => {
   const addonOptions = props.readonly
@@ -71,18 +71,29 @@ onMounted(() => {
     )
   }
 
-  if (autoSave) {
-    editor.on('change', () => {
-      emit('change', editor.getValue())
-    })
-  } else {
-    el.value!.addEventListener('keydown', (e: KeyboardEvent) => {
-      if (e.ctrlKey && e.key === 's') {
-        e.preventDefault()
-        emit('change', editor.getValue())
-      }
-    })
+  const editorChangeEvent = () => {
+    emit('change', editor.getValue())
   }
+  const saveKeydownEvent = (e: KeyboardEvent) => {
+    if (e.ctrlKey && e.key === 's') {
+      e.preventDefault()
+      emit('change', editor.getValue())
+    }
+  }
+
+  watch(
+    () => autoSave,
+    (newVal) => {
+      if (newVal) {
+        el.value!.removeEventListener('keydown', saveKeydownEvent)
+        editor.on('change', editorChangeEvent)
+      } else {
+        editor.off('change', editorChangeEvent)
+        el.value!.addEventListener('keydown', saveKeydownEvent)
+      }
+    },
+    { immediate: true },
+  )
 })
 </script>
 
