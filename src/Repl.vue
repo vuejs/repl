@@ -68,7 +68,7 @@ const outputSlotName = computed(() => (props.layoutReverse ? 'left' : 'right'))
 
 provide(injectKeyStore, props.store)
 provide('autoresize', props.autoResize)
-provide('autosave', props.autoSave)
+provide('autosave', toRef(props, 'autoSave'))
 provide('import-map', toRef(props, 'showImportMap'))
 provide('tsconfig', toRef(props, 'showTsConfig'))
 provide('clear-console', toRef(props, 'clearConsole'))
