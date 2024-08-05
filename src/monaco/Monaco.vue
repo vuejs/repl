@@ -142,18 +142,30 @@ onMounted(async () => {
     // ignore save event
   })
 
-  if (autoSave) {
-    editorInstance.onDidChangeModelContent(() => {
-      emit('change', editorInstance.getValue())
-    })
-  } else {
-    containerRef.value.addEventListener('keydown', (e: KeyboardEvent) => {
-      if (e.ctrlKey && e.key === 's') {
-        e.preventDefault()
-        emit('change', editorInstance.getValue())
-      }
-    })
+  const editorChangeEvent = () => {
+    emit('change', editorInstance.getValue())
   }
+  const saveKeydownEvent = (e: KeyboardEvent) => {
+    if (e.ctrlKey && e.key === 's') {
+      e.preventDefault()
+      emit('change', editorInstance.getValue())
+    }
+  }
+
+  let disposable: monaco.IDisposable
+  watch(
+    autoSave,
+    (newVal) => {
+      if (newVal) {
+        containerRef.value!.removeEventListener('keydown', saveKeydownEvent)
+        disposable = editorInstance.onDidChangeModelContent(editorChangeEvent)
+      } else {
+        disposable && disposable.dispose()
+        containerRef.value!.addEventListener('keydown', saveKeydownEvent)
+      }
+    },
+    { immediate: true },
+  )
 
   // update theme
   watch(replTheme, (n) => {
