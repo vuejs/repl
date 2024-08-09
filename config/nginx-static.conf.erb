@@ -1,0 +1,83 @@
+daemon off;
+# stay attached to the dyno process, run in Procfile / web
+
+pid /app/nginx.pid;
+# /app is $HOME & working directory of Heroku dyno
+
+error_log stderr info;
+# As documented for Nginx, but we still see error during start-up in log:
+# >  nginx: [alert] could not open error log file: open() "./logs/error.log"
+
+worker_processes <%= ENV['NGINX_WORKERS'] || 4 %>;
+# Heroku dynos have at least 4 cores.
+
+events {
+	use epoll;
+	accept_mutex on;
+	worker_connections <%= ENV['NGINX_WORKER_CONNECTIONS'] || 1024 %>;
+}
+
+http {
+	gzip on;
+	gzip_comp_level 2;
+	gzip_min_length 512;
+	gzip_proxied any; # Heroku router sends Via header
+
+	server_tokens off;
+
+	log_format l2met 'measure#nginx.service=$request_time request_id=$http_x_request_id';
+	access_log /dev/stdout l2met;
+	# Remote IP, request path, HTTP status, & timestamp are all logged by Heroku Router, so not useful to include here.
+
+	include mime.types;
+	default_type application/octet-stream;
+	sendfile on;
+
+	client_body_timeout <%= ENV['NGINX_CLIENT_BODY_TIMEOUT'] || 5 %>;
+	# Must read the body in 5 seconds.
+
+	server {
+		listen <%= ENV["PORT"] %>;
+		server_name _;
+		keepalive_timeout 5;
+		client_max_body_size <%= ENV['NGINX_CLIENT_MAX_BODY_SIZE'] || 1 %>M;
+
+		## HTTPS Only
+		if ($http_x_forwarded_proto != "https") {
+			return 301 https://$host$request_uri;
+		}
+
+		## Document root
+		root /app/dist;
+
+		location / {
+			## Clean URLs: match on extensionless requests.
+			# try_files $uri $uri/ $uri.html =404;
+
+			## Single-page app client-side routing: returns index.html if the requested path doesn't exist.
+			## When enabled, the client-side app must handle its own 404 errors.
+			# error_page 404 = /index.html;
+		}
+
+		## Define specific behaviors for sub directories and other locations.
+		# location /assets {
+		# 	expires 7d;
+		# }
+
+		## Custom error pages
+		# error_page 404 /404.html;
+		# error_page 500 /500.html;
+	}
+
+	## Canonical Host: redirect to a canonical hostname.
+	## Multiple server blocks may be used, one for each hostname to redirect from.
+	# server {
+	# 	server_name some-other-name.example.com;
+	# 	return 301 https://canonical-name.example.com$request_uri;
+	# }
+	# server {
+	# 	server_name yet-another-name.example.com;
+	# 	return 301 https://canonical-name.example.com$request_uri;
+	# }
+	# …
+}
