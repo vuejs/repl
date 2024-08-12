@@ -21,13 +21,13 @@ export function useVueImportMap(
         normalizeDefaults(
           productionMode.value ? defaults.runtimeProd : defaults.runtimeDev,
         )) ||
-      `https://cdn.jsdelivr.net/npm/@vue/runtime-dom@${
+      `https://unpkg-test.factset.io/@vue/runtime-dom@${
         vueVersion.value || currentVersion
       }/dist/runtime-dom.esm-browser${productionMode.value ? `.prod` : ``}.js`
 
     const serverRenderer =
       (!vueVersion.value && normalizeDefaults(defaults.serverRenderer)) ||
-      `https://cdn.jsdelivr.net/npm/@vue/server-renderer@${
+      `https://unpkg-test.factset.io/@vue/server-renderer@${
         vueVersion.value || currentVersion
       }/dist/server-renderer.esm-browser.js`
     return {

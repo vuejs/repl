@@ -38,7 +38,7 @@ importers:
       '@vitejs/plugin-vue':
         specifier: ^5.0.5
         version: 5.0.5(vite@5.3.2(@types/node@20.14.9))(vue@3.4.31(typescript@5.5.3))
-      '@volar/jsdelivr':
+      '@volar/language-service':
         specifier: ~2.4.0-alpha.12
         version: 2.4.0-alpha.12
       '@volar/monaco':
@@ -720,9 +720,6 @@ packages:
     peerDependencies:
       vite: ^5.0.0
       vue: ^3.2.25
-
-  '@volar/jsdelivr@2.4.0-alpha.12':
-    resolution: {integrity: sha512-GJuuvAdK9DO2oGLT+v/ZardVaTXQc+gNPlfdq4zbtYoc4ViPcrbfEM3weLpg4cm/Cj6iCSoXq/m+m48z417eoA==}
 
   '@volar/language-core@1.11.1':
     resolution: {integrity: sha512-dOcNn3i9GgZAcJt43wuaEykSluAuOkQgzni1cuxLxTV0nJKanQztp7FxyswdRILaKH+P2XZMPRp2S4MV/pElCw==}
@@ -3035,8 +3032,6 @@ snapshots:
     dependencies:
       vite: 5.3.2(@types/node@20.14.9)
       vue: 3.4.31(typescript@5.5.3)
-
-  '@volar/jsdelivr@2.4.0-alpha.12': {}
 
   '@volar/language-core@1.11.1':
     dependencies:
