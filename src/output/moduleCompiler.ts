@@ -177,6 +177,8 @@ function processModule(store: Store, src: string, filename: string) {
           }
         }
         s.remove(node.start!, node.end!)
+      } else {
+        s.overwrite(node.source.start!, node.source.end!, `"https://unpkg-test.factset.io/${node.source.value}"`);
       }
     }
   }
