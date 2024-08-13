@@ -34,6 +34,8 @@ export function useVueImportMap(
       imports: {
         vue,
         'vue/server-renderer': serverRenderer,
+
+        '@fds/': 'https://unpkg-test.factset.io/@fds/',
       },
     }
   })
