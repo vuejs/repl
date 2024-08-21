@@ -39,10 +39,10 @@ importers:
         specifier: ^5.1.2
         version: 5.1.2(vite@5.4.2(@types/node@20.16.1))(vue@3.4.38(typescript@5.5.4))
       '@volar/jsdelivr':
-        specifier: 2.4.0
+        specifier: ~2.4.0
         version: 2.4.0
       '@volar/monaco':
-        specifier: 2.4.0
+        specifier: ~2.4.0
         version: 2.4.0
       '@vue/babel-plugin-jsx':
         specifier: ^1.2.2
