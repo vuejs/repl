@@ -52,18 +52,8 @@ const props = withDefaults(defineProps<Props>(), {
   clearConsole: true,
   layoutReverse: false,
   ssr: false,
-  previewOptions: () => ({
-    headHTML: '',
-    bodyHTML: '',
-    placeholderHTML: '',
-    customCode: {
-      importCode: '',
-      useCode: '',
-    },
-    showRuntimeError: true,
-    showRuntimeWarning: true,
-  }),
   layout: 'horizontal',
+  previewOptions: () => ({}),
   editorOptions: () => ({}),
 })
 
