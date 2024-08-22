@@ -28,6 +28,11 @@ export interface Props {
       importCode?: string
       useCode?: string
     }
+    showRuntimeError?: boolean
+    showRuntimeWarning?: boolean
+  }
+  editorOptions?: {
+    ShowErrorText?: string
   }
 }
 
@@ -51,8 +56,13 @@ const props = withDefaults(defineProps<Props>(), {
       importCode: '',
       useCode: '',
     },
+    showRuntimeError: true,
+    showRuntimeWarning: true,
   }),
   layout: 'horizontal',
+  editorOptions: () => ({
+    ShowErrorText: 'Show Error',
+  }),
 })
 
 if (!props.editor) {
@@ -73,6 +83,7 @@ provide('import-map', toRef(props, 'showImportMap'))
 provide('tsconfig', toRef(props, 'showTsConfig'))
 provide('clear-console', toRef(props, 'clearConsole'))
 provide('preview-options', props.previewOptions)
+provide('editor-options', props.editorOptions)
 provide('theme', toRef(props, 'theme'))
 provide('preview-theme', toRef(props, 'previewTheme'))
 provide('preview-ref', () => outputRef.value?.previewRef?.container)
