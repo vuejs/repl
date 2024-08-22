@@ -296,8 +296,8 @@ defineExpose({ reload, container })
     class="iframe-container"
     :class="{ [theme]: previewTheme }"
   />
-  <Message :err="runtimeError" />
-  <Message v-if="!runtimeError" :warn="runtimeWarning" />
+  <Message :err="runtimeError && previewOptions?.showRuntimeError" />
+  <Message v-if="!runtimeError && previewOptions?.showRuntimeWarning" :warn="runtimeWarning" />
 </template>
 
 <style scoped>
