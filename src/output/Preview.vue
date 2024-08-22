@@ -19,9 +19,9 @@ const props = defineProps<{ show: boolean; ssr: boolean }>()
 const { store, clearConsole, theme, previewTheme, previewOptions } =
   inject(injectKeyProps)!
 
-const container = ref()
-const runtimeError = ref()
-const runtimeWarning = ref()
+const container = ref<HTMLDivElement>()
+const runtimeError = ref<string>()
+const runtimeWarning = ref<string>()
 
 let sandbox: HTMLIFrameElement
 let proxy: PreviewProxy
@@ -68,7 +68,7 @@ function createSandbox() {
     // clear prev sandbox
     proxy.destroy()
     stopUpdateWatcher && stopUpdateWatcher()
-    container.value.removeChild(sandbox)
+    container.value?.removeChild(sandbox)
   }
 
   sandbox = document.createElement('iframe')
@@ -101,7 +101,7 @@ function createSandbox() {
       previewOptions.value?.placeholderHTML || '',
     )
   sandbox.srcdoc = sandboxSrc
-  container.value.appendChild(sandbox)
+  container.value?.appendChild(sandbox)
 
   proxy = new PreviewProxy(sandbox, {
     on_fetch_progress: (progress: any) => {
@@ -169,8 +169,8 @@ async function updatePreview() {
   if (import.meta.env.PROD && clearConsole.value) {
     console.clear()
   }
-  runtimeError.value = null
-  runtimeWarning.value = null
+  runtimeError.value = undefined
+  runtimeWarning.value = undefined
 
   let isSSR = props.ssr
   if (store.value.vueVersion) {
@@ -290,7 +290,7 @@ defineExpose({ reload, container })
     class="iframe-container"
     :class="{ [theme]: previewTheme }"
   />
-  <Message :err="runtimeError && (previewOptions?.showRuntimeError ?? true)" />
+  <Message :err="(previewOptions?.showRuntimeError ?? true) && runtimeError" />
   <Message
     v-if="!runtimeError && (previewOptions?.showRuntimeWarning ?? true)"
     :warn="runtimeWarning"

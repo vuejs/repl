@@ -17,5 +17,6 @@ export type OutputModes = 'preview' | EditorMode
 
 export const injectKeyProps: InjectionKey<ToRefs<Required<Props>>> =
   Symbol('props')
-export const injectKeyPreviewRef: InjectionKey<ComputedRef<HTMLElement>> =
-  Symbol('preview-ref')
+export const injectKeyPreviewRef: InjectionKey<
+  ComputedRef<HTMLDivElement | undefined>
+> = Symbol('preview-ref')
