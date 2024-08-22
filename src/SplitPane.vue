@@ -1,24 +1,16 @@
 <script setup lang="ts">
-import {
-  type MaybeRefOrGetter,
-  computed,
-  inject,
-  reactive,
-  ref,
-  toRef,
-  toValue,
-} from 'vue'
-import { injectKeyStore } from './types'
+import { computed, inject, reactive, ref } from 'vue'
+import { injectKeyPreviewRef, injectKeyProps } from './types'
 
 const props = defineProps<{ layout?: 'horizontal' | 'vertical' }>()
 const isVertical = computed(() => props.layout === 'vertical')
 
 const container = ref()
-const previewRef = inject<MaybeRefOrGetter<HTMLDivElement>>('preview-ref')!
+const previewRef = inject(injectKeyPreviewRef)!
 
 // mobile only
-const store = inject(injectKeyStore)!
-const showOutput = toRef(store, 'showOutput')
+const { store } = inject(injectKeyProps)!
+const showOutput = computed(() => store.value.showOutput)
 
 const state = reactive({
   dragging: false,
@@ -61,7 +53,7 @@ function dragEnd() {
 }
 
 function changeViewSize() {
-  const el = toValue(previewRef)
+  const el = previewRef.value
   state.viewHeight = el.offsetHeight
   state.viewWidth = el.offsetWidth
 }

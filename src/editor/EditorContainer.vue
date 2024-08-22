@@ -4,7 +4,7 @@ import Message from '../Message.vue'
 import { debounce } from '../utils'
 import { inject, ref, watch } from 'vue'
 import MessageToggle from './MessageToggle.vue'
-import { type EditorComponentType, injectKeyStore } from '../types'
+import { type EditorComponentType, injectKeyProps } from '../types'
 
 const SHOW_ERROR_KEY = 'repl_show_error'
 
@@ -12,11 +12,11 @@ const props = defineProps<{
   editorComponent: EditorComponentType
 }>()
 
-const store = inject(injectKeyStore)!
+const { store } = inject(injectKeyProps)!
 const showMessage = ref(getItem())
 
 const onChange = debounce((code: string) => {
-  store.activeFile.code = code
+  store.value.activeFile.code = code
 }, 250)
 
 function setItem() {
