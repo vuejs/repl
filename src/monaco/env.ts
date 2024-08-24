@@ -47,6 +47,8 @@ export class WorkerHost {
   }
 }
 
+let resolveLanguageToolsLoaded: () => void
+let isLanguageToolsLoaded: Promise<void>
 let disposeVue: undefined | (() => void)
 export async function reloadLanguageTools(store: Store) {
   disposeVue?.()
@@ -115,6 +117,7 @@ export async function reloadLanguageTools(store: Store) {
     disposeAutoInsertion()
     disposeProvides()
   }
+  resolveLanguageToolsLoaded?.()
 }
 
 export interface WorkerMessage {
@@ -155,7 +158,17 @@ export function loadMonacoEnv(store: Store) {
   languages.setLanguageConfiguration('typescript', languageConfigs.ts)
   languages.setLanguageConfiguration('css', languageConfigs.css)
 
-  store.reloadLanguageTools = () => reloadLanguageTools(store)
+  store.reloadLanguageTools = async () => {
+    if (!isLanguageToolsLoaded) {
+      isLanguageToolsLoaded = new Promise((resolve) => {
+        resolveLanguageToolsLoaded = resolve
+      })
+    } else {
+      await isLanguageToolsLoaded
+      isLanguageToolsLoaded = null
+    }
+    return reloadLanguageTools(store)
+  }
   languages.onLanguage('vue', () => store.reloadLanguageTools!())
 
   // Support for go to definition
