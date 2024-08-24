@@ -2,8 +2,12 @@
 import SplitPane from './SplitPane.vue'
 import Output from './output/Output.vue'
 import { type Store, useStore } from './store'
-import { computed, provide, ref, toRef } from 'vue'
-import { type EditorComponentType, injectKeyStore } from './types'
+import { computed, provide, ref, toRefs } from 'vue'
+import {
+  type EditorComponentType,
+  injectKeyPreviewRef,
+  injectKeyProps,
+} from './types'
 import EditorContainer from './editor/EditorContainer.vue'
 
 export interface Props {
@@ -28,6 +32,11 @@ export interface Props {
       importCode?: string
       useCode?: string
     }
+    showRuntimeError?: boolean
+    showRuntimeWarning?: boolean
+  }
+  editorOptions?: {
+    showErrorText?: string
   }
 }
 
@@ -43,16 +52,9 @@ const props = withDefaults(defineProps<Props>(), {
   clearConsole: true,
   layoutReverse: false,
   ssr: false,
-  previewOptions: () => ({
-    headHTML: '',
-    bodyHTML: '',
-    placeholderHTML: '',
-    customCode: {
-      importCode: '',
-      useCode: '',
-    },
-  }),
   layout: 'horizontal',
+  previewOptions: () => ({}),
+  editorOptions: () => ({}),
 })
 
 if (!props.editor) {
@@ -66,16 +68,11 @@ props.store.init()
 const editorSlotName = computed(() => (props.layoutReverse ? 'right' : 'left'))
 const outputSlotName = computed(() => (props.layoutReverse ? 'left' : 'right'))
 
-provide(injectKeyStore, props.store)
-provide('autoresize', props.autoResize)
-provide('autosave', toRef(props, 'autoSave'))
-provide('import-map', toRef(props, 'showImportMap'))
-provide('tsconfig', toRef(props, 'showTsConfig'))
-provide('clear-console', toRef(props, 'clearConsole'))
-provide('preview-options', props.previewOptions)
-provide('theme', toRef(props, 'theme'))
-provide('preview-theme', toRef(props, 'previewTheme'))
-provide('preview-ref', () => outputRef.value?.previewRef?.container)
+provide(injectKeyProps, toRefs(props))
+provide(
+  injectKeyPreviewRef,
+  computed(() => outputRef.value?.previewRef?.container),
+)
 
 /**
  * Reload the preview iframe

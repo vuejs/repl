@@ -1,10 +1,14 @@
 <script setup lang="ts">
+import { inject } from 'vue'
+import { injectKeyProps } from '../../src/types'
+
+const { editorOptions } = inject(injectKeyProps)!
 const visible = defineModel<boolean>()
 </script>
 
 <template>
   <div class="wrapper" @click="visible = !visible">
-    <span>Show Error</span>
+    <span>{{ editorOptions?.showErrorText || 'Show Error' }}</span>
     <div class="toggle" :class="[{ active: modelValue }]">
       <div class="indicator" />
     </div>

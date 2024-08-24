@@ -1,6 +1,5 @@
 <script lang="ts" setup>
 import {
-  type Ref,
   computed,
   inject,
   nextTick,
@@ -13,7 +12,7 @@ import {
 import * as monaco from 'monaco-editor-core'
 import { initMonaco } from './env'
 import { getOrCreateModel } from './utils'
-import { type EditorMode, injectKeyStore } from '../types'
+import { type EditorMode, injectKeyProps } from '../types'
 
 const props = withDefaults(
   defineProps<{
@@ -36,14 +35,12 @@ const emit = defineEmits<{
 const containerRef = ref<HTMLDivElement>()
 const ready = ref(false)
 const editor = shallowRef<monaco.editor.IStandaloneCodeEditor>()
-const store = inject(injectKeyStore)!
-const autoSave = inject('autosave')!
+const { store, autoSave, theme: replTheme } = inject(injectKeyProps)!
 
-initMonaco(store)
+initMonaco(store.value)
 
 const lang = computed(() => (props.mode === 'css' ? 'css' : 'javascript'))
 
-const replTheme = inject<Ref<'dark' | 'light'>>('theme')!
 onMounted(async () => {
   const theme = await import('./highlight').then((r) => r.registerHighlighter())
   ready.value = true
@@ -114,7 +111,7 @@ onMounted(async () => {
       () => props.filename,
       (_, oldFilename) => {
         if (!editorInstance) return
-        const file = store.files[props.filename]
+        const file = store.value.files[props.filename]
         if (!file) return null
         const model = getOrCreateModel(
           monaco.Uri.parse(`file:///${props.filename}`),
@@ -122,7 +119,7 @@ onMounted(async () => {
           file.code,
         )
 
-        const oldFile = oldFilename ? store.files[oldFilename] : null
+        const oldFile = oldFilename ? store.value.files[oldFilename] : null
         if (oldFile) {
           oldFile.editorViewState = editorInstance.saveViewState()
         }

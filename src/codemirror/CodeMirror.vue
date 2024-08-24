@@ -4,9 +4,10 @@
 
 <script setup lang="ts">
 import type { ModeSpec, ModeSpecOptions } from 'codemirror'
-import { type Ref, inject, onMounted, ref, watch, watchEffect } from 'vue'
+import { inject, onMounted, ref, watch, watchEffect } from 'vue'
 import { debounce } from '../utils'
 import CodeMirror from './codemirror'
+import { injectKeyProps } from '../../src/types'
 
 export interface Props {
   mode?: string | ModeSpec<ModeSpecOptions>
@@ -22,9 +23,8 @@ const props = withDefaults(defineProps<Props>(), {
 
 const emit = defineEmits<(e: 'change', value: string) => void>()
 
-const el = ref<HTMLDivElement>()
-const needAutoResize = inject('autoresize')
-const autoSave = inject<Ref<boolean>>('autosave')!
+const el = ref()
+const { autoResize, autoSave } = inject(injectKeyProps)!
 
 onMounted(() => {
   const addonOptions = props.readonly
@@ -62,7 +62,7 @@ onMounted(() => {
     editor.refresh()
   }, 50)
 
-  if (needAutoResize) {
+  if (autoResize.value) {
     window.addEventListener(
       'resize',
       debounce(() => {

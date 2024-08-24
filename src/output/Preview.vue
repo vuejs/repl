@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import Message from '../Message.vue'
 import {
-  type Ref,
   type WatchStopHandle,
   inject,
   onMounted,
@@ -13,21 +12,16 @@ import {
 import srcdoc from './srcdoc.html?raw'
 import { PreviewProxy } from './PreviewProxy'
 import { compileModulesForPreview } from './moduleCompiler'
-import type { Props } from '../Repl.vue'
-import { injectKeyStore } from '../../src/types'
+import { injectKeyProps } from '../../src/types'
 
 const props = defineProps<{ show: boolean; ssr: boolean }>()
 
-const store = inject(injectKeyStore)!
-const clearConsole = inject<Ref<boolean>>('clear-console')!
-const theme = inject<Ref<'dark' | 'light'>>('theme')!
-const previewTheme = inject<Ref<boolean>>('preview-theme')!
+const { store, clearConsole, theme, previewTheme, previewOptions } =
+  inject(injectKeyProps)!
 
-const previewOptions = inject<Props['previewOptions']>('preview-options')
-
-const container = ref()
-const runtimeError = ref()
-const runtimeWarning = ref()
+const container = ref<HTMLDivElement>()
+const runtimeError = ref<string>()
+const runtimeWarning = ref<string>()
 
 let sandbox: HTMLIFrameElement
 let proxy: PreviewProxy
@@ -38,12 +32,12 @@ onMounted(createSandbox)
 
 // reset sandbox when import map changes
 watch(
-  () => store.getImportMap(),
+  () => store.value.getImportMap(),
   () => {
     try {
       createSandbox()
     } catch (e: any) {
-      store.errors = [e as Error]
+      store.value.errors = [e as Error]
       return
     }
   },
@@ -74,7 +68,7 @@ function createSandbox() {
     // clear prev sandbox
     proxy.destroy()
     stopUpdateWatcher && stopUpdateWatcher()
-    container.value.removeChild(sandbox)
+    container.value?.removeChild(sandbox)
   }
 
   sandbox = document.createElement('iframe')
@@ -91,7 +85,7 @@ function createSandbox() {
     ].join(' '),
   )
 
-  const importMap = store.getImportMap()
+  const importMap = store.value.getImportMap()
   const sandboxSrc = srcdoc
     .replace(
       /<html>/,
@@ -100,14 +94,14 @@ function createSandbox() {
     .replace(/<!--IMPORT_MAP-->/, JSON.stringify(importMap))
     .replace(
       /<!-- PREVIEW-OPTIONS-HEAD-HTML -->/,
-      previewOptions?.headHTML || '',
+      previewOptions.value?.headHTML || '',
     )
     .replace(
       /<!--PREVIEW-OPTIONS-PLACEHOLDER-HTML-->/,
-      previewOptions?.placeholderHTML || '',
+      previewOptions.value?.placeholderHTML || '',
     )
   sandbox.srcdoc = sandboxSrc
-  container.value.appendChild(sandbox)
+  container.value?.appendChild(sandbox)
 
   proxy = new PreviewProxy(sandbox, {
     on_fetch_progress: (progress: any) => {
@@ -175,17 +169,17 @@ async function updatePreview() {
   if (import.meta.env.PROD && clearConsole.value) {
     console.clear()
   }
-  runtimeError.value = null
-  runtimeWarning.value = null
+  runtimeError.value = undefined
+  runtimeWarning.value = undefined
 
   let isSSR = props.ssr
-  if (store.vueVersion) {
-    const [major, minor, patch] = store.vueVersion
+  if (store.value.vueVersion) {
+    const [major, minor, patch] = store.value.vueVersion
       .split('.')
       .map((v) => parseInt(v, 10))
     if (major === 3 && (minor < 2 || (minor === 2 && patch < 27))) {
       alert(
-        `The selected version of Vue (${store.vueVersion}) does not support in-browser SSR.` +
+        `The selected version of Vue (${store.value.vueVersion}) does not support in-browser SSR.` +
           ` Rendering in client mode instead.`,
       )
       isSSR = false
@@ -193,11 +187,11 @@ async function updatePreview() {
   }
 
   try {
-    const { mainFile } = store
+    const { mainFile } = store.value
 
     // if SSR, generate the SSR bundle and eval it to render the HTML
     if (isSSR && mainFile.endsWith('.vue')) {
-      const ssrModules = compileModulesForPreview(store, true)
+      const ssrModules = compileModulesForPreview(store.value, true)
       console.info(
         `[@vue/repl] successfully compiled ${ssrModules.length} modules for SSR.`,
       )
@@ -215,7 +209,7 @@ async function updatePreview() {
          app.config.warnHandler = () => {}
          window.__ssr_promise__ = _renderToString(app).then(html => {
            document.body.innerHTML = '<div id="app">' + html + '</div>' + \`${
-             previewOptions?.bodyHTML || ''
+             previewOptions.value?.bodyHTML || ''
            }\`
          }).catch(err => {
            console.error("SSR Error", err)
@@ -225,7 +219,7 @@ async function updatePreview() {
     }
 
     // compile code to simulated module system
-    const modules = compileModulesForPreview(store)
+    const modules = compileModulesForPreview(store.value)
     console.info(
       `[@vue/repl] successfully compiled ${modules.length} module${
         modules.length > 1 ? `s` : ``
@@ -238,7 +232,7 @@ async function updatePreview() {
         (isSSR
           ? ``
           : `document.body.innerHTML = '<div id="app"></div>' + \`${
-              previewOptions?.bodyHTML || ''
+              previewOptions.value?.bodyHTML || ''
             }\``),
       ...modules,
       `document.querySelectorAll('style[css]').forEach(el => el.remove())
@@ -251,7 +245,7 @@ async function updatePreview() {
         `import { ${
           isSSR ? `createSSRApp` : `createApp`
         } as _createApp } from "vue"
-        ${previewOptions?.customCode?.importCode || ''}
+        ${previewOptions.value?.customCode?.importCode || ''}
         const _mount = () => {
           const AppComponent = __modules__["${mainFile}"].default
           AppComponent.name = 'Repl'
@@ -260,7 +254,7 @@ async function updatePreview() {
             app.config.unwrapInjectedRef = true
           }
           app.config.errorHandler = e => console.error(e)
-          ${previewOptions?.customCode?.useCode || ''}
+          ${previewOptions.value?.customCode?.useCode || ''}
           app.mount('#app')
         }
         if (window.__ssr_promise__) {
@@ -296,8 +290,11 @@ defineExpose({ reload, container })
     class="iframe-container"
     :class="{ [theme]: previewTheme }"
   />
-  <Message :err="runtimeError" />
-  <Message v-if="!runtimeError" :warn="runtimeWarning" />
+  <Message :err="(previewOptions?.showRuntimeError ?? true) && runtimeError" />
+  <Message
+    v-if="!runtimeError && (previewOptions?.showRuntimeWarning ?? true)"
+    :warn="runtimeWarning"
+  />
 </template>
 
 <style scoped>
