@@ -34,6 +34,11 @@ export interface Props {
   editorOptions?: {
     ShowErrorText?: string
   }
+  splitPaneOptions?: {
+    CodeTogglerButtonText?: string
+    OutputTogglerButtonText?: string
+  }
+  isEmbedMode?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -63,6 +68,11 @@ const props = withDefaults(defineProps<Props>(), {
   editorOptions: () => ({
     ShowErrorText: 'Show Error',
   }),
+  splitPaneOptions: () => ({
+    CodeTogglerButtonText: '< Code',
+    OutputTogglerButtonText: 'Output >',
+  }),
+  isEmbedMode: false
 })
 
 if (!props.editor) {
@@ -87,6 +97,8 @@ provide('editor-options', props.editorOptions)
 provide('theme', toRef(props, 'theme'))
 provide('preview-theme', toRef(props, 'previewTheme'))
 provide('preview-ref', () => outputRef.value?.previewRef?.container)
+provide('split-pane-options', props.splitPaneOptions)
+provide('is-embed-mode', props.isEmbedMode)
 
 /**
  * Reload the preview iframe

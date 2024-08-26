@@ -9,12 +9,16 @@ import {
   toValue,
 } from 'vue'
 import { injectKeyStore } from './types'
+import type { Props } from './Repl.vue'
 
 const props = defineProps<{ layout?: 'horizontal' | 'vertical' }>()
 const isVertical = computed(() => props.layout === 'vertical')
 
 const container = ref()
 const previewRef = inject<MaybeRefOrGetter<HTMLDivElement>>('preview-ref')!
+const splitPaneOptions =
+  inject<Props['splitPaneOptions']>('split-pane-options')!
+const isEmbeddedMode = inject<Props['isEmbeddedMode']>('is-embed-mode')!
 
 // mobile only
 const store = inject(injectKeyStore)!
@@ -75,6 +79,7 @@ function changeViewSize() {
       dragging: state.dragging,
       'show-output': showOutput,
       vertical: isVertical,
+      'is-embed-mode': isEmbeddedMode,
     }"
     @mousemove="dragMove"
     @mouseup="dragEnd"
@@ -98,7 +103,11 @@ function changeViewSize() {
     </div>
 
     <button class="toggler" @click="showOutput = !showOutput">
-      {{ showOutput ? '< Code' : 'Output >' }}
+      {{
+        showOutput
+          ? splitPaneOptions?.CodeTogglerButtonText
+          : splitPaneOptions?.OutputTogglerButtonText
+      }}
     </button>
   </div>
 </template>
@@ -221,5 +230,36 @@ function changeViewSize() {
     z-index: -1;
     pointer-events: none;
   }
+}
+
+/* embed mode */
+.is-embed-mode .left,
+.is-embed-mode .right {
+  position: absolute;
+  inset: 0;
+  width: auto !important;
+  height: auto !important;
+}
+.is-embed-mode .dragger {
+  display: none;
+}
+.is-embed-mode.split-pane .toggler {
+  display: block;
+}
+.is-embed-mode.split-pane .right {
+  z-index: -1;
+  pointer-events: none;
+}
+.is-embed-mode.split-pane .left {
+  z-index: 0;
+  pointer-events: all;
+}
+.is-embed-mode.split-pane.show-output .right {
+  z-index: 0;
+  pointer-events: all;
+}
+.is-embed-mode.split-pane.show-output .left {
+  z-index: -1;
+  pointer-events: none;
 }
 </style>
