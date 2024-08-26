@@ -91,7 +91,7 @@ function changeViewSize() {
       <slot name="right" />
     </div>
 
-    <button class="toggler" @click="showOutput = !showOutput">
+    <button class="toggler" @click="store.showOutput = !showOutput">
       {{
         showOutput
           ? splitPaneOptions?.CodeTogglerButtonText
