@@ -67,6 +67,11 @@ const App = {
         },
         // showCompileOutput: false,
         // showImportMap: false
+        // splitPaneOptions: {
+        //   CodeTogglerButtonText: '< 代码',
+        //   OutputTogglerButtonText: '输出 >',
+        // },
+        // isEmbedMode: true,
       })
   },
 }

@@ -38,6 +38,11 @@ export interface Props {
   editorOptions?: {
     showErrorText?: string
   }
+  splitPaneOptions?: {
+    CodeTogglerButtonText?: string
+    OutputTogglerButtonText?: string
+  }
+  isEmbedMode?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -55,6 +60,11 @@ const props = withDefaults(defineProps<Props>(), {
   layout: 'horizontal',
   previewOptions: () => ({}),
   editorOptions: () => ({}),
+  splitPaneOptions: () => ({
+    CodeTogglerButtonText: '< Code',
+    OutputTogglerButtonText: 'Output >',
+  }),
+  isEmbedMode: false
 })
 
 if (!props.editor) {
