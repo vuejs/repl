@@ -67,6 +67,7 @@ onMounted(async () => {
       enabled: false,
     },
     fixedOverflowWidgets: true,
+    wordWrap: 'on',
   })
   editor.value = editorInstance
 
