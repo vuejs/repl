@@ -35,7 +35,12 @@ const emit = defineEmits<{
 const containerRef = ref<HTMLDivElement>()
 const ready = ref(false)
 const editor = shallowRef<monaco.editor.IStandaloneCodeEditor>()
-const { store, autoSave, theme: replTheme } = inject(injectKeyProps)!
+const {
+  store,
+  autoSave,
+  theme: replTheme,
+  editorOptions,
+} = inject(injectKeyProps)!
 
 initMonaco(store.value)
 
@@ -67,6 +72,7 @@ onMounted(async () => {
       enabled: false,
     },
     fixedOverflowWidgets: true,
+    ...editorOptions.value.monacoOptions,
   })
   editor.value = editorInstance
 

@@ -67,6 +67,11 @@ const App = {
         },
         // showCompileOutput: false,
         // showImportMap: false
+        editorOptions: {
+          monacoOptions: {
+            // wordWrap: 'on',
+          },
+        },
       })
   },
 }

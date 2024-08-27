@@ -9,6 +9,7 @@ import {
   injectKeyProps,
 } from './types'
 import EditorContainer from './editor/EditorContainer.vue'
+import type * as monaco from 'monaco-editor-core'
 
 export interface Props {
   theme?: 'dark' | 'light'
@@ -37,6 +38,7 @@ export interface Props {
   }
   editorOptions?: {
     showErrorText?: string
+    monacoOptions?: monaco.editor.IStandaloneEditorConstructionOptions
   }
 }
 
