@@ -72,6 +72,11 @@ const App = {
         //   OutputTogglerButtonText: '输出 >',
         // },
         // isEmbedMode: true,
+        editorOptions: {
+          monacoOptions: {
+            // wordWrap: 'on',
+          },
+        },
       })
   },
 }
