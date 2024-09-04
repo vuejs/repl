@@ -221,34 +221,5 @@ function changeViewSize() {
   }
 }
 
-/* embed mode */
-.is-embed-mode .left,
-.is-embed-mode .right {
-  position: absolute;
-  inset: 0;
-  width: auto !important;
-  height: auto !important;
-}
-.is-embed-mode .dragger {
-  display: none;
-}
-.is-embed-mode.split-pane .toggler {
-  display: block;
-}
-.is-embed-mode.split-pane .right {
-  z-index: -1;
-  pointer-events: none;
-}
-.is-embed-mode.split-pane .left {
-  z-index: 0;
-  pointer-events: all;
-}
-.is-embed-mode.split-pane.show-output .right {
-  z-index: 0;
-  pointer-events: all;
-}
-.is-embed-mode.split-pane.show-output .left {
-  z-index: -1;
-  pointer-events: none;
-}
+
 </style>
