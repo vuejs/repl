@@ -49,7 +49,7 @@ initMonaco(store.value)
 const lang = computed(() => (props.mode === 'css' ? 'css' : 'javascript'))
 
 let editorInstance: monaco.editor.IStandaloneCodeEditor
-function editorChangeEvent() {
+function emitChangeEvent() {
   emit('change', editorInstance.getValue())
 }
 
@@ -156,7 +156,7 @@ onMounted(async () => {
     (autoSave) => {
       if (autoSave) {
         const disposable =
-          editorInstance.onDidChangeModelContent(editorChangeEvent)
+          editorInstance.onDidChangeModelContent(emitChangeEvent)
         onWatcherCleanup(() => disposable.dispose())
       }
     },
@@ -180,8 +180,8 @@ onBeforeUnmount(() => {
   <div
     ref="container"
     class="editor"
-    @keydown.ctrl.s.prevent="editorChangeEvent"
-    @keydown.meta.s.prevent="editorChangeEvent"
+    @keydown.ctrl.s.prevent="emitChangeEvent"
+    @keydown.meta.s.prevent="emitChangeEvent"
   />
 </template>
 

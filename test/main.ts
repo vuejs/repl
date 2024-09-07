@@ -57,7 +57,7 @@ const App = {
         store,
         theme: theme.value,
         previewTheme: previewTheme.value,
-        editor: MonacoEditor,
+        editor: CodeMirrorEditor,
         // layout: 'vertical',
         ssr: true,
         sfcOptions: {

@@ -1,10 +1,22 @@
 <template>
-  <div ref="container" class="editor" />
+  <div
+    ref="container"
+    class="editor"
+    @keydown.ctrl.s.prevent="emitChangeEvent"
+    @keydown.meta.s.prevent="emitChangeEvent"
+  />
 </template>
 
 <script setup lang="ts">
 import type { ModeSpec, ModeSpecOptions } from 'codemirror'
-import { inject, onMounted, useTemplateRef, watch, watchEffect } from 'vue'
+import {
+  inject,
+  onMounted,
+  onWatcherCleanup,
+  useTemplateRef,
+  watch,
+  watchEffect,
+} from 'vue'
 import { debounce } from '../utils'
 import CodeMirror from './codemirror'
 import { injectKeyProps } from '../../src/types'
@@ -25,6 +37,11 @@ const emit = defineEmits<(e: 'change', value: string) => void>()
 
 const el = useTemplateRef('container')
 const { autoResize, autoSave } = inject(injectKeyProps)!
+let editor: CodeMirror.Editor
+
+const emitChangeEvent = () => {
+  emit('change', editor.getValue())
+}
 
 onMounted(() => {
   const addonOptions = props.readonly
@@ -37,7 +54,7 @@ onMounted(() => {
         keyMap: 'sublime',
       }
 
-  const editor = CodeMirror(el.value!, {
+  editor = CodeMirror(el.value!, {
     value: '',
     mode: props.mode,
     readOnly: props.readonly,
@@ -71,25 +88,12 @@ onMounted(() => {
     )
   }
 
-  const editorChangeEvent = () => {
-    emit('change', editor.getValue())
-  }
-  const saveKeydownEvent = (e: KeyboardEvent) => {
-    if (e.ctrlKey && e.key === 's') {
-      e.preventDefault()
-      emit('change', editor.getValue())
-    }
-  }
-
   watch(
     autoSave,
-    (newVal) => {
-      if (newVal) {
-        el.value!.removeEventListener('keydown', saveKeydownEvent)
-        editor.on('change', editorChangeEvent)
-      } else {
-        editor.off('change', editorChangeEvent)
-        el.value!.addEventListener('keydown', saveKeydownEvent)
+    (autoSave) => {
+      if (autoSave) {
+        editor.on('change', emitChangeEvent)
+        onWatcherCleanup(() => editor.off('change', emitChangeEvent))
       }
     },
     { immediate: true },
