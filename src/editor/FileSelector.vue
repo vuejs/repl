@@ -60,6 +60,7 @@ function doneNameFile() {
   if (!pending.value) return
   if (!pendingFilename.value) {
     pending.value = false
+    return
   }
 
   // add back the src prefix
