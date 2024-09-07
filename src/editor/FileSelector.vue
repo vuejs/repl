@@ -58,6 +58,11 @@ function focus({ el }: VNode) {
 
 function doneNameFile() {
   if (!pending.value) return
+  if (!pendingFilename.value) {
+    pending.value = false
+    return
+  }
+
   // add back the src prefix
   const filename = 'src/' + pendingFilename.value
   const oldFilename = pending.value === true ? '' : pending.value
