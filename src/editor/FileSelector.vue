@@ -58,6 +58,10 @@ function focus({ el }: VNode) {
 
 function doneNameFile() {
   if (!pending.value) return
+  if (!pendingFilename.value) {
+    pending.value = false
+  }
+
   // add back the src prefix
   const filename = 'src/' + pendingFilename.value
   const oldFilename = pending.value === true ? '' : pending.value
@@ -66,9 +70,6 @@ function doneNameFile() {
     store.value.errors = [
       `Playground only supports *.vue, *.jsx?, *.tsx?, *.css, *.json files.`,
     ]
-    if (!pendingFilename.value) {
-      pending.value = false
-    }
     return
   }
 
