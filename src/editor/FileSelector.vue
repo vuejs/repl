@@ -66,6 +66,7 @@ function doneNameFile() {
     store.value.errors = [
       `Playground only supports *.vue, *.jsx?, *.tsx?, *.css, *.json files.`,
     ]
+    pending.value = false
     return
   }
 
