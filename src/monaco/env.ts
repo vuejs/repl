@@ -7,7 +7,8 @@ import { getOrCreateModel } from './utils'
 import type { CreateData } from './vue.worker'
 import vueWorker from './vue.worker?worker'
 import * as languageConfigs from './language-configs'
-import type { LanguageService } from '@vue/language-service'
+import type { WorkerLanguageService } from '@volar/monaco/worker'
+import { debounce } from '../utils'
 
 let initted = false
 export function initMonaco(store: Store) {
@@ -77,7 +78,7 @@ export async function reloadLanguageTools(store: Store) {
     }
   }
 
-  const worker = editor.createWebWorker<LanguageService>({
+  const worker = editor.createWebWorker<WorkerLanguageService>({
     moduleId: 'vs/language/vue/vueWorker',
     label: 'vue',
     host: new WorkerHost(),
@@ -155,7 +156,12 @@ export function loadMonacoEnv(store: Store) {
   languages.setLanguageConfiguration('typescript', languageConfigs.ts)
   languages.setLanguageConfiguration('css', languageConfigs.css)
 
-  store.reloadLanguageTools = () => reloadLanguageTools(store)
+  let languageToolsPromise: Promise<void> | undefined
+  store.reloadLanguageTools = debounce(async () => {
+    ;(languageToolsPromise ||= reloadLanguageTools(store)).finally(() => {
+      languageToolsPromise = undefined
+    })
+  }, 250)
   languages.onLanguage('vue', () => store.reloadLanguageTools!())
 
   // Support for go to definition

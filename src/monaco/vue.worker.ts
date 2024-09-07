@@ -3,7 +3,7 @@ import * as worker from 'monaco-editor-core/esm/vs/editor/editor.worker'
 import type * as monaco from 'monaco-editor-core'
 import {
   type LanguageServiceEnvironment,
-  createTypeScriptWorkerService,
+  createTypeScriptWorkerLanguageService,
 } from '@volar/monaco/worker'
 import { createNpmFileSystem } from '@volar/jsdelivr'
 import {
@@ -72,7 +72,7 @@ self.onmessage = async (msg: MessageEvent<WorkerMessage>) => {
         tsconfig.vueCompilerOptions || {},
       )
 
-      return createTypeScriptWorkerService({
+      return createTypeScriptWorkerLanguageService({
         typescript: ts,
         compilerOptions,
         workerContext: ctx,
@@ -84,19 +84,9 @@ self.onmessage = async (msg: MessageEvent<WorkerMessage>) => {
         languagePlugins: [
           createVueLanguagePlugin(
             ts,
-            asFileName,
-            () => '', // TODO getProjectVersion
-            (fileName) => {
-              const uri = asUri(fileName)
-              for (const model of ctx.getMirrorModels()) {
-                if (model.uri.toString() === uri.toString()) {
-                  return true
-                }
-              }
-              return false
-            },
             compilerOptions,
             vueCompilerOptions,
+            asFileName,
           ),
         ],
         languageServicePlugins: getFullLanguageServicePlugins(ts),

@@ -7,6 +7,7 @@ import {
   onMounted,
   ref,
   shallowRef,
+  useTemplateRef,
   watch,
 } from 'vue'
 import * as monaco from 'monaco-editor-core'
@@ -32,10 +33,15 @@ const emit = defineEmits<{
   (e: 'change', value: string): void
 }>()
 
-const containerRef = ref<HTMLDivElement>()
+const containerRef = useTemplateRef('container')
 const ready = ref(false)
 const editor = shallowRef<monaco.editor.IStandaloneCodeEditor>()
-const { store, autoSave, theme: replTheme } = inject(injectKeyProps)!
+const {
+  store,
+  autoSave,
+  theme: replTheme,
+  editorOptions,
+} = inject(injectKeyProps)!
 
 initMonaco(store.value)
 
@@ -67,6 +73,7 @@ onMounted(async () => {
       enabled: false,
     },
     fixedOverflowWidgets: true,
+    ...editorOptions.value.monacoOptions,
   })
   editor.value = editorInstance
 
@@ -178,7 +185,7 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <div ref="containerRef" class="editor" />
+  <div ref="container" class="editor" />
 </template>
 
 <style>

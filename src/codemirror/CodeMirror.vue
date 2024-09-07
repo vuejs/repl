@@ -1,10 +1,10 @@
 <template>
-  <div ref="el" class="editor" />
+  <div ref="container" class="editor" />
 </template>
 
 <script setup lang="ts">
 import type { ModeSpec, ModeSpecOptions } from 'codemirror'
-import { inject, onMounted, ref, watch, watchEffect } from 'vue'
+import { inject, onMounted, useTemplateRef, watch, watchEffect } from 'vue'
 import { debounce } from '../utils'
 import CodeMirror from './codemirror'
 import { injectKeyProps } from '../../src/types'
@@ -23,7 +23,7 @@ const props = withDefaults(defineProps<Props>(), {
 
 const emit = defineEmits<(e: 'change', value: string) => void>()
 
-const el = ref()
+const el = useTemplateRef('container')
 const { autoResize, autoSave } = inject(injectKeyProps)!
 
 onMounted(() => {

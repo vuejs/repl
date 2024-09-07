@@ -2,13 +2,14 @@
 import SplitPane from './SplitPane.vue'
 import Output from './output/Output.vue'
 import { type Store, useStore } from './store'
-import { computed, provide, ref, toRefs } from 'vue'
+import { computed, provide, toRefs, useTemplateRef } from 'vue'
 import {
   type EditorComponentType,
   injectKeyPreviewRef,
   injectKeyProps,
 } from './types'
 import EditorContainer from './editor/EditorContainer.vue'
+import type * as monaco from 'monaco-editor-core'
 
 export interface Props {
   theme?: 'dark' | 'light'
@@ -37,6 +38,7 @@ export interface Props {
   }
   editorOptions?: {
     showErrorText?: string
+    monacoOptions?: monaco.editor.IStandaloneEditorConstructionOptions
   }
 }
 
@@ -61,7 +63,7 @@ if (!props.editor) {
   throw new Error('The "editor" prop is now required.')
 }
 
-const outputRef = ref<InstanceType<typeof Output>>()
+const outputRef = useTemplateRef('output')
 
 props.store.init()
 
@@ -92,7 +94,7 @@ defineExpose({ reload })
       </template>
       <template #[outputSlotName]>
         <Output
-          ref="outputRef"
+          ref="output"
           :editor-component="editor"
           :show-compile-output="props.showCompileOutput"
           :ssr="!!props.ssr"
