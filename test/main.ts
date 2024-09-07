@@ -72,6 +72,7 @@ const App = {
             // wordWrap: 'on',
           },
         },
+        // autoSave: false,
       })
   },
 }

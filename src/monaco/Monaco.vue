@@ -5,6 +5,7 @@ import {
   nextTick,
   onBeforeUnmount,
   onMounted,
+  onWatcherCleanup,
   ref,
   shallowRef,
   useTemplateRef,
@@ -47,6 +48,11 @@ initMonaco(store.value)
 
 const lang = computed(() => (props.mode === 'css' ? 'css' : 'javascript'))
 
+let editorInstance: monaco.editor.IStandaloneCodeEditor
+function editorChangeEvent() {
+  emit('change', editorInstance.getValue())
+}
+
 onMounted(async () => {
   const theme = await import('./highlight').then((r) => r.registerHighlighter())
   ready.value = true
@@ -55,8 +61,7 @@ onMounted(async () => {
   if (!containerRef.value) {
     throw new Error('Cannot find containerRef')
   }
-
-  const editorInstance = monaco.editor.create(containerRef.value, {
+  editorInstance = monaco.editor.create(containerRef.value, {
     ...(props.readonly
       ? { value: props.value, language: lang.value }
       : { model: null }),
@@ -146,26 +151,13 @@ onMounted(async () => {
     // ignore save event
   })
 
-  const editorChangeEvent = () => {
-    emit('change', editorInstance.getValue())
-  }
-  const saveKeydownEvent = (e: KeyboardEvent) => {
-    if (e.ctrlKey && e.key === 's') {
-      e.preventDefault()
-      emit('change', editorInstance.getValue())
-    }
-  }
-
-  let disposable: monaco.IDisposable
   watch(
     autoSave,
-    (newVal) => {
-      if (newVal) {
-        containerRef.value!.removeEventListener('keydown', saveKeydownEvent)
-        disposable = editorInstance.onDidChangeModelContent(editorChangeEvent)
-      } else {
-        disposable && disposable.dispose()
-        containerRef.value!.addEventListener('keydown', saveKeydownEvent)
+    (autoSave) => {
+      if (autoSave) {
+        const disposable =
+          editorInstance.onDidChangeModelContent(editorChangeEvent)
+        onWatcherCleanup(() => disposable.dispose())
       }
     },
     { immediate: true },
@@ -185,7 +177,12 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <div ref="container" class="editor" />
+  <div
+    ref="container"
+    class="editor"
+    @keydown.ctrl.s.prevent="editorChangeEvent"
+    @keydown.meta.s.prevent="editorChangeEvent"
+  />
 </template>
 
 <style>
