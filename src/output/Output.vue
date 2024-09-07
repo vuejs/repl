@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import Preview from './Preview.vue'
-import { computed, inject, ref } from 'vue'
+import { computed, inject, useTemplateRef } from 'vue'
 import {
   type EditorComponentType,
   type OutputModes,
@@ -14,7 +14,7 @@ const props = defineProps<{
 }>()
 
 const { store } = inject(injectKeyProps)!
-const previewRef = ref<InstanceType<typeof Preview>>()
+const previewRef = useTemplateRef('preview')
 const modes = computed(() =>
   props.showCompileOutput
     ? (['preview', 'js', 'css', 'ssr'] as const)
@@ -53,7 +53,7 @@ defineExpose({ reload, previewRef })
   </div>
 
   <div class="output-container">
-    <Preview ref="previewRef" :show="mode === 'preview'" :ssr="ssr" />
+    <Preview ref="preview" :show="mode === 'preview'" :ssr="ssr" />
     <props.editorComponent
       v-if="mode !== 'preview'"
       readonly
