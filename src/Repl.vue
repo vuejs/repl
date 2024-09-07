@@ -73,7 +73,7 @@ const outputSlotName = computed(() => (props.layoutReverse ? 'left' : 'right'))
 provide(injectKeyProps, toRefs(props))
 provide(
   injectKeyPreviewRef,
-  computed(() => outputRef.value?.previewRef?.container),
+  computed(() => outputRef.value?.previewRef?.container ?? null),
 )
 
 /**
