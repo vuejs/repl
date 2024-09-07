@@ -81,10 +81,10 @@
     "@types/hash-sum": "^1.0.2",
     "@types/node": "^22.5.0",
     "@vitejs/plugin-vue": "^5.1.2",
-    "@volar/jsdelivr": "2.4.0-alpha.12",
-    "@volar/monaco": "2.4.0-alpha.12",
+    "@volar/jsdelivr": "~2.4.4",
+    "@volar/monaco": "~2.4.4",
     "@vue/babel-plugin-jsx": "^1.2.2",
-    "@vue/language-service": "~2.0.29",
+    "@vue/language-service": "~2.1.6",
     "assert": "^2.1.0",
     "bumpp": "^9.5.2",
     "codemirror": "^5.65.17",
@@ -102,9 +102,9 @@
     "typescript": "^5.5.4",
     "typescript-eslint": "^8.2.0",
     "vite": "^5.4.2",
-    "vite-plugin-dts": "^4.0.3",
+    "vite-plugin-dts": "^4.1.1",
     "vscode-uri": "^3.0.8",
     "vue": "^3.4.38",
-    "vue-tsc": "~2.0.29"
+    "vue-tsc": "~2.1.6"
   }
 }
