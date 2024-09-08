@@ -2,7 +2,7 @@
 import SplitPane from './SplitPane.vue'
 import Output from './output/Output.vue'
 import { type Store, useStore } from './store'
-import { computed, provide, toRefs, useTemplateRef } from 'vue'
+import { computed, provide, toRefs, useTemplateRef, ref } from 'vue'
 import {
   type EditorComponentType,
   injectKeyPreviewRef,
@@ -17,7 +17,6 @@ export interface Props {
   editor: EditorComponentType
   store?: Store
   autoResize?: boolean
-  autoSave?: boolean // auto save and compile, default to true, if false, user need to press ctrl + s to save and compile
   showCompileOutput?: boolean
   showImportMap?: boolean
   showTsConfig?: boolean
@@ -42,12 +41,16 @@ export interface Props {
   }
 }
 
+const autoSave = defineModel<boolean>()
+const switchAutoSave = () => {
+  autoSave.value = !autoSave.value
+}
+
 const props = withDefaults(defineProps<Props>(), {
   theme: 'light',
   previewTheme: false,
   store: () => useStore(),
   autoResize: true,
-  autoSave: true,
   showCompileOutput: true,
   showImportMap: true,
   showTsConfig: true,
@@ -63,14 +66,18 @@ if (!props.editor) {
   throw new Error('The "editor" prop is now required.')
 }
 
-const outputRef = useTemplateRef('output')
+const outputRef = useTemplateRef<typeof Output>('output')
 
 props.store.init()
 
 const editorSlotName = computed(() => (props.layoutReverse ? 'right' : 'left'))
 const outputSlotName = computed(() => (props.layoutReverse ? 'left' : 'right'))
 
-provide(injectKeyProps, toRefs(props))
+provide(injectKeyProps, {
+  ...toRefs(props),
+  autoSave,
+  switchAutoSave: ref(switchAutoSave),
+})
 provide(
   injectKeyPreviewRef,
   computed(() => outputRef.value?.previewRef?.container ?? null),

@@ -2,13 +2,24 @@
 import { inject } from 'vue'
 import { injectKeyProps } from '../../src/types'
 
+withDefaults(
+  defineProps<{
+    text?: string
+    bottom?: string
+  }>(),
+  {
+    text: 'Show Error',
+    bottom: '18px',
+  },
+)
+
 const { editorOptions } = inject(injectKeyProps)!
-const visible = defineModel<boolean>()
+const active = defineModel<boolean>()
 </script>
 
 <template>
-  <div class="wrapper" @click="visible = !visible">
-    <span>{{ editorOptions?.showErrorText || 'Show Error' }}</span>
+  <div class="wrapper" @click="active = !active">
+    <span>{{ editorOptions?.showErrorText || text }}</span>
     <div class="toggle" :class="[{ active: modelValue }]">
       <div class="indicator" />
     </div>
@@ -18,7 +29,7 @@ const visible = defineModel<boolean>()
 <style scoped>
 .wrapper {
   position: absolute;
-  bottom: 8px;
+  bottom: v-bind(bottom);
   right: 15px;
   z-index: 11;
   display: flex;

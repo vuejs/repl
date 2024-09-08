@@ -35,7 +35,7 @@ const props = withDefaults(defineProps<Props>(), {
 
 const emit = defineEmits<(e: 'change', value: string) => void>()
 
-const el = useTemplateRef('container')
+const el = useTemplateRef<HTMLElement>('container')
 const { autoResize, autoSave } = inject(injectKeyProps)!
 let editor: CodeMirror.Editor
 
