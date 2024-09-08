@@ -1,3 +1,19 @@
+## [4.4.1](https://github.com/vuejs/repl/compare/v4.4.0...v4.4.1) (2024-09-08)
+
+
+### Bug Fixes
+
+* cancel creating new file ([#281](https://github.com/vuejs/repl/issues/281)) ([7467f38](https://github.com/vuejs/repl/commit/7467f38f65e4b05dacc389644a8001b24f86fcdb))
+* type error ([6653d0e](https://github.com/vuejs/repl/commit/6653d0e4b0b30eeee4bfe0c0c92bf00a84c0c753))
+
+
+### Features
+
+* add `autoSave` toggle button ([#283](https://github.com/vuejs/repl/issues/283)) ([83d8e48](https://github.com/vuejs/repl/commit/83d8e487de724261cf709c5648cc2512b4c33732))
+* export `languageToolsVersion` ([5a92a92](https://github.com/vuejs/repl/commit/5a92a9259da01da4aa30b09ed6dcedfb4503c71d))
+
+
+
 # [4.4.0](https://github.com/vuejs/repl/compare/v4.3.1...v4.4.0) (2024-09-07)
 
 
