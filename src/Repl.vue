@@ -66,7 +66,7 @@ if (!props.editor) {
   throw new Error('The "editor" prop is now required.')
 }
 
-const outputRef = useTemplateRef<typeof Output>('output')
+const outputRef = useTemplateRef('output')
 
 props.store.init()
 
