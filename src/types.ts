@@ -15,8 +15,9 @@ export type EditorComponentType = Component<EditorProps>
 
 export type OutputModes = 'preview' | EditorMode
 
-export const injectKeyProps: InjectionKey<ToRefs<Required<Props>>> =
-  Symbol('props')
+export const injectKeyProps: InjectionKey<
+  ToRefs<Required<Props & { autoSave: boolean }>>
+> = Symbol('props')
 export const injectKeyPreviewRef: InjectionKey<
   ComputedRef<HTMLDivElement | null>
 > = Symbol('preview-ref')

@@ -3,7 +3,7 @@ import FileSelector from './FileSelector.vue'
 import Message from '../Message.vue'
 import { debounce } from '../utils'
 import { inject, ref, watch } from 'vue'
-import MessageToggle from './MessageToggle.vue'
+import ToggleButton from './ToggleButton.vue'
 import { type EditorComponentType, injectKeyProps } from '../types'
 
 const SHOW_ERROR_KEY = 'repl_show_error'
@@ -12,7 +12,7 @@ const props = defineProps<{
   editorComponent: EditorComponentType
 }>()
 
-const { store } = inject(injectKeyProps)!
+const { store, autoSave, editorOptions } = inject(injectKeyProps)!
 const showMessage = ref(getItem())
 
 const onChange = debounce((code: string) => {
@@ -42,7 +42,19 @@ watch(showMessage, () => {
       @change="onChange"
     />
     <Message v-show="showMessage" :err="store.errors[0]" />
-    <MessageToggle v-model="showMessage" />
+
+    <div class="editor-floating">
+      <ToggleButton
+        v-if="editorOptions?.showErrorText !== false"
+        v-model="showMessage"
+        :text="editorOptions?.showErrorText || 'Show Error'"
+      />
+      <ToggleButton
+        v-if="editorOptions?.autoSaveText !== false"
+        v-model="autoSave"
+        :text="editorOptions?.autoSaveText || 'Auto Save'"
+      />
+    </div>
   </div>
 </template>
 
@@ -51,5 +63,19 @@ watch(showMessage, () => {
   height: calc(100% - var(--header-height));
   overflow: hidden;
   position: relative;
+}
+
+.editor-floating {
+  position: absolute;
+  bottom: 16px;
+  right: 16px;
+  z-index: 11;
+  display: flex;
+  flex-direction: column;
+  align-items: end;
+  gap: 8px;
+  background-color: var(--bg);
+  color: var(--text-light);
+  padding: 8px;
 }
 </style>

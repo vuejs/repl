@@ -17,7 +17,6 @@ export interface Props {
   editor: EditorComponentType
   store?: Store
   autoResize?: boolean
-  autoSave?: boolean // auto save and compile, default to true, if false, user need to press ctrl + s to save and compile
   showCompileOutput?: boolean
   showImportMap?: boolean
   showTsConfig?: boolean
@@ -37,17 +36,18 @@ export interface Props {
     showRuntimeWarning?: boolean
   }
   editorOptions?: {
-    showErrorText?: string
+    showErrorText?: string | false
+    autoSaveText?: string | false
     monacoOptions?: monaco.editor.IStandaloneEditorConstructionOptions
   }
 }
 
+const autoSave = defineModel<boolean>({ default: true })
 const props = withDefaults(defineProps<Props>(), {
   theme: 'light',
   previewTheme: false,
   store: () => useStore(),
   autoResize: true,
-  autoSave: true,
   showCompileOutput: true,
   showImportMap: true,
   showTsConfig: true,
@@ -70,7 +70,10 @@ props.store.init()
 const editorSlotName = computed(() => (props.layoutReverse ? 'right' : 'left'))
 const outputSlotName = computed(() => (props.layoutReverse ? 'left' : 'right'))
 
-provide(injectKeyProps, toRefs(props))
+provide(injectKeyProps, {
+  ...toRefs(props),
+  autoSave,
+})
 provide(
   injectKeyPreviewRef,
   computed(() => outputRef.value?.previewRef?.container ?? null),
