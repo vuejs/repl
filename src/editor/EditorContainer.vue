@@ -45,10 +45,15 @@ watch(showMessage, () => {
 
     <div class="editor-floating">
       <ToggleButton
+        v-if="editorOptions?.showErrorText !== false"
         v-model="showMessage"
         :text="editorOptions?.showErrorText || 'Show Error'"
       />
-      <ToggleButton v-model="autoSave" text="Auto Save" bottom="48px" />
+      <ToggleButton
+        v-if="editorOptions?.autoSaveText !== false"
+        v-model="autoSave"
+        :text="editorOptions?.autoSaveText || 'Auto Save'"
+      />
     </div>
   </div>
 </template>

@@ -36,7 +36,8 @@ export interface Props {
     showRuntimeWarning?: boolean
   }
   editorOptions?: {
-    showErrorText?: string
+    showErrorText?: string | false
+    autoSaveText?: string | false
     monacoOptions?: monaco.editor.IStandaloneEditorConstructionOptions
   }
 }
