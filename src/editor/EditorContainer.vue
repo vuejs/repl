@@ -12,7 +12,7 @@ const props = defineProps<{
   editorComponent: EditorComponentType
 }>()
 
-const { store, autoSave } = inject(injectKeyProps)!
+const { store, autoSave, editorOptions } = inject(injectKeyProps)!
 const showMessage = ref(getItem())
 
 const onChange = debounce((code: string) => {
@@ -31,8 +31,6 @@ function getItem() {
 watch(showMessage, () => {
   setItem()
 })
-
-const { editorOptions } = inject(injectKeyProps)!
 </script>
 
 <template>
