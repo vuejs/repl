@@ -2,7 +2,7 @@
 import SplitPane from './SplitPane.vue'
 import Output from './output/Output.vue'
 import { type Store, useStore } from './store'
-import { computed, provide, toRefs, useTemplateRef, ref } from 'vue'
+import { computed, provide, toRefs, useTemplateRef } from 'vue'
 import {
   type EditorComponentType,
   injectKeyPreviewRef,
@@ -41,11 +41,7 @@ export interface Props {
   }
 }
 
-const autoSave = defineModel<boolean>()
-const switchAutoSave = () => {
-  autoSave.value = !autoSave.value
-}
-
+const autoSave = defineModel<boolean>({ default: true })
 const props = withDefaults(defineProps<Props>(), {
   theme: 'light',
   previewTheme: false,
@@ -76,7 +72,6 @@ const outputSlotName = computed(() => (props.layoutReverse ? 'left' : 'right'))
 provide(injectKeyProps, {
   ...toRefs(props),
   autoSave,
-  switchAutoSave: ref(switchAutoSave),
 })
 provide(
   injectKeyPreviewRef,

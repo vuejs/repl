@@ -12,9 +12,8 @@ const props = defineProps<{
   editorComponent: EditorComponentType
 }>()
 
-const { store, autoSave, switchAutoSave } = inject(injectKeyProps)!
+const { store, autoSave } = inject(injectKeyProps)!
 const showMessage = ref(getItem())
-const auto_save = ref(autoSave.value)
 
 const onChange = debounce((code: string) => {
   store.value.activeFile.code = code
@@ -32,8 +31,6 @@ function getItem() {
 watch(showMessage, () => {
   setItem()
 })
-
-watch(auto_save, switchAutoSave.value)
 </script>
 
 <template>
@@ -46,7 +43,7 @@ watch(auto_save, switchAutoSave.value)
     />
     <Message v-show="showMessage" :err="store.errors[0]" />
     <ToggleButton v-model="showMessage" />
-    <ToggleButton v-model="auto_save" text="Auto Save" bottom="48px" />
+    <ToggleButton v-model="autoSave" text="Auto Save" bottom="48px" />
   </div>
 </template>
 
