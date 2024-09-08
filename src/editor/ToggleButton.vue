@@ -1,25 +1,11 @@
 <script setup lang="ts">
-import { inject } from 'vue'
-import { injectKeyProps } from '../../src/types'
-
-withDefaults(
-  defineProps<{
-    text?: string
-    bottom?: string
-  }>(),
-  {
-    text: 'Show Error',
-    bottom: '18px',
-  },
-)
-
-const { editorOptions } = inject(injectKeyProps)!
+defineProps<{ text: string }>()
 const active = defineModel<boolean>()
 </script>
 
 <template>
   <div class="wrapper" @click="active = !active">
-    <span>{{ editorOptions?.showErrorText || text }}</span>
+    <span>{{ text }}</span>
     <div class="toggle" :class="[{ active: modelValue }]">
       <div class="indicator" />
     </div>
@@ -28,19 +14,12 @@ const active = defineModel<boolean>()
 
 <style scoped>
 .wrapper {
-  position: absolute;
-  bottom: v-bind(bottom);
-  right: 15px;
-  z-index: 11;
   display: flex;
   align-items: center;
-  background-color: var(--bg);
-  color: var(--text-light);
   cursor: pointer;
-  padding: 4px 8px;
-  border-radius: 2px;
   user-select: none;
 }
+
 .toggle {
   display: inline-block;
   margin-left: 4px;

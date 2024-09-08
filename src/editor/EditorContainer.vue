@@ -31,6 +31,8 @@ function getItem() {
 watch(showMessage, () => {
   setItem()
 })
+
+const { editorOptions } = inject(injectKeyProps)!
 </script>
 
 <template>
@@ -42,8 +44,14 @@ watch(showMessage, () => {
       @change="onChange"
     />
     <Message v-show="showMessage" :err="store.errors[0]" />
-    <ToggleButton v-model="showMessage" />
-    <ToggleButton v-model="autoSave" text="Auto Save" bottom="48px" />
+
+    <div class="editor-floating">
+      <ToggleButton
+        v-model="showMessage"
+        :text="editorOptions?.showErrorText || 'Show Error'"
+      />
+      <ToggleButton v-model="autoSave" text="Auto Save" bottom="48px" />
+    </div>
   </div>
 </template>
 
@@ -52,5 +60,19 @@ watch(showMessage, () => {
   height: calc(100% - var(--header-height));
   overflow: hidden;
   position: relative;
+}
+
+.editor-floating {
+  position: absolute;
+  bottom: 16px;
+  right: 16px;
+  z-index: 11;
+  display: flex;
+  flex-direction: column;
+  align-items: end;
+  gap: 8px;
+  background-color: var(--bg);
+  color: var(--text-light);
+  padding: 8px;
 }
 </style>
