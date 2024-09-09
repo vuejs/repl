@@ -71,7 +71,6 @@ const App = {
         //   CodeTogglerButtonText: '< 代码',
         //   OutputTogglerButtonText: '输出 >',
         // },
-        // isEmbedMode: true,
         editorOptions: {
           autoSaveText: '💾',
           monacoOptions: {

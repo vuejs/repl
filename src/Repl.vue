@@ -44,7 +44,6 @@ export interface Props {
     CodeTogglerButtonText?: string
     OutputTogglerButtonText?: string
   }
-  isEmbedMode?: boolean
 }
 
 const autoSave = defineModel<boolean>({ default: true })
@@ -66,7 +65,6 @@ const props = withDefaults(defineProps<Props>(), {
     CodeTogglerButtonText: '< Code',
     OutputTogglerButtonText: 'Output >',
   }),
-  isEmbedMode: false
 })
 
 if (!props.editor) {

@@ -9,7 +9,7 @@ const containerRef = useTemplateRef('container')
 const previewRef = inject(injectKeyPreviewRef)!
 
 // mobile only
-const { store, splitPaneOptions, isEmbedMode } = inject(injectKeyProps)!
+const { store, splitPaneOptions } = inject(injectKeyProps)!
 const showOutput = computed(() => store.value.showOutput)
 
 const state = reactive({
@@ -68,7 +68,6 @@ function changeViewSize() {
       dragging: state.dragging,
       'show-output': showOutput,
       vertical: isVertical,
-      'is-embed-mode': isEmbedMode,
     }"
     @mousemove="dragMove"
     @mouseup="dragEnd"
@@ -220,6 +219,4 @@ function changeViewSize() {
     pointer-events: none;
   }
 }
-
-
 </style>
