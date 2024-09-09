@@ -73,10 +73,12 @@ const App = {
         // },
         // isEmbedMode: true,
         editorOptions: {
+          autoSaveText: '💾',
           monacoOptions: {
             // wordWrap: 'on',
           },
         },
+        // autoSave: false,
       })
   },
 }

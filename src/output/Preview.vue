@@ -6,6 +6,7 @@ import {
   onMounted,
   onUnmounted,
   ref,
+  useTemplateRef,
   watch,
   watchEffect,
 } from 'vue'
@@ -19,7 +20,7 @@ const props = defineProps<{ show: boolean; ssr: boolean }>()
 const { store, clearConsole, theme, previewTheme, previewOptions } =
   inject(injectKeyProps)!
 
-const container = ref<HTMLDivElement>()
+const containerRef = useTemplateRef('container')
 const runtimeError = ref<string>()
 const runtimeWarning = ref<string>()
 
@@ -68,7 +69,7 @@ function createSandbox() {
     // clear prev sandbox
     proxy.destroy()
     stopUpdateWatcher && stopUpdateWatcher()
-    container.value?.removeChild(sandbox)
+    containerRef.value?.removeChild(sandbox)
   }
 
   sandbox = document.createElement('iframe')
@@ -101,7 +102,7 @@ function createSandbox() {
       previewOptions.value?.placeholderHTML || '',
     )
   sandbox.srcdoc = sandboxSrc
-  container.value?.appendChild(sandbox)
+  containerRef.value?.appendChild(sandbox)
 
   proxy = new PreviewProxy(sandbox, {
     on_fetch_progress: (progress: any) => {
@@ -280,7 +281,7 @@ function reload() {
   sandbox.contentWindow?.location.reload()
 }
 
-defineExpose({ reload, container })
+defineExpose({ reload, container: containerRef })
 </script>
 
 <template>

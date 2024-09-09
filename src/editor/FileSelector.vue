@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { injectKeyProps } from '../../src/types'
 import { importMapFile, stripSrcPrefix, tsconfigFile } from '../store'
-import { type VNode, computed, inject, ref } from 'vue'
+import { type VNode, computed, inject, ref, useTemplateRef } from 'vue'
 
 const { store, showTsConfig, showImportMap } = inject(injectKeyProps)!
 
@@ -58,6 +58,11 @@ function focus({ el }: VNode) {
 
 function doneNameFile() {
   if (!pending.value) return
+  if (!pendingFilename.value) {
+    pending.value = false
+    return
+  }
+
   // add back the src prefix
   const filename = 'src/' + pendingFilename.value
   const oldFilename = pending.value === true ? '' : pending.value
@@ -93,10 +98,10 @@ function editFileName(file: string) {
   pending.value = file
 }
 
-const fileSel = ref(null)
+const fileSelector = useTemplateRef('fileSelector')
 function horizontalScroll(e: WheelEvent) {
   e.preventDefault()
-  const el = fileSel.value! as HTMLElement
+  const el = fileSelector.value!
   const direction =
     Math.abs(e.deltaX) >= Math.abs(e.deltaY) ? e.deltaX : e.deltaY
   const distance = 30 * (direction > 0 ? 1 : -1)
@@ -108,7 +113,7 @@ function horizontalScroll(e: WheelEvent) {
 
 <template>
   <div
-    ref="fileSel"
+    ref="fileSelector"
     class="file-selector"
     :class="{ 'has-import-map': showImportMap }"
     @wheel="horizontalScroll"

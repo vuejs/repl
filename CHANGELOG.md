@@ -1,3 +1,37 @@
+## [4.4.1](https://github.com/vuejs/repl/compare/v4.4.0...v4.4.1) (2024-09-08)
+
+
+### Bug Fixes
+
+* cancel creating new file ([#281](https://github.com/vuejs/repl/issues/281)) ([7467f38](https://github.com/vuejs/repl/commit/7467f38f65e4b05dacc389644a8001b24f86fcdb))
+* type error ([6653d0e](https://github.com/vuejs/repl/commit/6653d0e4b0b30eeee4bfe0c0c92bf00a84c0c753))
+
+
+### Features
+
+* add `autoSave` toggle button ([#283](https://github.com/vuejs/repl/issues/283)) ([83d8e48](https://github.com/vuejs/repl/commit/83d8e487de724261cf709c5648cc2512b4c33732))
+* export `languageToolsVersion` ([5a92a92](https://github.com/vuejs/repl/commit/5a92a9259da01da4aa30b09ed6dcedfb4503c71d))
+
+
+
+# [4.4.0](https://github.com/vuejs/repl/compare/v4.3.1...v4.4.0) (2024-09-07)
+
+
+### Bug Fixes
+
+* debounce reloadLanguageTools in monaco ([f9f650a](https://github.com/vuejs/repl/commit/f9f650ada945f7ea597b7e7b51c132c4594bd5cb)), closes [#275](https://github.com/vuejs/repl/issues/275) [#263](https://github.com/vuejs/repl/issues/263)
+* no default value for object props ([d786626](https://github.com/vuejs/repl/commit/d78662652ec18f4610facc8f3e2a50f38c01f93f))
+* rollback & pin volar version ([c6f58c7](https://github.com/vuejs/repl/commit/c6f58c7f4d04799a64f788251362f8349728bea4))
+
+
+### Features
+
+* add more customization options ([#274](https://github.com/vuejs/repl/issues/274)) ([c73b786](https://github.com/vuejs/repl/commit/c73b7868d73d3dad792c80a36507ce92234443d4))
+* expose `editorOptions.monacoOptions` ([00176d0](https://github.com/vuejs/repl/commit/00176d007ff5eb74e216abff3de87e625cde543b)), closes [#277](https://github.com/vuejs/repl/issues/277) [#232](https://github.com/vuejs/repl/issues/232)
+* reactivity `autoSave` option ([#266](https://github.com/vuejs/repl/issues/266)) ([d90082a](https://github.com/vuejs/repl/commit/d90082a2e44956e08fc64d296661b30ea4590506))
+
+
+
 ## [4.3.1](https://github.com/vuejs/repl/compare/v4.3.0...v4.3.1) (2024-07-03)
 
 

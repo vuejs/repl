@@ -7,7 +7,7 @@ import { getOrCreateModel } from './utils'
 import type { CreateData } from './vue.worker'
 import vueWorker from './vue.worker?worker'
 import * as languageConfigs from './language-configs'
-import type { LanguageService } from '@vue/language-service'
+import type { WorkerLanguageService } from '@volar/monaco/worker'
 import { debounce } from '../utils'
 
 let initted = false
@@ -78,7 +78,7 @@ export async function reloadLanguageTools(store: Store) {
     }
   }
 
-  const worker = editor.createWebWorker<LanguageService>({
+  const worker = editor.createWebWorker<WorkerLanguageService>({
     moduleId: 'vs/language/vue/vueWorker',
     label: 'vue',
     host: new WorkerHost(),

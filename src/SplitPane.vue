@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { computed, inject, reactive, ref } from 'vue'
+import { computed, inject, reactive, useTemplateRef } from 'vue'
 import { injectKeyPreviewRef, injectKeyProps } from './types'
 
 const props = defineProps<{ layout?: 'horizontal' | 'vertical' }>()
 const isVertical = computed(() => props.layout === 'vertical')
 
-const container = ref()
+const containerRef = useTemplateRef('container')
 const previewRef = inject(injectKeyPreviewRef)!
 
 // mobile only
@@ -36,11 +36,11 @@ function dragStart(e: MouseEvent) {
 }
 
 function dragMove(e: MouseEvent) {
-  if (state.dragging) {
+  if (containerRef.value && state.dragging) {
     const position = isVertical.value ? e.pageY : e.pageX
     const totalSize = isVertical.value
-      ? container.value.offsetHeight
-      : container.value.offsetWidth
+      ? containerRef.value.offsetHeight
+      : containerRef.value.offsetWidth
     const dp = position - startPosition
     state.split = startSplit + +((dp / totalSize) * 100).toFixed(2)
 

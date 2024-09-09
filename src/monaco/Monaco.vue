@@ -5,8 +5,10 @@ import {
   nextTick,
   onBeforeUnmount,
   onMounted,
+  onWatcherCleanup,
   ref,
   shallowRef,
+  useTemplateRef,
   watch,
 } from 'vue'
 import * as monaco from 'monaco-editor-core'
@@ -32,7 +34,7 @@ const emit = defineEmits<{
   (e: 'change', value: string): void
 }>()
 
-const containerRef = ref<HTMLDivElement>()
+const containerRef = useTemplateRef('container')
 const ready = ref(false)
 const editor = shallowRef<monaco.editor.IStandaloneCodeEditor>()
 const {
@@ -46,6 +48,11 @@ initMonaco(store.value)
 
 const lang = computed(() => (props.mode === 'css' ? 'css' : 'javascript'))
 
+let editorInstance: monaco.editor.IStandaloneCodeEditor
+function emitChangeEvent() {
+  emit('change', editorInstance.getValue())
+}
+
 onMounted(async () => {
   const theme = await import('./highlight').then((r) => r.registerHighlighter())
   ready.value = true
@@ -54,8 +61,7 @@ onMounted(async () => {
   if (!containerRef.value) {
     throw new Error('Cannot find containerRef')
   }
-
-  const editorInstance = monaco.editor.create(containerRef.value, {
+  editorInstance = monaco.editor.create(containerRef.value, {
     ...(props.readonly
       ? { value: props.value, language: lang.value }
       : { model: null }),
@@ -145,18 +151,17 @@ onMounted(async () => {
     // ignore save event
   })
 
-  if (autoSave) {
-    editorInstance.onDidChangeModelContent(() => {
-      emit('change', editorInstance.getValue())
-    })
-  } else {
-    containerRef.value.addEventListener('keydown', (e: KeyboardEvent) => {
-      if (e.ctrlKey && e.key === 's') {
-        e.preventDefault()
-        emit('change', editorInstance.getValue())
+  watch(
+    autoSave,
+    (autoSave) => {
+      if (autoSave) {
+        const disposable =
+          editorInstance.onDidChangeModelContent(emitChangeEvent)
+        onWatcherCleanup(() => disposable.dispose())
       }
-    })
-  }
+    },
+    { immediate: true },
+  )
 
   // update theme
   watch(replTheme, (n) => {
@@ -172,7 +177,12 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <div ref="containerRef" class="editor" />
+  <div
+    ref="container"
+    class="editor"
+    @keydown.ctrl.s.prevent="emitChangeEvent"
+    @keydown.meta.s.prevent="emitChangeEvent"
+  />
 </template>
 
 <style>
