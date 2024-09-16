@@ -1,3 +1,13 @@
+## [4.4.2](https://github.com/vuejs/repl/compare/v4.4.1...v4.4.2) (2024-09-16)
+
+
+### Bug Fixes
+
+* output toggle button ([#279](https://github.com/vuejs/repl/issues/279)) ([93051f3](https://github.com/vuejs/repl/commit/93051f35a232b53d01dd0a40623cab5b11baa3ee))
+* upgrade vue language tools ([ec393cf](https://github.com/vuejs/repl/commit/ec393cfe4b8b8008976e4fd2017bd112d98fa599))
+
+
+
 ## [4.4.1](https://github.com/vuejs/repl/compare/v4.4.0...v4.4.1) (2024-09-08)
 
 
