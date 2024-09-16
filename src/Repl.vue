@@ -40,6 +40,10 @@ export interface Props {
     autoSaveText?: string | false
     monacoOptions?: monaco.editor.IStandaloneEditorConstructionOptions
   }
+  splitPaneOptions?: {
+    codeTogglerText?: string
+    outputTogglerText?: string
+  }
 }
 
 const autoSave = defineModel<boolean>({ default: true })
@@ -57,6 +61,7 @@ const props = withDefaults(defineProps<Props>(), {
   layout: 'horizontal',
   previewOptions: () => ({}),
   editorOptions: () => ({}),
+  splitPaneOptions: () => ({}),
 })
 
 if (!props.editor) {

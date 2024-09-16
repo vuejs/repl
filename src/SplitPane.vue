@@ -9,8 +9,7 @@ const containerRef = useTemplateRef('container')
 const previewRef = inject(injectKeyPreviewRef)!
 
 // mobile only
-const { store } = inject(injectKeyProps)!
-const showOutput = computed(() => store.value.showOutput)
+const { store, splitPaneOptions } = inject(injectKeyProps)!
 
 const state = reactive({
   dragging: false,
@@ -66,7 +65,7 @@ function changeViewSize() {
     class="split-pane"
     :class="{
       dragging: state.dragging,
-      'show-output': showOutput,
+      'show-output': store.showOutput,
       vertical: isVertical,
     }"
     @mousemove="dragMove"
@@ -90,8 +89,12 @@ function changeViewSize() {
       <slot name="right" />
     </div>
 
-    <button class="toggler" @click="showOutput = !showOutput">
-      {{ showOutput ? '< Code' : 'Output >' }}
+    <button class="toggler" @click="store.showOutput = !store.showOutput">
+      {{
+        store.showOutput
+          ? splitPaneOptions?.codeTogglerText || '< Code'
+          : splitPaneOptions?.outputTogglerText || 'Output >'
+      }}
     </button>
   </div>
 </template>
