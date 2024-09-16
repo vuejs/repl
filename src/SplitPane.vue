@@ -93,8 +93,8 @@ function changeViewSize() {
     <button class="toggler" @click="store.showOutput = !showOutput">
       {{
         showOutput
-          ? splitPaneOptions?.CodeTogglerButtonText
-          : splitPaneOptions?.OutputTogglerButtonText
+          ? splitPaneOptions?.codeTogglerText || '< Code'
+          : splitPaneOptions?.outputTogglerText || 'Output >'
       }}
     </button>
   </div>

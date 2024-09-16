@@ -41,8 +41,8 @@ export interface Props {
     monacoOptions?: monaco.editor.IStandaloneEditorConstructionOptions
   }
   splitPaneOptions?: {
-    CodeTogglerButtonText?: string
-    OutputTogglerButtonText?: string
+    codeTogglerText?: string
+    outputTogglerText?: string
   }
 }
 
@@ -61,10 +61,7 @@ const props = withDefaults(defineProps<Props>(), {
   layout: 'horizontal',
   previewOptions: () => ({}),
   editorOptions: () => ({}),
-  splitPaneOptions: () => ({
-    CodeTogglerButtonText: '< Code',
-    OutputTogglerButtonText: 'Output >',
-  }),
+  splitPaneOptions: () => ({}),
 })
 
 if (!props.editor) {
