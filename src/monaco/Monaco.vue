@@ -2,11 +2,9 @@
 import {
   computed,
   inject,
-  nextTick,
   onBeforeUnmount,
   onMounted,
   onWatcherCleanup,
-  ref,
   shallowRef,
   useTemplateRef,
   watch,
@@ -15,6 +13,7 @@ import * as monaco from 'monaco-editor-core'
 import { initMonaco } from './env'
 import { getOrCreateModel } from './utils'
 import { type EditorMode, injectKeyProps } from '../types'
+import { registerHighlighter } from './highlight'
 
 const props = withDefaults(
   defineProps<{
@@ -35,7 +34,6 @@ const emit = defineEmits<{
 }>()
 
 const containerRef = useTemplateRef('container')
-const ready = ref(false)
 const editor = shallowRef<monaco.editor.IStandaloneCodeEditor>()
 const {
   store,
@@ -53,11 +51,8 @@ function emitChangeEvent() {
   emit('change', editorInstance.getValue())
 }
 
-onMounted(async () => {
-  const theme = await import('./highlight').then((r) => r.registerHighlighter())
-  ready.value = true
-  await nextTick()
-
+onMounted(() => {
+  const theme = registerHighlighter()
   if (!containerRef.value) {
     throw new Error('Cannot find containerRef')
   }
