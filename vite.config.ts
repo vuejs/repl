@@ -24,14 +24,8 @@ const patchCssFiles: Plugin = {
   name: 'patch-css',
   apply: 'build',
   writeBundle() {
-    // 1. MonacoEditor.css -> monaco-editor.css
+    //  inject css imports to the files
     const outDir = path.resolve('dist')
-    fs.renameSync(
-      path.resolve(outDir, 'MonacoEditor.css'),
-      path.resolve(outDir, 'monaco-editor.css'),
-    )
-
-    // 2. inject css imports to the files
     ;['vue-repl', 'monaco-editor', 'codemirror-editor'].forEach((file) => {
       const filePath = path.resolve(outDir, file + '.js')
       const content = fs.readFileSync(filePath, 'utf-8')
