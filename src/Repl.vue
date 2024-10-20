@@ -2,11 +2,12 @@
 import SplitPane from './SplitPane.vue'
 import Output from './output/Output.vue'
 import { type Store, useStore } from './store'
-import { computed, provide, toRefs, useTemplateRef } from 'vue'
+import { computed, provide, ref, toRefs, useTemplateRef } from 'vue'
 import {
   type EditorComponentType,
   injectKeyPreviewRef,
   injectKeyProps,
+  injectKeyShowPreviewRef,
 } from './types'
 import EditorContainer from './editor/EditorContainer.vue'
 import type * as monaco from 'monaco-editor-core'
@@ -84,6 +85,9 @@ provide(
   computed(() => outputRef.value?.previewRef?.container ?? null),
 )
 
+const showPreview = ref(true)
+provide(injectKeyShowPreviewRef, showPreview)
+
 /**
  * Reload the preview iframe
  */
@@ -97,7 +101,7 @@ defineExpose({ reload })
 <template>
   <div class="vue-repl">
     <SplitPane :layout="layout">
-      <template #[editorSlotName]>
+      <template v-if="showPreview" #[editorSlotName]>
         <EditorContainer :editor-component="editor" />
       </template>
       <template #[outputSlotName]>
