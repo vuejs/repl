@@ -99,7 +99,11 @@ function changeViewSize() {
       <slot name="right" />
     </div>
 
-    <button class="toggler" @click="store.showOutput = !store.showOutput">
+    <button
+      v-if="showPreview"
+      class="toggler"
+      @click="store.showOutput = !store.showOutput"
+    >
       {{
         store.showOutput
           ? splitPaneOptions?.codeTogglerText || '< Code'
