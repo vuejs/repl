@@ -6,6 +6,17 @@ Vue SFC REPL as a Vue 3 component.
 
 **Note: `@vue/repl` >= 2 now supports Monaco Editor, but also requires explicitly passing in the editor to be used for tree-shaking.**
 
+```ts
+// vite.config.ts
+import { defineConfig } from 'vite'
+export default defineConfig({
+  optimizeDeps: {
+    exclude: ['@vue/repl'],
+  },
+  // ...
+})
+```
+
 ### With CodeMirror Editor
 
 Basic editing experience with no intellisense. Lighter weight, fewer network requests, better for embedding use cases.
