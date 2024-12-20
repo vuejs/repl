@@ -30,6 +30,8 @@ export class PreviewProxy {
     return new Promise((resolve, reject) => {
       const cmd_id = uid++
 
+      //console.log('resolve', resolve)
+      //console.log('reject', reject)
       this.pending_cmds.set(cmd_id, { resolve, reject })
 
       this.iframe.contentWindow!.postMessage({ action, cmd_id, args }, '*')

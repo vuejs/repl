@@ -31,3 +31,16 @@ export function atou(base64: string): string {
   // https://base64.guru/developers/javascript/examples/unicode-strings
   return decodeURIComponent(escape(binary))
 }
+
+export function parse(value: any = false) {
+	value = value ?? false
+	if (typeof value === 'object') {
+		return Object.entries(value) as [string, any][]
+	}
+	return false
+}
+
+export function word(total: number, singular: string, plural: string) {
+	const choose = total > 1 ? plural : singular
+	return `${total} ${choose}`
+}

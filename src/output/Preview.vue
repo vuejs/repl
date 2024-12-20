@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import SplitPane from '../SplitPane.vue'
 import Message from '../Message.vue'
 import {
   type WatchStopHandle,
@@ -13,7 +14,8 @@ import {
 import srcdoc from './srcdoc.html?raw'
 import { PreviewProxy } from './PreviewProxy'
 import { compileModulesForPreview } from './moduleCompiler'
-import { injectKeyProps } from '../../src/types'
+import { CommandData, injectKeyProps } from '../../src/types'
+import Console from './Console.vue'
 
 const props = defineProps<{ show: boolean; ssr: boolean }>()
 
@@ -23,6 +25,7 @@ const { store, clearConsole, theme, previewTheme, previewOptions } =
 const containerRef = useTemplateRef('container')
 const runtimeError = ref<string>()
 const runtimeWarning = ref<string>()
+const logs = ref<CommandData[]>([])
 
 let sandbox: HTMLIFrameElement
 let proxy: PreviewProxy
@@ -146,6 +149,8 @@ function createSandbox() {
             .replace(/\[Vue warn\]:/, '')
             .trim()
         }
+      } else {
+        push_logs(log)
       }
     },
     on_console_group: (action: any) => {
@@ -158,6 +163,11 @@ function createSandbox() {
       // group_logs(action.label, true);
     },
   })
+
+  function push_logs(log: CommandData) {
+    //current_log_group.push(last_console_event = log);
+    logs.value.push(log)
+  }
 
   sandbox.addEventListener('load', () => {
     proxy.handle_links()
@@ -285,17 +295,24 @@ defineExpose({ reload, container: containerRef })
 </script>
 
 <template>
-  <div
-    v-show="show"
-    ref="container"
-    class="iframe-container"
-    :class="{ [theme]: previewTheme }"
-  />
-  <Message :err="(previewOptions?.showRuntimeError ?? true) && runtimeError" />
-  <Message
-    v-if="!runtimeError && (previewOptions?.showRuntimeWarning ?? true)"
-    :warn="runtimeWarning"
-  />
+  <SplitPane layout="vertical">
+    <template #left>
+      <div
+        v-show="show"
+        ref="container"
+        class="iframe-container"
+        :class="{ [theme]: previewTheme }"
+      />
+      <Message :err="(previewOptions?.showRuntimeError ?? true) && runtimeError" />
+      <Message
+        v-if="!runtimeError && (previewOptions?.showRuntimeWarning ?? true)"
+        :warn="runtimeWarning"
+      />
+    </template>
+    <template #right>
+       <Console :logs="logs" />
+    </template>
+  </SplitPane>
 </template>
 
 <style scoped>
