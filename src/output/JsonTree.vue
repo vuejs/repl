@@ -13,10 +13,6 @@ const props = defineProps({
     type: Number,
     default: 1,
   },
-  increment: {
-    type: Number,
-    default: 1,
-  },
 })
 
 const open = ref(false)
@@ -25,7 +21,6 @@ const entries = computed(() => parse(props.data))
 </script>
 
 <template>
-  &nbsp;
   <JsonNode
     :keyData="keyData"
     :value="data"
@@ -36,10 +31,11 @@ const entries = computed(() => parse(props.data))
   <template v-if="entries && open">
     <div class="hah">
       <JsonTree
-        v-for="[k, v] in entries"
-        :key="k"
+        v-for="([k, v], idx) in entries"
+        :key="idx"
+        :key-data="k"
         :data="v"
-        :margin-offset="marginOffset + increment"
+        :margin-offset="marginOffset + 1"
       />
     </div>
   </template>

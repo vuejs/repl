@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, watchEffect } from 'vue'
-import { isObject, parse, word } from '../utils'
+import {  parse, isObject } from '../utils'
 const emits = defineEmits<{
   click: []
 }>()
@@ -17,6 +17,7 @@ const props = defineProps({
   open: Boolean,
 })
 
+
 const renderValue = computed(() => {
   const value = props.value
   if (Array.isArray(value)) return value
@@ -27,13 +28,13 @@ const renderValue = computed(() => {
   return value
 })
 
-watchEffect(() => console.log(props.marginOffset))
+const huh = computed(() => isObject(props.value) && props.keyData !== 'root' ? props.marginOffset - 1 : props.marginOffset)
 </script>
 
 <template>
   <div
     class="tree"
-    :style="`margin-left: ${marginOffset}rem`"
+    :style="`margin-left: ${huh}rem`"
     @click="emits('click')"
   >
     <svg
@@ -50,17 +51,13 @@ watchEffect(() => console.log(props.marginOffset))
       />
     </svg>
     <span v-if="keyData !== 'root'" class="tree__title"> {{ keyData }}: </span>
-    <span>
-      {{ renderValue }}
-    </span>
+    <span>{{ renderValue }}</span>
   </div>
 </template>
 
 <style>
 .tree {
   color: white;
-  cursor: pointer;
-  user-select: none;
   /* margin-bottom: 1em; */
   display: flex;
   align-items: center;

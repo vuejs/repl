@@ -58,7 +58,6 @@ const level = ref(1)
         v-for="arg in log.args"
         :data="arg"
         :margin-offset="0"
-        :increment="0"
       />
     </template>
 
