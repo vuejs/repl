@@ -1,10 +1,8 @@
 <script setup lang="ts">
-import { CommandData } from '../types';
-import ConsoleLine from './ConsoleLine.vue';
+import { CommandData } from '../types'
+import ConsoleLine from './ConsoleLine.vue'
 
-
-const props = defineProps<{ logs: CommandData[] }>()
-
+defineProps<{ logs: CommandData[] }>()
 </script>
 
 <template>

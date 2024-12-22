@@ -303,14 +303,16 @@ defineExpose({ reload, container: containerRef })
         class="iframe-container"
         :class="{ [theme]: previewTheme }"
       />
-      <Message :err="(previewOptions?.showRuntimeError ?? true) && runtimeError" />
+      <Message
+        :err="(previewOptions?.showRuntimeError ?? true) && runtimeError"
+      />
       <Message
         v-if="!runtimeError && (previewOptions?.showRuntimeWarning ?? true)"
         :warn="runtimeWarning"
       />
     </template>
     <template #right>
-       <Console :logs="logs" />
+      <Console :logs="logs" />
     </template>
   </SplitPane>
 </template>
