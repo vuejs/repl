@@ -1,3 +1,12 @@
+## [4.4.3](https://github.com/vuejs/repl/compare/v4.4.2...v4.4.3) (2025-01-02)
+
+
+### Bug Fixes
+
+* transform jsx for entire file ([48325f9](https://github.com/vuejs/repl/commit/48325f99e010c3065c99efd4fb3e95950cda9596)), closes [#301](https://github.com/vuejs/repl/issues/301) [#300](https://github.com/vuejs/repl/issues/300)
+
+
+
 ## [4.4.2](https://github.com/vuejs/repl/compare/v4.4.1...v4.4.2) (2024-09-16)
 
 
