@@ -6,6 +6,7 @@ import type {
 } from 'vue/compiler-sfc'
 import { type Transform, transform } from 'sucrase'
 import hashId from 'hash-sum'
+import { extractVueImport, mergeVueImports } from './utils'
 
 export const COMP_IDENTIFIER = `__sfc__`
 
@@ -172,7 +173,20 @@ export async function compileFile(
     if (Array.isArray(clientTemplateResult)) {
       return clientTemplateResult
     }
-    clientCode += `;${clientTemplateResult}`
+
+    if (isJSX) {
+      // Template compilation products may have the same Vue import as script compilation products
+      const { cleanedCode: clientCleanedCode, imports: clientImports } =
+        extractVueImport(clientCode)
+      const { cleanedCode: templateCleanedCode, imports: templateImports } =
+        extractVueImport(clientTemplateResult)
+      const mergeImports = mergeVueImports(clientImports, templateImports)
+
+      clientCode = `${mergeImports}
+${clientCleanedCode};${templateCleanedCode}`
+    } else {
+      clientCode += `;${clientTemplateResult}`
+    }
 
     const ssrTemplateResult = await doCompileTemplate(
       store,
@@ -185,7 +199,19 @@ export async function compileFile(
     )
     if (typeof ssrTemplateResult === 'string') {
       // ssr compile failure is fine
-      ssrCode += `;${ssrTemplateResult}`
+      if (isJSX) {
+        // Template compilation products may have the same Vue import as script compilation products
+        const { cleanedCode: ssrCleanedCode, imports: ssrImports } =
+          extractVueImport(ssrCode)
+        const { cleanedCode: templateCleanedCode, imports: templateImports } =
+          extractVueImport(ssrTemplateResult)
+        const mergeImports = mergeVueImports(ssrImports, templateImports)
+
+        ssrCode = `${mergeImports}
+${ssrCleanedCode};${templateCleanedCode}`
+      } else {
+        ssrCode += `;${ssrTemplateResult}`
+      }
     } else {
       ssrCode = `/* SSR compile error: ${ssrTemplateResult[0]} */`
     }

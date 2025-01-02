@@ -31,3 +31,44 @@ export function atou(base64: string): string {
   // https://base64.guru/developers/javascript/examples/unicode-strings
   return decodeURIComponent(escape(binary))
 }
+
+export function extractVueImport(sourceCode: string) {
+  const importPattern = /^import\s*{[^}]*}\s*from\s*["']vue["'];?/gm
+
+  const importMatches = sourceCode.match(importPattern)
+
+  const imports = importMatches
+    ? importMatches.map((match) => match.trim())[0]
+    : ''
+
+  const cleanedCode = sourceCode.replace(importPattern, '')
+
+  return {
+    cleanedCode,
+    imports,
+  }
+}
+
+export function mergeVueImports(imports1: string, imports2: string) {
+  const importPattern = /{([\s\S]*?)}/
+
+  const matches1 = imports1.match(importPattern)
+  const content1 = matches1 ? matches1[1].trim() : ''
+
+  const matches2 = imports2.match(importPattern)
+  const content2 = matches2 ? matches2[1].trim() : ''
+
+  const mergedContent = Array.from(
+    new Set(
+      content1
+        .split(',')
+        .map((item) => item.trim())
+        .concat(content2.split(',').map((item) => item.trim())),
+    ),
+  ).join(', ')
+
+  //Merge import statements of template and jsx
+  const mergedImport = `import { ${mergedContent} } from 'vue';`
+
+  return mergedImport
+}
