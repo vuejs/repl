@@ -1,4 +1,4 @@
-import type { Component, ComputedRef, InjectionKey, ToRefs } from 'vue'
+import type { Component, ComputedRef, InjectionKey, Ref, ToRefs } from 'vue'
 import { Props } from './Repl.vue'
 
 export type EditorMode = 'js' | 'css' | 'ssr'
@@ -21,3 +21,5 @@ export const injectKeyProps: InjectionKey<
 export const injectKeyPreviewRef: InjectionKey<
   ComputedRef<HTMLDivElement | null>
 > = Symbol('preview-ref')
+export const injectKeyShowPreviewRef: InjectionKey<Ref<boolean>> =
+  Symbol('show-preview-ref')
