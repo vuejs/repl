@@ -328,6 +328,14 @@ export function useStore(
     )
   }
 
+  const resetFiles = () => {
+    setActive(mainFile.value)
+    setDefaultFile()
+    for (const filename of Object.keys(files.value))
+      if (![mainFile.value, tsconfigFile, importMapFile].includes(filename))
+        delete files.value[filename]
+  }
+
   if (serializedState) {
     deserialize(serializedState)
   } else {
@@ -373,6 +381,7 @@ export function useStore(
     deserialize,
     getFiles,
     setFiles,
+    resetFiles,
   })
   return store
 }
@@ -441,6 +450,7 @@ export interface ReplStore extends UnwrapRef<StoreState> {
   deserialize(serializedState: string): void
   getFiles(): Record<string, string>
   setFiles(newFiles: Record<string, string>, mainFile?: string): Promise<void>
+  resetFiles(): void
 }
 
 export type Store = Pick<
@@ -465,6 +475,7 @@ export type Store = Pick<
   | 'renameFile'
   | 'getImportMap'
   | 'getTsConfig'
+  | 'resetFiles'
 >
 
 export class File {
