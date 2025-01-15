@@ -11,11 +11,11 @@ import {
   watch,
   watchEffect,
 } from 'vue'
+import LunaConsole from 'luna-console'
 import srcdoc from './srcdoc.html?raw'
 import { PreviewProxy } from './PreviewProxy'
 import { compileModulesForPreview } from './moduleCompiler'
-import { CommandData, injectKeyProps } from '../../src/types'
-import Console from './Console.vue'
+import { injectKeyProps } from '../../src/types'
 
 const props = defineProps<{ show: boolean; ssr: boolean }>()
 
@@ -23,16 +23,21 @@ const { store, clearConsole, theme, previewTheme, previewOptions } =
   inject(injectKeyProps)!
 
 const containerRef = useTemplateRef('container')
+const consoleContainerRef = useTemplateRef('console-container')
 const runtimeError = ref<string>()
 const runtimeWarning = ref<string>()
-const logs = ref<CommandData[]>([])
 
 let sandbox: HTMLIFrameElement
+let lunaConsole: LunaConsole
 let proxy: PreviewProxy
 let stopUpdateWatcher: WatchStopHandle | undefined
 
 // create sandbox on mount
-onMounted(createSandbox)
+onMounted(() => {
+  createSandbox()
+  if (!consoleContainerRef.value) return
+  lunaConsole = new LunaConsole(consoleContainerRef.value, { theme: 'dark' })
+})
 
 // reset sandbox when import map changes
 watch(
@@ -142,6 +147,7 @@ function createSandbox() {
         } else {
           runtimeError.value = log.args[0]
         }
+        lunaConsole.error(...log.args)
       } else if (log.level === 'warn') {
         if (log.args[0].toString().includes('[Vue warn]')) {
           runtimeWarning.value = log.args
@@ -149,25 +155,21 @@ function createSandbox() {
             .replace(/\[Vue warn\]:/, '')
             .trim()
         }
+        lunaConsole.warn(...log.args)
       } else {
-        push_logs(log)
+        lunaConsole.log(...log.args)
       }
     },
     on_console_group: (action: any) => {
-      // group_logs(action.label, false);
+      lunaConsole.group(action.label)
     },
     on_console_group_end: () => {
-      // ungroup_logs();
+      lunaConsole.groupEnd()
     },
     on_console_group_collapsed: (action: any) => {
-      // group_logs(action.label, true);
+      lunaConsole.groupCollapsed(action.label)
     },
   })
-
-  function push_logs(log: CommandData) {
-    //current_log_group.push(last_console_event = log);
-    logs.value.push(log)
-  }
 
   sandbox.addEventListener('load', () => {
     proxy.handle_links()
@@ -312,7 +314,7 @@ defineExpose({ reload, container: containerRef })
       />
     </template>
     <template #right>
-      <Console :logs="logs" />
+      <div ref="console-container" />
     </template>
   </SplitPane>
 </template>
