@@ -9,7 +9,7 @@ const containerRef = useTemplateRef('container')
 const previewRef = inject(injectKeyPreviewRef)!
 
 // mobile only
-const { store, splitPaneOptions } = inject(injectKeyProps)!
+const { store, layoutReverse, splitPaneOptions } = inject(injectKeyProps)!
 
 const state = reactive({
   dragging: false,
@@ -66,6 +66,7 @@ function changeViewSize() {
     :class="{
       dragging: state.dragging,
       'show-output': store.showOutput,
+      reverse: layoutReverse,
       vertical: isVertical,
     }"
     @mousemove="dragMove"
@@ -201,21 +202,19 @@ function changeViewSize() {
   .split-pane .toggler {
     display: block;
   }
-  .split-pane .right {
+  .split-pane .right,
+  .split-pane.show-output.reverse .right,
+  .split-pane.show-output .left,
+  .split-pane.reverse .left {
     z-index: -1;
     pointer-events: none;
   }
-  .split-pane .left {
+  .split-pane .left,
+  .split-pane.show-output.reverse .left,
+  .split-pane.show-output .right,
+  .split-pane.reverse .right {
     z-index: 0;
     pointer-events: all;
-  }
-  .split-pane.show-output .right {
-    z-index: 0;
-    pointer-events: all;
-  }
-  .split-pane.show-output .left {
-    z-index: -1;
-    pointer-events: none;
   }
 }
 </style>
