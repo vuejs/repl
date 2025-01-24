@@ -26,6 +26,11 @@
       "import": "./dist/codemirror-editor.js",
       "require": null
     },
+    "./store": {
+      "types": "./dist/store.d.ts",
+      "import": "./dist/store.js",
+      "require": null
+    },
     "./transform": {
       "types": "./dist/transform.d.ts",
       "import": "./dist/transform.js",
