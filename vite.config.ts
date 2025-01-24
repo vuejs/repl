@@ -57,6 +57,7 @@ export default mergeConfig(base, {
     lib: {
       entry: {
         'vue-repl': './src/index.ts',
+        transform: './src/transform.ts',
         'monaco-editor': './src/editor/MonacoEditor.vue',
         'codemirror-editor': './src/editor/CodeMirrorEditor.vue',
       },
