@@ -86,7 +86,7 @@
     "@vue/babel-plugin-jsx": "^1.2.5",
     "@vue/language-service": "~2.2.0",
     "assert": "^2.1.0",
-    "bumpp": "^9.9.2",
+    "bumpp": "^10.0.1",
     "codemirror": "^5.65.18",
     "conventional-changelog-cli": "^5.0.0",
     "eslint": "^9.17.0",
