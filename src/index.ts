@@ -11,5 +11,5 @@ export {
 export { useVueImportMap, mergeImportMap, type ImportMap } from './import-map'
 export { compileFile } from './transform'
 export type { Props as ReplProps } from './Repl.vue'
-export type { OutputModes } from './types'
+export { type OutputModes, injectKeyProps } from './types'
 export { version as languageToolsVersion } from '@vue/language-service/package.json'
