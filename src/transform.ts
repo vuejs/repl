@@ -340,6 +340,8 @@ async function doCompileTemplate(
   let { code, errors } = store.compiler.compileTemplate({
     isProd: false,
     ...store.sfcOptions?.template,
+    // @ts-expect-error TODO remove expect-error after 3.6
+    vapor: descriptor.vapor,
     ast: descriptor.template!.ast,
     source: descriptor.template!.content,
     filename: descriptor.filename,
