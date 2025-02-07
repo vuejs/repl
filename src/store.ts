@@ -142,7 +142,11 @@ export function useStore(
     }
   }
 
-  function setImportMap(map: ImportMap) {
+  function setImportMap(map: ImportMap, merge = false) {
+    if (merge) {
+      map = mergeImportMap(getImportMap(), map)
+    }
+
     if (map.imports)
       for (const [key, value] of Object.entries(map.imports)) {
         if (value) {
@@ -368,6 +372,7 @@ export function useStore(
     deleteFile,
     renameFile,
     getImportMap,
+    setImportMap,
     getTsConfig,
     serialize,
     deserialize,
@@ -436,6 +441,7 @@ export interface ReplStore extends UnwrapRef<StoreState> {
   deleteFile(filename: string): void
   renameFile(oldFilename: string, newFilename: string): void
   getImportMap(): ImportMap
+  setImportMap(map: ImportMap, merge?: boolean): void
   getTsConfig(): Record<string, any>
   serialize(): string
   deserialize(serializedState: string): void
