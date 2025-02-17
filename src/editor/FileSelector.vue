@@ -198,6 +198,13 @@ function horizontalScroll(e: WheelEvent) {
   background-color: var(--color-branding);
 }
 
+@-moz-document url-prefix() {
+  .file-selector {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-branding) var(--border);
+  }
+}
+
 .file-selector.has-import-map .add {
   margin-right: 10px;
 }
