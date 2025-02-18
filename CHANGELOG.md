@@ -1,3 +1,12 @@
+# [4.5.0](https://github.com/vuejs/repl/compare/v4.4.3...v4.5.0) (2025-02-03)
+
+
+### Features
+
+* pass on descriptor vapor flag when compiling template ([adaaceb](https://github.com/vuejs/repl/commit/adaaceb24984435ae02ab3eda071f10dba9e0362))
+
+
+
 ## [4.4.3](https://github.com/vuejs/repl/compare/v4.4.2...v4.4.3) (2025-01-02)
 
 
