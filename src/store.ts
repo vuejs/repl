@@ -292,8 +292,7 @@ export function useStore(
         vueVersion.value = saved[filename]
       } else if (filename === '_tsVersion') {
         typescriptVersion.value = saved[filename]
-      }
-      else {
+      } else {
         setFile(files.value, filename, saved[filename])
       }
     }
