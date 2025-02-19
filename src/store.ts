@@ -270,6 +270,9 @@ export function useStore(
       }
     }
     if (vueVersion.value) files._version = vueVersion.value
+    if (typescriptVersion.value !== 'latest' || files._tsVersion) {
+      files._tsVersion = typescriptVersion.value
+    }
     return '#' + utoa(JSON.stringify(files))
   }
   const deserialize: ReplStore['deserialize'] = (
@@ -289,6 +292,8 @@ export function useStore(
     for (const filename in saved) {
       if (filename === '_version') {
         vueVersion.value = saved[filename]
+      } else if (filename === '_tsVersion') {
+        typescriptVersion.value = saved[filename]
       } else {
         setFile(files.value, filename, saved[filename])
       }
