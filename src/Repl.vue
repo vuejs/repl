@@ -91,7 +91,14 @@ function reload() {
   outputRef.value?.reload()
 }
 
-defineExpose({ reload })
+/**
+ * Reset playground files
+ */
+function resetFiles() {
+  props.store.resetFiles()
+}
+
+defineExpose({ reload, resetFiles })
 </script>
 
 <template>
