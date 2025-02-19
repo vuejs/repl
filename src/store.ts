@@ -45,7 +45,7 @@ export function useStore(
     vueVersion = ref(null),
 
     locale = ref(),
-    typescriptVersion = ref('latest'),
+    typescriptVersion = ref(null),
     dependencyVersion = ref(Object.create(null)),
     reloadLanguageTools = ref(),
   }: Partial<StoreState> = {},
@@ -434,7 +434,7 @@ export type StoreState = ToRefs<{
 
   // volar-related
   locale: string | undefined
-  typescriptVersion: string
+  typescriptVersion: string | null
   /** \{ dependencyName: version \} */
   dependencyVersion: Record<string, string>
   reloadLanguageTools?: (() => void) | undefined
