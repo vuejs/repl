@@ -100,7 +100,7 @@ self.onmessage = async (msg: MessageEvent<WorkerMessage>) => {
 
 async function importTsFromCdn(tsVersion: string) {
   const _module = globalThis.module
-    ; (globalThis as any).module = { exports: {} }
+  ;(globalThis as any).module = { exports: {} }
   const tsUrl = `https://cdn.jsdelivr.net/npm/typescript@${tsVersion}/lib/typescript.js`
   await import(/* @vite-ignore */ tsUrl)
   const ts = globalThis.module.exports
