@@ -45,7 +45,7 @@ export function useStore(
     vueVersion = ref(null),
 
     locale = ref(),
-    typescriptVersion = ref(null),
+    typescriptVersion = ref('latest'),
     dependencyVersion = ref(Object.create(null)),
     reloadLanguageTools = ref(),
   }: Partial<StoreState> = {},
@@ -270,7 +270,9 @@ export function useStore(
       }
     }
     if (vueVersion.value) files._version = vueVersion.value
-    if (typescriptVersion.value) files._tsVersion = typescriptVersion.value
+    if (typescriptVersion.value !== 'latest' || files._tsVersion) {
+      files._tsVersion = typescriptVersion.value
+    }
     return '#' + utoa(JSON.stringify(files))
   }
   const deserialize: ReplStore['deserialize'] = (
@@ -434,7 +436,7 @@ export type StoreState = ToRefs<{
 
   // volar-related
   locale: string | undefined
-  typescriptVersion: string | null
+  typescriptVersion: string
   /** \{ dependencyName: version \} */
   dependencyVersion: Record<string, string>
   reloadLanguageTools?: (() => void) | undefined
