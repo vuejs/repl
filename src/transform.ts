@@ -316,7 +316,8 @@ async function doCompileScript(
 
     return [code, compiledScript.bindings]
   } else {
-    return [`\nconst ${COMP_IDENTIFIER} = {}`, undefined]
+    const vaporFlag = descriptor.vapor ? '__vapor: true' :''
+    return [`\nconst ${COMP_IDENTIFIER} = { ${vaporFlag} }`, undefined]
   }
 }
 
