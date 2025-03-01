@@ -1,9 +1,9 @@
-import { createNpmFileSystem } from '@volar/jsdelivr'
 import {
   type LanguageServiceEnvironment,
   createTypeScriptWorkerLanguageService,
   Language,
 } from '@volar/monaco/worker'
+import { createNpmFileSystem } from './resource'
 import {
   type VueCompilerOptions,
   VueVirtualCode,
