@@ -2,7 +2,7 @@
  * base on @volar/jsdelivr
  * MIT License https://github.com/volarjs/volar.js/blob/master/packages/jsdelivr/LICENSE
  */
-import type { FileSystem, FileType } from '@volar/language-service'
+import type { FileStat, FileSystem, FileType } from '@volar/language-service'
 import type { URI } from 'vscode-uri'
 
 const textCache = new Map<string, Promise<string | undefined>>()
@@ -20,17 +20,8 @@ export function createNpmFileSystem(
   onFetch?: (path: string, content: string) => void,
 ): FileSystem {
   const fetchResults = new Map<string, Promise<string | undefined>>()
-  const flatResults = new Map<
-    string,
-    Promise<
-      {
-        name: string
-        size: number
-        time: string
-        hash: string
-      }[]
-    >
-  >()
+  const statCache = new Map<string, { type: FileType }>()
+  const dirCache = new Map<string, [string, FileType][]>()
 
   return {
     async stat(uri) {
@@ -65,7 +56,16 @@ export function createNpmFileSystem(
   }
 
   async function _stat(path: string) {
-    const [modName, pkgName, pkgVersion, pkgFilePath] = resolvePackageName(path)
+    if (statCache.has(path)) {
+      return {
+        ...statCache.get(path),
+        ctime: -1,
+        mtime: -1,
+        size: -1,
+      } as FileStat
+    }
+
+    const [modName, pkgName, , pkgFilePath] = resolvePackageName(path)
     if (!pkgName) {
       if (modName.startsWith('@')) {
         return {
@@ -82,72 +82,111 @@ export function createNpmFileSystem(
       return
     }
 
-    if (!pkgFilePath) {
-      // perf: skip flat request
-      return {
-        type: 2 satisfies FileType.Directory,
-        ctime: -1,
-        mtime: -1,
-        size: -1,
+    if (!pkgFilePath || pkgFilePath === '/') {
+      const result = {
+        type: 2 as FileType.Directory,
       }
+      statCache.set(path, result)
+      return { ...result, ctime: -1, mtime: -1, size: -1 }
     }
 
-    if (!flatResults.has(modName)) {
-      flatResults.set(modName, flat(pkgName, pkgVersion))
-    }
+    try {
+      const parentDir = path.substring(0, path.lastIndexOf('/'))
+      const fileName = path.substring(path.lastIndexOf('/') + 1)
 
-    const flatResult = await flatResults.get(modName)!
-    const filePath = path.slice(modName.length)
-    const file = flatResult.find((file) => file.name === filePath)
-    if (file) {
-      return {
-        type: 1 satisfies FileType.File,
-        ctime: new Date(file.time).valueOf(),
-        mtime: new Date(file.time).valueOf(),
-        size: file.size,
+      const dirContent = await _readDirectory(parentDir)
+      const fileEntry = dirContent.find(([name]) => name === fileName)
+
+      if (fileEntry) {
+        const result = {
+          type: fileEntry[1] as FileType,
+        }
+        statCache.set(path, result)
+        return { ...result, ctime: -1, mtime: -1, size: -1 }
       }
-    } else if (
-      flatResult.some((file) => file.name.startsWith(filePath + '/'))
-    ) {
-      return {
-        type: 2 satisfies FileType.Directory,
-        ctime: -1,
-        mtime: -1,
-        size: -1,
-      }
+
+      return
+    } catch {
+      return
     }
   }
 
   async function _readDirectory(path: string): Promise<[string, FileType][]> {
-    const [modName, pkgName, pkgVersion] = resolvePackageName(path)
+    if (dirCache.has(path)) {
+      return dirCache.get(path)!
+    }
+
+    const [, pkgName, pkgVersion, pkgPath] = resolvePackageName(path)
+
     if (!pkgName || !(await isValidPackageName(pkgName))) {
       return []
     }
 
-    if (!flatResults.has(modName)) {
-      flatResults.set(modName, flat(pkgName, pkgVersion))
+    const resolvedVersion = pkgVersion || 'latest'
+
+    let actualVersion = resolvedVersion
+    if (resolvedVersion === 'latest') {
+      try {
+        const data = await fetchJson<{ version: string }>(
+          `https://unpkg.com/${pkgName}@${resolvedVersion}/package.json`,
+        )
+        if (data?.version) {
+          actualVersion = data.version
+        }
+      } catch {
+        // ignore
+      }
     }
 
-    const flatResult = await flatResults.get(modName)!
-    const dirPath = path.slice(modName.length)
-    const files = flatResult
-      .filter((f) => f.name.substring(0, f.name.lastIndexOf('/')) === dirPath)
-      .map((f) => f.name.slice(dirPath.length + 1))
-    const dirs = flatResult
-      .filter(
-        (f) =>
-          f.name.startsWith(dirPath + '/') &&
-          f.name.substring(dirPath.length + 1).split('/').length >= 2,
-      )
-      .map((f) => f.name.slice(dirPath.length + 1).split('/')[0])
+    const endpoint = `https://unpkg.com/${pkgName}@${actualVersion}/${pkgPath}/?meta`
 
-    return [
-      ...files.map<[string, FileType]>((f) => [f, 1 satisfies FileType.File]),
-      ...[...new Set(dirs)].map<[string, FileType]>((f) => [
-        f,
-        2 satisfies FileType.Directory,
-      ]),
-    ]
+    try {
+      const data = await fetchJson<{
+        files: {
+          path: string
+          type: 'file' | 'directory'
+          size?: number
+        }[]
+      }>(endpoint)
+
+      if (!data?.files) {
+        return []
+      }
+
+      const result: [string, FileType][] = data.files.map((file) => {
+        const type =
+          file.type === 'directory'
+            ? (2 as FileType.Directory)
+            : (1 as FileType.File)
+
+        const fullPath = file.path
+        statCache.set(fullPath, { type })
+
+        return [_getNameFromPath(file.path), type]
+      })
+
+      dirCache.set(path, result)
+      return result
+    } catch {
+      return []
+    }
+  }
+
+  function _getNameFromPath(path: string): string {
+    if (!path) return ''
+
+    const trimmedPath = path.endsWith('/') ? path.slice(0, -1) : path
+
+    const lastSlashIndex = trimmedPath.lastIndexOf('/')
+
+    if (
+      lastSlashIndex === -1 ||
+      (lastSlashIndex === 0 && trimmedPath.length === 1)
+    ) {
+      return trimmedPath
+    }
+
+    return trimmedPath.slice(lastSlashIndex + 1)
   }
 
   async function _readFile(path: string): Promise<string | undefined> {
@@ -163,7 +202,7 @@ export function createNpmFileSystem(
           if ((await _stat(path))?.type !== (1 satisfies FileType.File)) {
             return
           }
-          const text = await fetchText(`https://cdn.jsdelivr.net/npm/${path}`)
+          const text = await fetchText(`https://unpkg.com/${path}`)
           if (text !== undefined) {
             onFetch?.(path, text)
           }
@@ -173,35 +212,6 @@ export function createNpmFileSystem(
     }
 
     return await fetchResults.get(path)!
-  }
-
-  async function flat(pkgName: string, version: string | undefined) {
-    version ??= 'latest'
-
-    // resolve latest tag
-    if (version === 'latest') {
-      const data = await fetchJson<{ version: string | null }>(
-        `https://data.jsdelivr.com/v1/package/resolve/npm/${pkgName}@${version}`,
-      )
-      if (!data?.version) {
-        return []
-      }
-      version = data.version
-    }
-
-    const flat = await fetchJson<{
-      files: {
-        name: string
-        size: number
-        time: string
-        hash: string
-      }[]
-    }>(`https://data.jsdelivr.com/v1/package/npm/${pkgName}@${version}/flat`)
-    if (!flat) {
-      return []
-    }
-
-    return flat.files
   }
 
   async function isValidPackageName(pkgName: string) {
