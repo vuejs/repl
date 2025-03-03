@@ -3,7 +3,6 @@ import {
   createTypeScriptWorkerLanguageService,
   Language,
 } from '@volar/monaco/worker'
-import { createNpmFileSystem } from './resource'
 import {
   type VueCompilerOptions,
   VueVirtualCode,
@@ -33,6 +32,8 @@ import { getComponentSlots } from '@vue/typescript-plugin/lib/requests/getCompon
 import { getElementAttrs } from '@vue/typescript-plugin/lib/requests/getElementAttrs'
 import { getElementNames } from '@vue/typescript-plugin/lib/requests/getElementNames'
 import { getPropertiesAtLocation } from '@vue/typescript-plugin/lib/requests/getPropertiesAtLocation'
+
+import { createNpmFileSystem } from './resource'
 
 export interface CreateData {
   tsconfig: {

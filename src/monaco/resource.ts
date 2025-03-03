@@ -8,6 +8,32 @@ import type { URI } from 'vscode-uri'
 const textCache = new Map<string, Promise<string | undefined>>()
 const jsonCache = new Map<string, Promise<any>>()
 
+export type CreateNpmFileSystemOptions = {
+  getPackageLatestVersionUrl?: (pkgName: string) => string
+  getPackageDirectoryUrl?: (
+    pkgName: string,
+    pkgVersion: string,
+    pkgPath: string,
+  ) => string
+  getPackageFileTextUrl?: (
+    path: string,
+    pkgName: string,
+    pkgVersion: string | undefined,
+    pkgPath: string,
+  ) => string
+}
+
+const defaultUnpkgOptions: Required<CreateNpmFileSystemOptions> = {
+  getPackageLatestVersionUrl: (pkgName: string) =>
+    `https://unpkg.com/${pkgName}@latest/package.json`,
+  getPackageDirectoryUrl: (
+    pkgName: string,
+    pkgVersion: string,
+    pkgPath: string,
+  ) => `https://unpkg.com/${pkgName}@${pkgVersion}/${pkgPath}/?meta`,
+  getPackageFileTextUrl: (path: string) => `https://unpkg.com/${path}`,
+}
+
 export function createNpmFileSystem(
   getCdnPath = (uri: URI): string | undefined => {
     if (uri.path === '/node_modules') {
@@ -18,7 +44,14 @@ export function createNpmFileSystem(
   },
   getPackageVersion?: (pkgName: string) => string | undefined,
   onFetch?: (path: string, content: string) => void,
+  options?: CreateNpmFileSystemOptions,
 ): FileSystem {
+  const {
+    getPackageDirectoryUrl = defaultUnpkgOptions.getPackageDirectoryUrl,
+    getPackageFileTextUrl = defaultUnpkgOptions.getPackageFileTextUrl,
+    getPackageLatestVersionUrl = defaultUnpkgOptions.getPackageLatestVersionUrl,
+  } = options || {}
+
   const fetchResults = new Map<string, Promise<string | undefined>>()
   const statCache = new Map<string, { type: FileType }>()
   const dirCache = new Map<string, [string, FileType][]>()
@@ -128,7 +161,7 @@ export function createNpmFileSystem(
     if (resolvedVersion === 'latest') {
       try {
         const data = await fetchJson<{ version: string }>(
-          `https://unpkg.com/${pkgName}@${resolvedVersion}/package.json`,
+          getPackageLatestVersionUrl(pkgName),
         )
         if (data?.version) {
           actualVersion = data.version
@@ -138,8 +171,7 @@ export function createNpmFileSystem(
       }
     }
 
-    const endpoint = `https://unpkg.com/${pkgName}@${actualVersion}/${pkgPath}/?meta`
-
+    const endpoint = getPackageDirectoryUrl(pkgName, actualVersion, pkgPath)
     try {
       const data = await fetchJson<{
         files: {
@@ -202,7 +234,9 @@ export function createNpmFileSystem(
           if ((await _stat(path))?.type !== (1 satisfies FileType.File)) {
             return
           }
-          const text = await fetchText(`https://unpkg.com/${path}`)
+          const text = await fetchText(
+            getPackageFileTextUrl(path, pkgName, _version, pkgFilePath),
+          )
           if (text !== undefined) {
             onFetch?.(path, text)
           }
