@@ -45,14 +45,30 @@ export interface CreateData {
 
 const asFileName = (uri: URI) => uri.path
 const asUri = (fileName: string): URI => URI.file(fileName)
+const createFunc = (func?: string) => (func && typeof func === 'string') ? Function(`return ${func}`)() : undefined
 
 let ts: typeof import('typescript')
 let locale: string | undefined
+let resourceLinks: Record<
+  keyof Pick<
+    WorkerMessage,
+    'pkgDirUrl' | 'pkgFileTextUrl' | 'pkgLatestVersionUrl'
+  >,
+  ((...args: any[]) => string) | undefined
+>
 
 self.onmessage = async (msg: MessageEvent<WorkerMessage>) => {
   if (msg.data?.event === 'init') {
     locale = msg.data.tsLocale
-    ts = await importTsFromCdn(msg.data.tsVersion)
+    ts = await importTsFromCdn(
+      msg.data.tsVersion,
+      createFunc(msg.data.typescriptLib),
+    )
+    resourceLinks = {
+      pkgDirUrl: createFunc(msg.data.pkgDirUrl),
+      pkgFileTextUrl: createFunc(msg.data.pkgFileTextUrl),
+      pkgLatestVersionUrl: createFunc(msg.data.pkgLatestVersionUrl),
+    }
     self.postMessage('inited')
     return
   }
@@ -81,6 +97,11 @@ self.onmessage = async (msg: MessageEvent<WorkerMessage>) => {
               asUri('/node_modules/' + path).toString(),
               content,
             )
+          },
+          {
+            getPackageDirectoryUrl: resourceLinks.pkgDirUrl,
+            getPackageFileTextUrl: resourceLinks.pkgFileTextUrl,
+            getPackageLatestVersionUrl: resourceLinks.pkgLatestVersionUrl,
           },
         ),
       }
@@ -303,10 +324,15 @@ self.onmessage = async (msg: MessageEvent<WorkerMessage>) => {
   )
 }
 
-async function importTsFromCdn(tsVersion: string) {
+async function importTsFromCdn(
+  tsVersion: string,
+  getTsCdn?: (version?: string) => string,
+) {
   const _module = globalThis.module
   ;(globalThis as any).module = { exports: {} }
-  const tsUrl = `https://cdn.jsdelivr.net/npm/typescript@${tsVersion}/lib/typescript.js`
+  const tsUrl =
+    getTsCdn?.(tsVersion) ||
+    `https://cdn.jsdelivr.net/npm/typescript@${tsVersion}/lib/typescript.js`
   await import(/* @vite-ignore */ tsUrl)
   const ts = globalThis.module.exports
   globalThis.module = _module

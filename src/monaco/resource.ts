@@ -16,7 +16,6 @@ export type CreateNpmFileSystemOptions = {
     pkgPath: string,
   ) => string
   getPackageFileTextUrl?: (
-    path: string,
     pkgName: string,
     pkgVersion: string | undefined,
     pkgPath: string,
@@ -24,14 +23,12 @@ export type CreateNpmFileSystemOptions = {
 }
 
 const defaultUnpkgOptions: Required<CreateNpmFileSystemOptions> = {
-  getPackageLatestVersionUrl: (pkgName: string) =>
+  getPackageLatestVersionUrl: (pkgName) =>
     `https://unpkg.com/${pkgName}@latest/package.json`,
-  getPackageDirectoryUrl: (
-    pkgName: string,
-    pkgVersion: string,
-    pkgPath: string,
-  ) => `https://unpkg.com/${pkgName}@${pkgVersion}/${pkgPath}/?meta`,
-  getPackageFileTextUrl: (path: string) => `https://unpkg.com/${path}`,
+  getPackageDirectoryUrl: (pkgName, pkgVersion, pkgPath) =>
+    `https://unpkg.com/${pkgName}@${pkgVersion}/${pkgPath}/?meta`,
+  getPackageFileTextUrl: (pkgName, pkgVersion, pkgPath) =>
+    `https://unpkg.com/${pkgName}@${pkgVersion || 'latest'}/${pkgPath}`,
 }
 
 export function createNpmFileSystem(
@@ -235,7 +232,7 @@ export function createNpmFileSystem(
             return
           }
           const text = await fetchText(
-            getPackageFileTextUrl(path, pkgName, _version, pkgFilePath),
+            getPackageFileTextUrl(pkgName, _version, pkgFilePath),
           )
           if (text !== undefined) {
             onFetch?.(path, text)
@@ -317,7 +314,7 @@ export function createNpmFileSystem(
       version = modName.substring(modName.lastIndexOf('@') + 1)
     }
     if (!version && getPackageVersion) {
-      getPackageVersion?.(pkgName)
+      version = getPackageVersion?.(pkgName)
     }
     return [modName, pkgName, version, path]
   }
