@@ -48,6 +48,7 @@ export function useStore(
     typescriptVersion = ref('latest'),
     dependencyVersion = ref(Object.create(null)),
     reloadLanguageTools = ref(),
+    resourceLinks = undefined,
   }: Partial<StoreState> = {},
   serializedState?: string,
 ): ReplStore {
@@ -92,7 +93,9 @@ export function useStore(
       vueVersion,
       async (version) => {
         if (version) {
-          const compilerUrl = `https://cdn.jsdelivr.net/npm/@vue/compiler-sfc@${version}/dist/compiler-sfc.esm-browser.js`
+          const compilerUrl =
+            resourceLinks?.value?.vueCompilerUrl?.(version) ||
+            `https://cdn.jsdelivr.net/npm/@vue/compiler-sfc@${version}/dist/compiler-sfc.esm-browser.js`
           loading.value = true
           compiler.value = await import(/* @vite-ignore */ compilerUrl).finally(
             () => (loading.value = false),
@@ -389,6 +392,8 @@ export function useStore(
     deserialize,
     getFiles,
     setFiles,
+
+    resourceLinks,
   })
   return store
 }
@@ -412,6 +417,20 @@ export interface SFCOptions {
   script?: Partial<SFCScriptCompileOptions>
   style?: Partial<SFCAsyncStyleCompileOptions>
   template?: Partial<SFCTemplateCompileOptions>
+}
+
+export type ResourceLinkConfigs = {
+  esModuleShims?: string
+  vueCompilerUrl?: (version: string) => string
+  typescriptLib?: (version: string) => string
+  // for monaco
+  pkgLatestVersionUrl?: (pkgName: string) => string
+  pkgDirUrl?: (pkgName: string, pkgVersion: string, pkgPath: string) => string
+  pkgFileTextUrl?: (
+    pkgName: string,
+    pkgVersion: string | undefined,
+    pkgPath: string,
+  ) => string
 }
 
 export type StoreState = ToRefs<{
@@ -440,6 +459,9 @@ export type StoreState = ToRefs<{
   /** \{ dependencyName: version \} */
   dependencyVersion: Record<string, string>
   reloadLanguageTools?: (() => void) | undefined
+
+  /** Custom online resources */
+  resourceLinks?: ResourceLinkConfigs
 }>
 
 export interface ReplStore extends UnwrapRef<StoreState> {
@@ -463,6 +485,8 @@ export interface ReplStore extends UnwrapRef<StoreState> {
   deserialize(serializedState: string, checkBuiltinImportMap?: boolean): void
   getFiles(): Record<string, string>
   setFiles(newFiles: Record<string, string>, mainFile?: string): Promise<void>
+  /** Custom online resources */
+  resourceLinks?: ResourceLinkConfigs
 }
 
 export type Store = Pick<
@@ -487,6 +511,7 @@ export type Store = Pick<
   | 'renameFile'
   | 'getImportMap'
   | 'getTsConfig'
+  | 'resourceLinks'
 >
 
 export class File {
