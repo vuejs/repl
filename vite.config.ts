@@ -51,6 +51,11 @@ export default mergeConfig(base, {
     ],
   },
   base: './',
+  resolve: {
+    alias: {
+      '@unocss/preset-icons': '@unocss/preset-icons/browser',
+    },
+  },
   build: {
     target: 'esnext',
     minify: false,

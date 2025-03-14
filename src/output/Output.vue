@@ -17,7 +17,7 @@ const { store } = inject(injectKeyProps)!
 const previewRef = useTemplateRef('preview')
 const modes = computed(() =>
   props.showCompileOutput
-    ? (['preview', 'js', 'css', 'ssr'] as const)
+    ? (['preview', 'js', 'css', 'ssr', 'uno.css'] as const)
     : (['preview'] as const),
 )
 
@@ -55,7 +55,14 @@ defineExpose({ reload, previewRef })
   <div class="output-container">
     <Preview ref="preview" :show="mode === 'preview'" :ssr="ssr" />
     <props.editorComponent
-      v-if="mode !== 'preview'"
+      v-if="mode === 'uno.css'"
+      readonly
+      filename="uno.css"
+      :value="store.unoCss"
+      mode="css"
+    />
+    <props.editorComponent
+      v-else-if="mode !== 'preview'"
       readonly
       :filename="store.activeFile.filename"
       :value="store.activeFile.compiled[mode]"

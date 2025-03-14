@@ -85,6 +85,14 @@
     "@types/codemirror": "^5.60.15",
     "@types/hash-sum": "^1.0.2",
     "@types/node": "^22.13.4",
+    "@unocss/autocomplete": "66.1.0-beta.5",
+    "@unocss/core": "66.1.0-beta.5",
+    "@unocss/extractor-arbitrary-variants": "66.1.0-beta.5",
+    "@unocss/rule-utils": "66.1.0-beta.5",
+    "@unocss/transformer-attributify-jsx": "66.1.0-beta.5",
+    "@unocss/transformer-compile-class": "66.1.0-beta.5",
+    "@unocss/transformer-directives": "66.1.0-beta.5",
+    "@unocss/transformer-variant-group": "66.1.0-beta.5",
     "@vitejs/plugin-vue": "^5.2.1",
     "@volar/jsdelivr": "~2.4.11",
     "@volar/monaco": "~2.4.11",
@@ -106,10 +114,14 @@
     "sucrase": "^3.35.0",
     "typescript": "^5.7.3",
     "typescript-eslint": "^8.24.1",
+    "unocss": "66.1.0-beta.5",
     "vite": "^6.1.0",
     "vite-plugin-dts": "^4.5.0",
     "vscode-uri": "^3.1.0",
     "vue": "^3.5.13",
     "vue-tsc": "~2.2.2"
+  },
+  "dependencies": {
+    "ofetch": "^1.4.1"
   }
 }

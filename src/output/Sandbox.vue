@@ -215,7 +215,7 @@ async function updatePreview() {
   }
 
   try {
-    const { mainFile } = store.value
+    const { mainFile, unoCss } = store.value
 
     // if SSR, generate the SSR bundle and eval it to render the HTML
     if (isSSR && mainFile.endsWith('.vue')) {
@@ -255,7 +255,7 @@ async function updatePreview() {
     )
 
     const codeToEval = [
-      `window.__modules__ = {};window.__css__ = [];` +
+      `window.__modules__ = {};window.__css__ = [${JSON.stringify(unoCss)}];` +
         `if (window.__app__) window.__app__.unmount();` +
         (isSSR
           ? ``

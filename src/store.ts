@@ -19,12 +19,16 @@ import type {
 import type { OutputModes } from './types'
 import type { editor } from 'monaco-editor-core'
 import { type ImportMap, mergeImportMap, useVueImportMap } from './import-map'
+import { createGenerator, type UnoGenerator } from 'unocss'
 
 import welcomeSFCCode from './template/welcome.vue?raw'
 import newSFCCode from './template/new-sfc.vue?raw'
+import unoConfigCode from './template/uno.config.ts?raw'
+import { evaluateUserConfig } from './uno'
 
 export const importMapFile = 'import-map.json'
 export const tsconfigFile = 'tsconfig.json'
+export const unoconfigFile = 'uno.config.ts'
 
 export function useStore(
   {
@@ -48,6 +52,8 @@ export function useStore(
     typescriptVersion = ref('latest'),
     dependencyVersion = ref(Object.create(null)),
     reloadLanguageTools = ref(),
+    reloadUnoConfig = ref(),
+    unocssVersion = ref('latest'),
   }: Partial<StoreState> = {},
   serializedState?: string,
 ): ReplStore {
@@ -57,11 +63,14 @@ export function useStore(
     }))
   }
   const loading = ref(false)
+  const unoCss = ref('/* uno.css */')
 
   function applyBuiltinImportMap() {
     const importMap = mergeImportMap(builtinImportMap.value, getImportMap())
     setImportMap(importMap)
   }
+
+  const unoGenerator = shallowRef<UnoGenerator>()
 
   function init() {
     watchEffect(() => {
@@ -79,6 +88,29 @@ export function useStore(
       () => reloadLanguageTools.value?.(),
       { deep: true },
     )
+
+    watch(
+      () => files.value[unoconfigFile]?.code,
+      async (configRaw) => {
+        unoGenerator.value = await createGenerator(
+          await evaluateUserConfig(configRaw, unocssVersion.value),
+        )
+        reloadUnoConfig.value?.()
+      },
+      { immediate: true },
+    )
+
+    watchEffect(async () => {
+      unoCss.value =
+        (
+          await unoGenerator.value?.generate(
+            Object.entries(files.value)
+              .filter(([name, file]) => name.startsWith('src/'))
+              .map(([name, file]) => file.code)
+              .join('\n'),
+          )
+        )?.css ?? '/* uno.css */'
+    })
 
     watch(
       builtinImportMap,
@@ -131,6 +163,11 @@ export function useStore(
         tsconfigFile,
         JSON.stringify(tsconfig, undefined, 2),
       )
+    }
+
+    // init uno config
+    if (!files.value[unoconfigFile]) {
+      files.value[unoconfigFile] = new File(unoconfigFile, unoConfigCode)
     }
 
     // compile rest of the files
@@ -376,6 +413,9 @@ export function useStore(
     typescriptVersion,
     dependencyVersion,
     reloadLanguageTools,
+    reloadUnoConfig,
+    unoCss,
+    unocssVersion,
 
     init,
     setActive,
@@ -440,6 +480,11 @@ export type StoreState = ToRefs<{
   /** \{ dependencyName: version \} */
   dependencyVersion: Record<string, string>
   reloadLanguageTools?: (() => void) | undefined
+
+  // unocss
+  reloadUnoConfig?: (() => void) | undefined
+  unocssVersion: string
+  unoCss: string
 }>
 
 export interface ReplStore extends UnwrapRef<StoreState> {
@@ -480,6 +525,9 @@ export type Store = Pick<
   | 'typescriptVersion'
   | 'dependencyVersion'
   | 'reloadLanguageTools'
+  | 'reloadUnoConfig'
+  | 'unocssVersion'
+  | 'unoCss'
   | 'init'
   | 'setActive'
   | 'addFile'
@@ -523,6 +571,7 @@ export class File {
 function addSrcPrefix(file: string) {
   return file === importMapFile ||
     file === tsconfigFile ||
+    file === unoconfigFile ||
     file.startsWith('src/')
     ? file
     : `src/${file}`

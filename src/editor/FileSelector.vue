@@ -1,9 +1,15 @@
 <script setup lang="ts">
 import { injectKeyProps } from '../../src/types'
-import { importMapFile, stripSrcPrefix, tsconfigFile } from '../store'
+import {
+  importMapFile,
+  stripSrcPrefix,
+  tsconfigFile,
+  unoconfigFile,
+} from '../store'
 import { type VNode, computed, inject, ref, useTemplateRef } from 'vue'
 
-const { store, showTsConfig, showImportMap } = inject(injectKeyProps)!
+const { store, showTsConfig, showImportMap, showUnoConfig } =
+  inject(injectKeyProps)!
 
 /**
  * When `true`: indicates adding a new file
@@ -19,10 +25,7 @@ const pendingFilename = ref('Comp.vue')
 
 const files = computed(() =>
   Object.entries(store.value.files)
-    .filter(
-      ([name, file]) =>
-        name !== importMapFile && name !== tsconfigFile && !file.hidden,
-    )
+    .filter(([name, file]) => name.startsWith('src/') && !file.hidden)
     .map(([name]) => name),
 )
 
@@ -153,6 +156,14 @@ function horizontalScroll(e: WheelEvent) {
     <button class="add" @click="startAddFile">+</button>
 
     <div class="import-map-wrapper">
+      <div
+        v-if="showUnoConfig && store.files[unoconfigFile]"
+        class="file"
+        :class="{ active: store.activeFile.filename === unoconfigFile }"
+        @click="store.setActive(unoconfigFile)"
+      >
+        <span class="label">uno.config.ts</span>
+      </div>
       <div
         v-if="showTsConfig && store.files[tsconfigFile]"
         class="file"

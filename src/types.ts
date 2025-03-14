@@ -13,7 +13,7 @@ export interface EditorEmits {
 }
 export type EditorComponentType = Component<EditorProps>
 
-export type OutputModes = 'preview' | EditorMode
+export type OutputModes = 'preview' | EditorMode | 'uno.css'
 
 export const injectKeyProps: InjectionKey<
   ToRefs<Required<Props & { autoSave: boolean }>>
