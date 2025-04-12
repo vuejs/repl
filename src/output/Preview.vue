@@ -5,8 +5,14 @@ import Sandbox from './Sandbox.vue'
 
 const props = defineProps<{ show: boolean; ssr: boolean }>()
 
-const { store, clearConsole, theme, previewTheme, previewOptions } =
-  inject(injectKeyProps)!
+const {
+  store,
+  clearConsole,
+  showConsole,
+  theme,
+  previewTheme,
+  previewOptions,
+} = inject(injectKeyProps)!
 
 const sandboxTheme = computed(() =>
   previewTheme.value ? theme.value : undefined,
@@ -29,6 +35,7 @@ defineExpose({
     :theme="sandboxTheme"
     :preview-options="previewOptions"
     :ssr="props.ssr"
+    :show-console="showConsole"
     :clear-console="clearConsole"
   />
 </template>

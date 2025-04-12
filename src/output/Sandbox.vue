@@ -11,17 +11,21 @@ import {
   watch,
   watchEffect,
 } from 'vue'
+import LunaConsole from 'luna-console'
 import srcdoc from './srcdoc.html?raw'
 import { PreviewProxy } from './PreviewProxy'
+import SplitPane from '../SplitPane.vue'
 import { compileModulesForPreview } from './moduleCompiler'
-import type { Store } from '../store'
 import { injectKeyProps } from '../types'
+
+import type { Store } from '../store'
 
 export interface SandboxProps {
   store: Store
   show?: boolean
   ssr?: boolean
   clearConsole?: boolean
+  showConsole?: boolean
   theme?: 'dark' | 'light'
   previewOptions?: {
     headHTML?: string
@@ -42,6 +46,7 @@ const props = withDefaults(defineProps<SandboxProps>(), {
   show: true,
   ssr: false,
   theme: 'light',
+  showConsole: false,
   clearConsole: true,
   previewOptions: () => ({}),
   autoStoreInit: true,
@@ -54,15 +59,26 @@ if (keyProps === undefined && props.autoStoreInit) {
 }
 
 const containerRef = useTemplateRef('container')
+const consoleContainerRef = useTemplateRef('console-container')
 const runtimeError = ref<string>()
 const runtimeWarning = ref<string>()
 
 let sandbox: HTMLIFrameElement
+let lunaConsole: LunaConsole
 let proxy: PreviewProxy
 let stopUpdateWatcher: WatchStopHandle | undefined
 
 // create sandbox on mount
-onMounted(createSandbox)
+onMounted(() => {
+  createSandbox()
+  if (!consoleContainerRef.value) return
+  if (props.showConsole) {
+    lunaConsole = new LunaConsole(consoleContainerRef.value, {
+      theme: keyProps?.theme.value || 'light',
+    })
+    watch(() => store.value.activeFile.code, clearLunaConsole)
+  }
+})
 
 // reset sandbox when import map changes
 watch(
@@ -157,15 +173,13 @@ function createSandbox() {
       runtimeError.value = 'Uncaught (in promise): ' + error.message
     },
     on_console: (log: any) => {
-      if (log.duplicate) {
-        return
-      }
       if (log.level === 'error') {
         if (log.args[0] instanceof Error) {
           runtimeError.value = log.args[0].message
         } else {
           runtimeError.value = log.args[0]
         }
+        lunaConsole.error(...log.args)
       } else if (log.level === 'warn') {
         if (log.args[0].toString().includes('[Vue warn]')) {
           runtimeWarning.value = log.args
@@ -173,16 +187,19 @@ function createSandbox() {
             .replace(/\[Vue warn\]:/, '')
             .trim()
         }
+        lunaConsole.warn(...log.args)
+      } else {
+        lunaConsole.log(...log.args)
       }
     },
     on_console_group: (action: any) => {
-      // group_logs(action.label, false);
+      lunaConsole.group(action.label)
     },
     on_console_group_end: () => {
-      // ungroup_logs();
+      lunaConsole.groupEnd()
     },
     on_console_group_collapsed: (action: any) => {
-      // group_logs(action.label, true);
+      lunaConsole.groupCollapsed(action.label)
     },
   })
 
@@ -301,18 +318,33 @@ async function updatePreview() {
   }
 }
 
+function clearLunaConsole() {
+  lunaConsole?.clear(true)
+}
+
 /**
  * Reload the preview iframe
  */
 function reload() {
   sandbox.contentWindow?.location.reload()
+  clearLunaConsole()
 }
 
 defineExpose({ reload, container: containerRef })
 </script>
 
 <template>
+  <SplitPane v-if="show && showConsole" layout="vertical">
+    <template #left>
+      <div ref="container" class="iframe-container" :class="theme" />
+    </template>
+    <template #right>
+      <div ref="console-container" />
+      <button class="clear-btn" @click="clearLunaConsole">clear</button>
+    </template>
+  </SplitPane>
   <div
+    v-if="!showConsole"
     v-show="props.show"
     ref="container"
     class="iframe-container"
@@ -335,5 +367,24 @@ defineExpose({ reload, container: containerRef })
 }
 .iframe-container.dark :deep(iframe) {
   background-color: #1e1e1e;
+}
+.luna-console-theme-dark {
+  background-color: var(--bg) !important;
+}
+.clear-btn {
+  position: absolute;
+  font-size: 18px;
+  font-family: var(--font-code);
+  color: #999;
+  top: 10px;
+  right: 10px;
+  z-index: 99;
+  padding: 8px 10px 6px;
+  background-color: var(--bg);
+  border-radius: 4px;
+  border: 1px solid var(--border);
+  &:hover {
+    color: var(--color-branding);
+  }
 }
 </style>

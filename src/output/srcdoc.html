@@ -6,8 +6,9 @@
         color-scheme: dark;
       }
       body {
-        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
-          Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+        font-family:
+          -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu,
+          Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
       }
     </style>
     <!-- PREVIEW-OPTIONS-HEAD-HTML -->
@@ -152,9 +153,6 @@
             )
           }
         })
-
-        let previous = { level: null, args: null }
-
         ;['clear', 'log', 'info', 'dir', 'warn', 'error', 'table'].forEach(
           (level) => {
             const original = console[level]
@@ -170,28 +168,13 @@
               }
 
               original(...args)
-
-              const stringifiedArgs = stringify(args)
-              if (
-                previous.level === level &&
-                previous.args &&
-                previous.args === stringifiedArgs
-              ) {
+              try {
+                parent.postMessage({ action: 'console', level, args }, '*')
+              } catch (err) {
                 parent.postMessage(
-                  { action: 'console', level, duplicate: true },
+                  { action: 'console', level, args: args.map(toString) },
                   '*',
                 )
-              } else {
-                previous = { level, args: stringifiedArgs }
-
-                try {
-                  parent.postMessage({ action: 'console', level, args }, '*')
-                } catch (err) {
-                  parent.postMessage(
-                    { action: 'console', level, args: args.map(toString) },
-                    '*',
-                  )
-                }
               }
             }
           },
