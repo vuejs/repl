@@ -1,3 +1,41 @@
+## [4.5.1](https://github.com/vuejs/repl/compare/v4.5.0...v4.5.1) (2025-02-19)
+
+
+### Bug Fixes
+
+* apply builtin import map after deserialize ([#315](https://github.com/vuejs/repl/issues/315)) ([e62ddda](https://github.com/vuejs/repl/commit/e62ddda06fe3339a467f88b13b0271c2a5c7e96d))
+* handle `showOutput`  work with `layoutReverse: false` mobile-only edge case ([#307](https://github.com/vuejs/repl/pull/307))([0bd4c17](https://github.com/vuejs/repl/commit/0bd4c17b6dd26d4e17387f50e089dd3ffefaf054))
+
+
+### Features
+
+* add core entry for node usage ([#310](https://github.com/vuejs/repl/issues/310)) ([da105a4](https://github.com/vuejs/repl/commit/da105a42618899d214701a5fb6549719f73331bb))
+* scrollbar style for firefox ([#320](https://github.com/vuejs/repl/issues/320)) ([bbc740b](https://github.com/vuejs/repl/commit/bbc740bfa840dfb6c77824470f1ffdc4a6261e85))
+* export `Sandbox` as standalone output component ([#309](https://github.com/vuejs/repl/issues/309)) ([b549715](https://github.com/vuejs/repl/commit/b5497152fefe8f190eca59755bedb27b2f3178f2))
+* expose `setImportMap` ([#314](https://github.com/vuejs/repl/pull/314))([9f53bd1](https://github.com/vuejs/repl/commit/9f53bd11aee1d75984e5597878e53bec4ae168e5))
+* support cache selected typescript version ([#305](https://github.com/vuejs/repl/issues/305)) ([33ca3c0](https://github.com/vuejs/repl/commit/33ca3c0317aa0418c094ec8f9e6712d81fa11465))
+* support vapor template-only component ([#322](https://github.com/vuejs/repl/issues/322)) ([9ae056b](https://github.com/vuejs/repl/commit/9ae056b701ff54446c5c1ec9f29444d5239e0931))
+
+
+
+# [4.5.0](https://github.com/vuejs/repl/compare/v4.4.3...v4.5.0) (2025-02-03)
+
+
+### Features
+
+* pass on descriptor vapor flag when compiling template ([adaaceb](https://github.com/vuejs/repl/commit/adaaceb24984435ae02ab3eda071f10dba9e0362))
+
+
+
+## [4.4.3](https://github.com/vuejs/repl/compare/v4.4.2...v4.4.3) (2025-01-02)
+
+
+### Bug Fixes
+
+* transform jsx for entire file ([48325f9](https://github.com/vuejs/repl/commit/48325f99e010c3065c99efd4fb3e95950cda9596)), closes [#301](https://github.com/vuejs/repl/issues/301) [#300](https://github.com/vuejs/repl/issues/300)
+
+
+
 ## [4.4.2](https://github.com/vuejs/repl/compare/v4.4.1...v4.4.2) (2024-09-16)
 
 

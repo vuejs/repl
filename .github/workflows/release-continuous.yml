@@ -9,10 +9,13 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - run: corepack enable
-      - uses: actions/setup-node@v4
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Install Node.js
+        uses: actions/setup-node@v4
         with:
-          node-version: lts/*
+          node-version-file: '.node-version'
           cache: 'pnpm'
 
       - name: Install dependencies

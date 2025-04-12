@@ -17,7 +17,7 @@ function testJsx(filename: string | undefined | null) {
   return !!(filename && /(\.|\b)[jt]sx$/.test(filename))
 }
 
-async function transformTS(src: string, isJSX?: boolean) {
+function transformTS(src: string, isJSX?: boolean) {
   return transform(src, {
     transforms: ['typescript', ...(isJSX ? (['jsx'] as Transform[]) : [])],
     jsxRuntime: 'preserve',
@@ -40,10 +40,12 @@ export async function compileFile(
   if (REGEX_JS.test(filename)) {
     const isJSX = testJsx(filename)
     if (testTs(filename)) {
-      code = await transformTS(code, isJSX)
+      code = transformTS(code, isJSX)
     }
     if (isJSX) {
-      code = await import('./jsx').then((m) => m.transformJSX(code))
+      code = await import('./jsx').then(({ transformJSX }) =>
+        transformJSX(code),
+      )
     }
     compiled.js = compiled.ssr = code
     return []
@@ -191,6 +193,12 @@ export async function compileFile(
     }
   }
 
+  if (isJSX) {
+    const { transformJSX } = await import('./jsx')
+    clientCode &&= transformJSX(clientCode)
+    ssrCode &&= transformJSX(ssrCode)
+  }
+
   if (hasScoped) {
     appendSharedCode(
       `\n${COMP_IDENTIFIER}.__scopeId = ${JSON.stringify(`data-v-${id}`)}`,
@@ -297,9 +305,6 @@ async function doCompileScript(
     if (isTS) {
       code = await transformTS(code, isJSX)
     }
-    if (isJSX) {
-      code = await import('./jsx').then((m) => m.transformJSX(code))
-    }
     if (compiledScript.bindings) {
       code =
         `/* Analyzed bindings: ${JSON.stringify(
@@ -311,7 +316,9 @@ async function doCompileScript(
 
     return [code, compiledScript.bindings]
   } else {
-    return [`\nconst ${COMP_IDENTIFIER} = {}`, undefined]
+    // @ts-expect-error TODO remove when 3.6 is out
+    const vaporFlag = descriptor.vapor ? '__vapor: true' : ''
+    return [`\nconst ${COMP_IDENTIFIER} = { ${vaporFlag} }`, undefined]
   }
 }
 
@@ -335,6 +342,8 @@ async function doCompileTemplate(
   let { code, errors } = store.compiler.compileTemplate({
     isProd: false,
     ...store.sfcOptions?.template,
+    // @ts-expect-error TODO remove expect-error after 3.6
+    vapor: descriptor.vapor,
     ast: descriptor.template!.ast,
     source: descriptor.template!.content,
     filename: descriptor.filename,
@@ -364,9 +373,5 @@ async function doCompileTemplate(
   if (isTS) {
     code = await transformTS(code, isJSX)
   }
-  if (isJSX) {
-    code = await import('./jsx').then((m) => m.transformJSX(code))
-  }
-
   return code
 }

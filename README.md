@@ -107,3 +107,28 @@ productionMode.value = true
   <Repl :store="store" :editor="Monaco" :showCompileOutput="true" />
 </template>
 ```
+
+Use only the Preview without the editor
+
+```vue
+<script setup>
+import { ref } from 'vue'
+import { Sandbox, useStore } from '@vue/repl'
+
+// retrieve some configuration options from the URL
+const query = new URLSearchParams(location.search)
+
+const store = useStore(
+  {
+    // custom vue version
+    vueVersion: ref(query.get('vue')),
+  },
+  // initialize repl with previously serialized state
+  location.hash,
+)
+</script>
+
+<template>
+  <Sandbox :store="store" />
+</template>
+```
