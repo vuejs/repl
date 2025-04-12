@@ -59,7 +59,8 @@ const App = {
         previewTheme: previewTheme.value,
         editor: MonacoEditor,
         // layout: 'vertical',
-        ssr: false,
+        ssr: true,
+        showConsole: true,
         sfcOptions: {
           script: {
             // inlineTemplate: false
