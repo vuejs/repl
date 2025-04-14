@@ -1,6 +1,16 @@
 <script setup lang="ts">
 import Preview from './Preview.vue'
-import { computed, inject, useTemplateRef } from 'vue'
+import SplitPane from '../SplitPane.vue'
+import {
+  computed,
+  inject,
+  onMounted,
+  ref,
+  useTemplateRef,
+  watch,
+  type WatchHandle,
+} from 'vue'
+import LunaConsole from 'luna-console'
 import {
   type EditorComponentType,
   type OutputModes,
@@ -13,8 +23,36 @@ const props = defineProps<{
   ssr: boolean
 }>()
 
-const { store } = inject(injectKeyProps)!
+const { store, showConsole, theme } = inject(injectKeyProps)!
 const previewRef = useTemplateRef('preview')
+const consoleContainerRef = useTemplateRef('console-container')
+const lunaConsole = ref<LunaConsole>()
+let lunaWatcher: WatchHandle | undefined = undefined
+
+onMounted(createConsole)
+
+watch(
+  showConsole,
+  (val) => {
+    if (val) {
+      createConsole()
+    } else {
+      lunaConsole.value = undefined
+      lunaWatcher?.stop()
+    }
+  },
+  { flush: 'post' },
+)
+
+function createConsole() {
+  if (!consoleContainerRef.value || lunaConsole.value) return
+  lunaConsole.value = new LunaConsole(consoleContainerRef.value, {
+    theme: theme.value || 'light',
+  })
+  lunaWatcher ??= watch(() => store.value.activeFile.code, clearLunaConsole)
+  lunaWatcher.resume()
+}
+
 const modes = computed(() =>
   props.showCompileOutput
     ? (['preview', 'js', 'css', 'ssr'] as const)
@@ -33,8 +71,14 @@ const mode = computed<OutputModes>({
   },
 })
 
+function clearLunaConsole() {
+  console.log('clear')
+  lunaConsole.value?.clear(true)
+}
+
 function reload() {
   previewRef.value?.reload()
+  clearLunaConsole()
 }
 
 defineExpose({ reload, previewRef })
@@ -53,7 +97,21 @@ defineExpose({ reload, previewRef })
   </div>
 
   <div class="output-container">
-    <Preview ref="preview" :show="mode === 'preview'" :ssr="ssr" />
+    <SplitPane v-if="showConsole" layout="vertical">
+      <template #left>
+        <Preview
+          ref="preview"
+          :luna-console="lunaConsole"
+          :show="mode === 'preview'"
+          :ssr="ssr"
+        />
+      </template>
+      <template #right>
+        <div ref="console-container" />
+        <button class="clear-btn" @click="clearLunaConsole">clear</button>
+      </template>
+    </SplitPane>
+    <Preview v-else ref="preview" :show="mode === 'preview'" :ssr="ssr" />
     <props.editorComponent
       v-if="mode !== 'preview'"
       readonly
@@ -94,5 +152,24 @@ defineExpose({ reload, previewRef })
 button.active {
   color: var(--color-branding-dark);
   border-bottom: 3px solid var(--color-branding-dark);
+}
+.luna-console-theme-dark {
+  background-color: var(--bg) !important;
+}
+.clear-btn {
+  position: absolute;
+  font-size: 18px;
+  font-family: var(--font-code);
+  color: #999;
+  top: 10px;
+  right: 10px;
+  z-index: 99;
+  padding: 8px 10px 6px;
+  background-color: var(--bg);
+  border-radius: 4px;
+  border: 1px solid var(--border);
+  &:hover {
+    color: var(--color-branding);
+  }
 }
 </style>

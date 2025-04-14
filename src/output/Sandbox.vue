@@ -14,10 +14,8 @@ import {
 import LunaConsole from 'luna-console'
 import srcdoc from './srcdoc.html?raw'
 import { PreviewProxy } from './PreviewProxy'
-import SplitPane from '../SplitPane.vue'
 import { compileModulesForPreview } from './moduleCompiler'
 import { injectKeyProps } from '../types'
-
 import type { Store } from '../store'
 
 export interface SandboxProps {
@@ -25,7 +23,6 @@ export interface SandboxProps {
   show?: boolean
   ssr?: boolean
   clearConsole?: boolean
-  showConsole?: boolean
   theme?: 'dark' | 'light'
   previewOptions?: {
     headHTML?: string
@@ -40,13 +37,13 @@ export interface SandboxProps {
   }
   /** @default true */
   autoStoreInit?: boolean
+  lunaConsole?: LunaConsole
 }
 
 const props = withDefaults(defineProps<SandboxProps>(), {
   show: true,
   ssr: false,
   theme: 'light',
-  showConsole: false,
   clearConsole: true,
   previewOptions: () => ({}),
   autoStoreInit: true,
@@ -59,26 +56,15 @@ if (keyProps === undefined && props.autoStoreInit) {
 }
 
 const containerRef = useTemplateRef('container')
-const consoleContainerRef = useTemplateRef('console-container')
 const runtimeError = ref<string>()
 const runtimeWarning = ref<string>()
 
 let sandbox: HTMLIFrameElement
-let lunaConsole: LunaConsole
 let proxy: PreviewProxy
 let stopUpdateWatcher: WatchStopHandle | undefined
 
 // create sandbox on mount
-onMounted(() => {
-  createSandbox()
-  if (!consoleContainerRef.value) return
-  if (props.showConsole) {
-    lunaConsole = new LunaConsole(consoleContainerRef.value, {
-      theme: keyProps?.theme.value || 'light',
-    })
-    watch(() => store.value.activeFile.code, clearLunaConsole)
-  }
-})
+onMounted(createSandbox)
 
 // reset sandbox when import map changes
 watch(
@@ -173,13 +159,14 @@ function createSandbox() {
       runtimeError.value = 'Uncaught (in promise): ' + error.message
     },
     on_console: (log: any) => {
+      const lc = props.lunaConsole
       if (log.level === 'error') {
         if (log.args[0] instanceof Error) {
           runtimeError.value = log.args[0].message
         } else {
           runtimeError.value = log.args[0]
         }
-        lunaConsole.error(...log.args)
+        lc?.error(...log.args)
       } else if (log.level === 'warn') {
         if (log.args[0].toString().includes('[Vue warn]')) {
           runtimeWarning.value = log.args
@@ -187,19 +174,19 @@ function createSandbox() {
             .replace(/\[Vue warn\]:/, '')
             .trim()
         }
-        lunaConsole.warn(...log.args)
+        lc?.warn(...log.args)
       } else {
-        lunaConsole.log(...log.args)
+        lc?.log(...log.args)
       }
     },
     on_console_group: (action: any) => {
-      lunaConsole.group(action.label)
+      props.lunaConsole?.group(action.label)
     },
     on_console_group_end: () => {
-      lunaConsole.groupEnd()
+      props.lunaConsole?.groupEnd()
     },
     on_console_group_collapsed: (action: any) => {
-      lunaConsole.groupCollapsed(action.label)
+      props.lunaConsole?.groupCollapsed(action.label)
     },
   })
 
@@ -318,38 +305,18 @@ async function updatePreview() {
   }
 }
 
-function clearLunaConsole() {
-  lunaConsole?.clear(true)
-}
-
 /**
  * Reload the preview iframe
  */
 function reload() {
   sandbox.contentWindow?.location.reload()
-  clearLunaConsole()
 }
 
 defineExpose({ reload, container: containerRef })
 </script>
 
 <template>
-  <SplitPane v-if="show && showConsole" layout="vertical">
-    <template #left>
-      <div ref="container" class="iframe-container" :class="theme" />
-    </template>
-    <template #right>
-      <div ref="console-container" />
-      <button class="clear-btn" @click="clearLunaConsole">clear</button>
-    </template>
-  </SplitPane>
-  <div
-    v-if="!showConsole"
-    v-show="props.show"
-    ref="container"
-    class="iframe-container"
-    :class="theme"
-  />
+  <div v-show="show" ref="container" class="iframe-container" :class="theme" />
   <Message :err="(previewOptions?.showRuntimeError ?? true) && runtimeError" />
   <Message
     v-if="!runtimeError && (previewOptions?.showRuntimeWarning ?? true)"
@@ -367,24 +334,5 @@ defineExpose({ reload, container: containerRef })
 }
 .iframe-container.dark :deep(iframe) {
   background-color: #1e1e1e;
-}
-.luna-console-theme-dark {
-  background-color: var(--bg) !important;
-}
-.clear-btn {
-  position: absolute;
-  font-size: 18px;
-  font-family: var(--font-code);
-  color: #999;
-  top: 10px;
-  right: 10px;
-  z-index: 99;
-  padding: 8px 10px 6px;
-  background-color: var(--bg);
-  border-radius: 4px;
-  border: 1px solid var(--border);
-  &:hover {
-    color: var(--color-branding);
-  }
 }
 </style>

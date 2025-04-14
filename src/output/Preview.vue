@@ -2,17 +2,16 @@
 import { computed, inject, useTemplateRef } from 'vue'
 import { injectKeyProps } from '../../src/types'
 import Sandbox from './Sandbox.vue'
+import LunaConsole from 'luna-console'
 
-const props = defineProps<{ show: boolean; ssr: boolean }>()
+const props = defineProps<{
+  show: boolean
+  ssr: boolean
+  lunaConsole?: LunaConsole
+}>()
 
-const {
-  store,
-  clearConsole,
-  showConsole,
-  theme,
-  previewTheme,
-  previewOptions,
-} = inject(injectKeyProps)!
+const { store, clearConsole, theme, previewTheme, previewOptions } =
+  inject(injectKeyProps)!
 
 const sandboxTheme = computed(() =>
   previewTheme.value ? theme.value : undefined,
@@ -35,7 +34,7 @@ defineExpose({
     :theme="sandboxTheme"
     :preview-options="previewOptions"
     :ssr="props.ssr"
-    :show-console="showConsole"
     :clear-console="clearConsole"
+    :luna-console="props.lunaConsole"
   />
 </template>
