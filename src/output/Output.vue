@@ -72,7 +72,6 @@ const mode = computed<OutputModes>({
 })
 
 function clearLunaConsole() {
-  console.log('clear')
   lunaConsole.value?.clear(true)
 }
 
