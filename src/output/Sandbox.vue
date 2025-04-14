@@ -15,9 +15,8 @@ import LunaConsole from 'luna-console'
 import srcdoc from './srcdoc.html?raw'
 import { PreviewProxy } from './PreviewProxy'
 import { compileModulesForPreview } from './moduleCompiler'
-import { injectKeyProps } from '../types'
 import type { Store } from '../store'
-
+import { injectKeyProps } from '../types'
 export interface SandboxProps {
   store: Store
   show?: boolean
