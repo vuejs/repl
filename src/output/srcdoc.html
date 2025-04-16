@@ -168,21 +168,18 @@
               }
               original(...args)
 
-              const clonnable = await new Promise((res) => {
-                try {
-                  structuredClone(args)
-                  res(true)
-                } catch {
-                  res(false)
-                }
-              })
+              const postMessage = () =>
+                parent.postMessage({ action: 'console', level, args }, '*')
 
-              if (!clonnable)
+              try {
+                postMessage()
+              } catch {
                 args = [
                   '%c Cannot clone the message, please open the devtool to see corretly this log. Supported types are listed here: https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Structured_clone_algorithm#javascript_types',
                   'color: #fb2c36',
                 ]
-              parent.postMessage({ action: 'console', level, args }, '*')
+                postMessage()
+              }
             }
           },
         )
