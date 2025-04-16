@@ -13,6 +13,7 @@ import {
 import LunaConsole from 'luna-console'
 import {
   type EditorComponentType,
+  type LogPayload,
   type OutputModes,
   injectKeyProps,
 } from '../types'
@@ -71,6 +72,10 @@ const mode = computed<OutputModes>({
   },
 })
 
+function onLog({ logLevel, data = [] }: LogPayload) {
+  ;(lunaConsole.value?.[logLevel] as any)?.(...data)
+}
+
 function clearLunaConsole() {
   lunaConsole.value?.clear(true)
 }
@@ -100,9 +105,9 @@ defineExpose({ reload, previewRef })
       <template #left>
         <Preview
           ref="preview"
-          :luna-console="lunaConsole"
           :show="mode === 'preview'"
           :ssr="ssr"
+          @log="onLog"
         />
       </template>
       <template #right>

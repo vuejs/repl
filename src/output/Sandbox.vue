@@ -11,12 +11,11 @@ import {
   watch,
   watchEffect,
 } from 'vue'
-import LunaConsole from 'luna-console'
 import srcdoc from './srcdoc.html?raw'
 import { PreviewProxy } from './PreviewProxy'
 import { compileModulesForPreview } from './moduleCompiler'
 import type { Store } from '../store'
-import { injectKeyProps } from '../types'
+import { injectKeyProps, type LogLevel, type SandboxEmits } from '../types'
 export interface SandboxProps {
   store: Store
   show?: boolean
@@ -36,7 +35,6 @@ export interface SandboxProps {
   }
   /** @default true */
   autoStoreInit?: boolean
-  lunaConsole?: LunaConsole
 }
 
 const props = withDefaults(defineProps<SandboxProps>(), {
@@ -47,6 +45,9 @@ const props = withDefaults(defineProps<SandboxProps>(), {
   previewOptions: () => ({}),
   autoStoreInit: true,
 })
+
+const emit = defineEmits<SandboxEmits>()
+
 const { store, theme, clearConsole, previewOptions } = toRefs(props)
 
 const keyProps = inject(injectKeyProps)
@@ -131,7 +132,8 @@ function createSandbox() {
     )
   sandbox.srcdoc = sandboxSrc
   containerRef.value?.appendChild(sandbox)
-
+  const doLog = (logLevel: LogLevel, data?: any) =>
+    emit('log', { logLevel, data })
   proxy = new PreviewProxy(sandbox, {
     on_fetch_progress: (progress: any) => {
       // pending_imports = progress;
@@ -158,34 +160,34 @@ function createSandbox() {
       runtimeError.value = 'Uncaught (in promise): ' + error.message
     },
     on_console: (log: any) => {
-      const lc = props.lunaConsole
+      const maybeMsg = log.args[0]
       if (log.level === 'error') {
-        if (log.args[0] instanceof Error) {
-          runtimeError.value = log.args[0].message
-        } else {
-          runtimeError.value = log.args[0]
+        if (maybeMsg instanceof Error) {
+          runtimeError.value = maybeMsg.message
+        } else if (!maybeMsg.includes('%c Cannot clone the message')) {
+          runtimeError.value = maybeMsg
         }
-        lc?.error(...log.args)
+        doLog('warn', log.args)
       } else if (log.level === 'warn') {
-        if (log.args[0].toString().includes('[Vue warn]')) {
+        if (maybeMsg.toString().includes('[Vue warn]')) {
           runtimeWarning.value = log.args
             .join('')
             .replace(/\[Vue warn\]:/, '')
             .trim()
         }
-        lc?.warn(...log.args)
+        doLog('warn', log.args)
       } else {
-        lc?.log(...log.args)
+        doLog(log.level || 'log', log.args)
       }
     },
     on_console_group: (action: any) => {
-      props.lunaConsole?.group(action.label)
+      doLog('group', action.label)
     },
     on_console_group_end: () => {
-      props.lunaConsole?.groupEnd()
+      doLog('groupEnd')
     },
     on_console_group_collapsed: (action: any) => {
-      props.lunaConsole?.groupCollapsed(action.label)
+      doLog('groupCollapsed', action.label)
     },
   })
 

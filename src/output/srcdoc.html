@@ -156,7 +156,7 @@
         ;['clear', 'log', 'info', 'dir', 'warn', 'error', 'table'].forEach(
           (level) => {
             const original = console[level]
-            console[level] = (...args) => {
+            console[level] = async (...args) => {
               const msg = args[0]
               if (typeof msg === 'string') {
                 if (
@@ -166,16 +166,23 @@
                   return
                 }
               }
-
               original(...args)
-              try {
-                parent.postMessage({ action: 'console', level, args }, '*')
-              } catch (err) {
-                parent.postMessage(
-                  { action: 'console', level, args: args.map(toString) },
-                  '*',
-                )
-              }
+
+              const clonnable = await new Promise((res) => {
+                try {
+                  structuredClone(args)
+                  res(true)
+                } catch {
+                  res(false)
+                }
+              })
+
+              if (!clonnable)
+                args = [
+                  '%c Cannot clone the message, please open the devtool to see corretly this log. Supported types are listed here: https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Structured_clone_algorithm#javascript_types',
+                  'color: #fb2c36',
+                ]
+              parent.postMessage({ action: 'console', level, args }, '*')
             }
           },
         )
@@ -208,7 +215,7 @@
             parent.postMessage(
               {
                 action: 'console',
-                level: 'system-log',
+                level: 'log',
                 args: [`${label}: ${now - timers.get(label)}ms`],
               },
               '*',
@@ -217,7 +224,7 @@
             parent.postMessage(
               {
                 action: 'console',
-                level: 'system-warn',
+                level: 'warn',
                 args: [`Timer '${label}' does not exist`],
               },
               '*',
@@ -231,7 +238,7 @@
             parent.postMessage(
               {
                 action: 'console',
-                level: 'system-log',
+                level: 'log',
                 args: [`${label}: ${now - timers.get(label)}ms`],
               },
               '*',
@@ -240,7 +247,7 @@
             parent.postMessage(
               {
                 action: 'console',
-                level: 'system-warn',
+                level: 'warn',
                 args: [`Timer '${label}' does not exist`],
               },
               '*',
@@ -270,8 +277,8 @@
           parent.postMessage(
             {
               action: 'console',
-              level: 'system-log',
-              args: `${label}: ${counter.get(label)}`,
+              level: 'log',
+              args: [`${label}: ${counter.get(label)}`],
             },
             '*',
           )
@@ -285,8 +292,8 @@
             parent.postMessage(
               {
                 action: 'console',
-                level: 'system-warn',
-                args: `Count for '${label}' does not exist`,
+                level: 'warn',
+                args: [`Count for '${label}' does not exist`],
               },
               '*',
             )
