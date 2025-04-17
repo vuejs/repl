@@ -49,6 +49,7 @@ export function useStore(
     dependencyVersion = ref(Object.create(null)),
     reloadLanguageTools = ref(),
     executeLog = ref(),
+    clearConsole = ref(),
   }: Partial<StoreState> = {},
   serializedState?: string,
 ): ReplStore {
@@ -391,6 +392,7 @@ export function useStore(
     getFiles,
     setFiles,
     executeLog,
+    clearConsole,
   })
   return store
 }
@@ -447,6 +449,10 @@ export type StoreState = ToRefs<{
    * @param payload - payload of a console static method output
    */
   executeLog?: (payload: LogPayload) => void
+  /**
+   * If you enabled "showConsole" and have a custom "console" then you must provide this function.
+   */
+  clearConsole?: () => void
 }>
 
 export interface ReplStore extends UnwrapRef<StoreState> {
@@ -471,6 +477,7 @@ export interface ReplStore extends UnwrapRef<StoreState> {
   getFiles(): Record<string, string>
   setFiles(newFiles: Record<string, string>, mainFile?: string): Promise<void>
   executeLog?(payload: LogPayload): void
+  clearConsole?(): void
 }
 
 export type Store = Pick<
@@ -496,6 +503,7 @@ export type Store = Pick<
   | 'getImportMap'
   | 'getTsConfig'
   | 'executeLog'
+  | 'clearConsole'
 >
 
 export class File {

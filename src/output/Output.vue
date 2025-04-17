@@ -39,7 +39,7 @@ const mode = computed<OutputModes>({
 
 function reload() {
   previewRef.value?.reload()
-  //clearLunaConsole()
+  store.value.clearConsole?.()
 }
 
 defineExpose({ reload, previewRef })

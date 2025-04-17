@@ -18,6 +18,7 @@ onMounted(() => {
   store.value.executeLog = ({ logLevel, data = [] }: LogPayload) => {
     ;(lunaConsole.value?.[logLevel] as any)?.(...data)
   }
+  store.value.clearConsole = clearLunaConsole
 })
 
 function clearLunaConsole() {
