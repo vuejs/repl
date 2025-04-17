@@ -164,7 +164,7 @@ function createSandbox() {
       if (log.level === 'error') {
         if (maybeMsg instanceof Error) {
           runtimeError.value = maybeMsg.message
-        } else if (!maybeMsg.includes('%c Cannot clone the message')) {
+        } else if (!maybeMsg?.startsWith('[vue-repl]')) {
           runtimeError.value = maybeMsg
         }
       } else if (

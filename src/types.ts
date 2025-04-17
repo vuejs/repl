@@ -9,6 +9,7 @@ export interface EditorProps {
   mode?: EditorMode
 }
 export type LogLevel =
+  | 'clear'
   | 'log'
   | 'error'
   | 'warn'
