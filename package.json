@@ -113,7 +113,6 @@
     "vue-tsc": "~2.2.2",
     "luna-console": "^1.3.5",
     "luna-data-grid": "^1.3.0",
-    "luna-dom-viewer": "^1.4.0",
     "luna-object-viewer": "^0.3.1"
   }
 }
