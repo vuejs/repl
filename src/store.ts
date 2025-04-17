@@ -48,8 +48,6 @@ export function useStore(
     typescriptVersion = ref('latest'),
     dependencyVersion = ref(Object.create(null)),
     reloadLanguageTools = ref(),
-    executeLog = ref(),
-    clearConsole = ref(),
   }: Partial<StoreState> = {},
   serializedState?: string,
 ): ReplStore {
@@ -355,6 +353,8 @@ export function useStore(
   }
   activeFilename ||= ref(mainFile.value)
   const activeFile = computed(() => files.value[activeFilename.value])
+  const executeLog = ref()
+  const clearConsole = ref()
 
   applyBuiltinImportMap()
 
@@ -444,15 +444,6 @@ export type StoreState = ToRefs<{
   /** \{ dependencyName: version \} */
   dependencyVersion: Record<string, string>
   reloadLanguageTools?: (() => void) | undefined
-  /**
-   * If you enabled "showConsole" and have a custom "console" then you must provide this function.
-   * @param payload - payload of a console static method output
-   */
-  executeLog?: (payload: LogPayload) => void
-  /**
-   * If you enabled "showConsole" and have a custom "console" then you must provide this function.
-   */
-  clearConsole?: () => void
 }>
 
 export interface ReplStore extends UnwrapRef<StoreState> {
