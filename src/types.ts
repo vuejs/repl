@@ -39,6 +39,8 @@ export interface SandboxEmits {
 }
 export type EditorComponentType = Component<EditorProps>
 
+export type ConsoleComponentType = Component
+
 export type OutputModes = 'preview' | EditorMode
 
 export const injectKeyProps: InjectionKey<

@@ -167,18 +167,16 @@ function createSandbox() {
         } else if (!maybeMsg.includes('%c Cannot clone the message')) {
           runtimeError.value = maybeMsg
         }
-        doLog('warn', log.args)
-      } else if (log.level === 'warn') {
-        if (maybeMsg.toString().includes('[Vue warn]')) {
-          runtimeWarning.value = log.args
-            .join('')
-            .replace(/\[Vue warn\]:/, '')
-            .trim()
-        }
-        doLog('warn', log.args)
-      } else {
-        doLog(log.level || 'log', log.args)
+      } else if (
+        log.level === 'warn' &&
+        maybeMsg.toString().includes('[Vue warn]')
+      ) {
+        runtimeWarning.value = log.args
+          .join('')
+          .replace(/\[Vue warn\]:/, '')
+          .trim()
       }
+      doLog(log.level || 'log', log.args)
     },
     on_console_group: (action: any) => {
       doLog('group', action.label)

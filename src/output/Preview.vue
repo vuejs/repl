@@ -1,13 +1,12 @@
 <script setup lang="ts">
 import { computed, inject, useTemplateRef } from 'vue'
-import { injectKeyProps, SandboxEmits } from '../../src/types'
+import { injectKeyProps } from '../../src/types'
 import Sandbox from './Sandbox.vue'
 
 const props = defineProps<{
   show: boolean
   ssr: boolean
 }>()
-const emit = defineEmits<SandboxEmits>()
 
 const { store, clearConsole, theme, previewTheme, previewOptions } =
   inject(injectKeyProps)!
@@ -34,6 +33,6 @@ defineExpose({
     :preview-options="previewOptions"
     :ssr="props.ssr"
     :clear-console="clearConsole"
-    @log="(p) => emit('log', p)"
+    @log="store.executeLog"
   />
 </template>

@@ -2,8 +2,9 @@
 import SplitPane from './SplitPane.vue'
 import Output from './output/Output.vue'
 import { type Store, useStore } from './store'
-import { computed, provide, toRefs, useTemplateRef } from 'vue'
+import { computed, provide, toRefs, useTemplateRef, watchEffect } from 'vue'
 import {
+  type ConsoleComponentType,
   type EditorComponentType,
   injectKeyPreviewRef,
   injectKeyProps,
@@ -16,6 +17,7 @@ export interface Props {
   theme?: 'dark' | 'light'
   previewTheme?: boolean
   editor: EditorComponentType
+  console?: ConsoleComponentType
   store?: Store
   autoResize?: boolean
   showCompileOutput?: boolean
@@ -57,6 +59,7 @@ const props = withDefaults(defineProps<Props>(), {
   showCompileOutput: true,
   showImportMap: true,
   showTsConfig: true,
+  showConsole: false,
   clearConsole: true,
   layoutReverse: false,
   ssr: false,
@@ -69,6 +72,15 @@ const props = withDefaults(defineProps<Props>(), {
 if (!props.editor) {
   throw new Error('The "editor" prop is now required.')
 }
+watchEffect(() => {
+  if (!!props.showConsole && !props.console)
+    throw new Error(
+      'If you want to enable a console "console" prop is required.',
+    )
+})
+const consoleWrapper = computed<ConsoleComponentType>(
+  () => props.console ?? (() => ({})),
+)
 
 const outputRef = useTemplateRef('output')
 
@@ -79,6 +91,7 @@ const outputSlotName = computed(() => (props.layoutReverse ? 'left' : 'right'))
 
 provide(injectKeyProps, {
   ...toRefs(props),
+  console: consoleWrapper,
   autoSave,
 })
 provide(
@@ -106,6 +119,7 @@ defineExpose({ reload })
         <Output
           ref="output"
           :editor-component="editor"
+          :console-component="consoleWrapper"
           :show-compile-output="props.showCompileOutput"
           :ssr="!!props.ssr"
         />

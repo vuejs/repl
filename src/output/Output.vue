@@ -1,67 +1,23 @@
 <script setup lang="ts">
 import Preview from './Preview.vue'
 import SplitPane from '../SplitPane.vue'
+import { computed, inject, useTemplateRef } from 'vue'
 import {
-  computed,
-  inject,
-  onMounted,
-  ref,
-  useTemplateRef,
-  watch,
-  type WatchHandle,
-} from 'vue'
-import LunaConsole from 'luna-console'
-import {
+  type ConsoleComponentType,
   type EditorComponentType,
-  type LogPayload,
   type OutputModes,
   injectKeyProps,
 } from '../types'
 
 const props = defineProps<{
   editorComponent: EditorComponentType
+  consoleComponent: ConsoleComponentType
   showCompileOutput?: boolean
   ssr: boolean
 }>()
 
-const { store, showConsole, theme } = inject(injectKeyProps)!
+const { store, showConsole } = inject(injectKeyProps)!
 const previewRef = useTemplateRef('preview')
-const consoleContainerRef = useTemplateRef('console-container')
-const lunaConsole = ref<LunaConsole>()
-let lunaWatcher: WatchHandle | undefined = undefined
-
-onMounted(createConsole)
-
-watch(
-  showConsole,
-  (val) => {
-    if (val) {
-      createConsole()
-    } else {
-      lunaConsole.value = undefined
-      lunaWatcher?.stop()
-    }
-  },
-  { flush: 'post' },
-)
-
-function createConsole() {
-  if (!consoleContainerRef.value || lunaConsole.value) return
-  lunaConsole.value = new LunaConsole(consoleContainerRef.value, {
-    theme: theme.value || 'light',
-  })
-  if (!lunaWatcher) {
-    const consoleStyles = [
-      import('luna-object-viewer/luna-object-viewer.css'),
-      import('luna-data-grid/luna-data-grid.css'),
-      import('luna-dom-viewer/luna-dom-viewer.css'),
-      import('luna-console/luna-console.css'),
-    ]
-    Promise.all(consoleStyles)
-    lunaWatcher = watch(() => store.value.activeFile.code, clearLunaConsole)
-  }
-  lunaWatcher.resume()
-}
 
 const modes = computed(() =>
   props.showCompileOutput
@@ -81,17 +37,9 @@ const mode = computed<OutputModes>({
   },
 })
 
-function onLog({ logLevel, data = [] }: LogPayload) {
-  ;(lunaConsole.value?.[logLevel] as any)?.(...data)
-}
-
-function clearLunaConsole() {
-  lunaConsole.value?.clear(true)
-}
-
 function reload() {
   previewRef.value?.reload()
-  clearLunaConsole()
+  //clearLunaConsole()
 }
 
 defineExpose({ reload, previewRef })
@@ -112,16 +60,10 @@ defineExpose({ reload, previewRef })
   <div class="output-container">
     <SplitPane v-if="showConsole" layout="vertical">
       <template #left>
-        <Preview
-          ref="preview"
-          :show="mode === 'preview'"
-          :ssr="ssr"
-          @log="onLog"
-        />
+        <Preview ref="preview" :show="mode === 'preview'" :ssr="ssr" />
       </template>
       <template #right>
-        <div ref="console-container" />
-        <button class="clear-btn" @click="clearLunaConsole">clear</button>
+        <props.consoleComponent />
       </template>
     </SplitPane>
     <Preview v-else ref="preview" :show="mode === 'preview'" :ssr="ssr" />
@@ -165,24 +107,5 @@ defineExpose({ reload, previewRef })
 button.active {
   color: var(--color-branding-dark);
   border-bottom: 3px solid var(--color-branding-dark);
-}
-.luna-console-theme-dark {
-  background-color: var(--bg) !important;
-}
-.clear-btn {
-  position: absolute;
-  font-size: 18px;
-  font-family: var(--font-code);
-  color: #999;
-  top: 10px;
-  right: 10px;
-  z-index: 99;
-  padding: 8px 10px 6px;
-  background-color: var(--bg);
-  border-radius: 4px;
-  border: 1px solid var(--border);
-  &:hover {
-    color: var(--color-branding);
-  }
 }
 </style>

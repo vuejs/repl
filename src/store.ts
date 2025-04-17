@@ -16,7 +16,7 @@ import type {
   SFCScriptCompileOptions,
   SFCTemplateCompileOptions,
 } from 'vue/compiler-sfc'
-import type { OutputModes } from './types'
+import type { LogPayload, OutputModes } from './types'
 import type { editor } from 'monaco-editor-core'
 import { type ImportMap, mergeImportMap, useVueImportMap } from './import-map'
 
@@ -48,6 +48,7 @@ export function useStore(
     typescriptVersion = ref('latest'),
     dependencyVersion = ref(Object.create(null)),
     reloadLanguageTools = ref(),
+    executeLog = ref(),
   }: Partial<StoreState> = {},
   serializedState?: string,
 ): ReplStore {
@@ -389,6 +390,7 @@ export function useStore(
     deserialize,
     getFiles,
     setFiles,
+    executeLog,
   })
   return store
 }
@@ -440,6 +442,11 @@ export type StoreState = ToRefs<{
   /** \{ dependencyName: version \} */
   dependencyVersion: Record<string, string>
   reloadLanguageTools?: (() => void) | undefined
+  /**
+   * If you enabled "showConsole" and have a custom "console" then you must provide this function.
+   * @param payload - payload of a console static method output
+   */
+  executeLog?: (payload: LogPayload) => void
 }>
 
 export interface ReplStore extends UnwrapRef<StoreState> {
@@ -463,6 +470,7 @@ export interface ReplStore extends UnwrapRef<StoreState> {
   deserialize(serializedState: string, checkBuiltinImportMap?: boolean): void
   getFiles(): Record<string, string>
   setFiles(newFiles: Record<string, string>, mainFile?: string): Promise<void>
+  executeLog?(payload: LogPayload): void
 }
 
 export type Store = Pick<
@@ -487,6 +495,7 @@ export type Store = Pick<
   | 'renameFile'
   | 'getImportMap'
   | 'getTsConfig'
+  | 'executeLog'
 >
 
 export class File {
