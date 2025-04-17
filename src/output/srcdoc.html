@@ -172,7 +172,7 @@
           'countReset',
         ].forEach((level) => {
           const original = console[level]
-          console[level] = async (...args) => {
+          console[level] = (...args) => {
             const msg = args[0]
             if (typeof msg === 'string') {
               if (

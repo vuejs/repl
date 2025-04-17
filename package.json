@@ -26,6 +26,11 @@
       "import": "./dist/codemirror-editor.js",
       "require": null
     },
+    "./luna-console": {
+      "types": "./dist/luna-console.d.ts",
+      "import": "./dist/luna-console.js",
+      "require": null
+    },
     "./core": {
       "types": "./dist/core.d.ts",
       "import": "./dist/core.js",
