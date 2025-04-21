@@ -10,7 +10,7 @@ import {
 } from 'vue'
 import * as defaultCompiler from 'vue/compiler-sfc'
 import { compileFile } from './transform'
-import { atou, utoa } from './utils'
+import { atou, hasScriptLangChanged, utoa } from './utils'
 import type {
   SFCAsyncStyleCompileOptions,
   SFCScriptCompileOptions,
@@ -67,6 +67,18 @@ export function useStore(
     watchEffect(() => {
       compileFile(store, activeFile.value).then((errs) => (errors.value = errs))
     })
+
+    // Temporary workaround for https://github.com/vuejs/repl/issues/321
+    // which is related to https://github.com/microsoft/TypeScript/issues/57631
+    // TODO: remove this when the issue is fixed
+    watch(
+      () => activeFile.value.code,
+      (newCode, oldCode) => {
+        if (activeFile.value.language !== 'vue') return
+        if (hasScriptLangChanged(newCode, oldCode))
+          reloadLanguageTools.value?.()
+      },
+    )
 
     watch(
       () => [
