@@ -257,6 +257,47 @@ export function createNpmFileSystem(
 	}
 }
 
+let inflightRequests = 0;
+const maxInflightRequests = 10;
+const queue = new Array<{
+	resolve: (value: any) => void;
+	reject: (reason?: any) => void;
+	fn: () => Promise<any>;
+}>();
+
+
+async function runWithRateLimiting<T>(fn: () => Promise<T>) {
+	async function run() {
+		if (inflightRequests >= maxInflightRequests || !queue.length) {
+			// Either we have no more work to do, or we already have the max number of requests in flight, so we can't start another one.
+			// Another worker will pick up the next item in the queue when one of them finishes.
+			return;
+		}
+
+		const item = queue.shift()!;
+
+		inflightRequests++;
+
+		try {
+			await item.fn();
+		} catch (e) {
+			item.reject(e);
+		}
+
+		inflightRequests--;
+	}
+
+	return new Promise<T>((resolve, reject) => {
+		queue.push({
+			resolve,
+			reject,
+			fn,
+		});
+
+		run();
+	});
+}
+
 async function fetchText(url: string) {
 	console.log('fetching text', url);
 	if (!textCache.has(url)) {
@@ -271,7 +312,7 @@ async function fetchText(url: string) {
 			}
 		})());
 	}
-	return await textCache.get(url)!;
+	return await runWithRateLimiting(() => textCache.get(url)!);
 }
 
 async function fetchJson<T>(url: string) {
@@ -288,5 +329,5 @@ async function fetchJson<T>(url: string) {
 			}
 		})());
 	}
-	return await jsonCache.get(url)! as T;
+	return await runWithRateLimiting<T>(() => jsonCache.get(url)!);
 }
