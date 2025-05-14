@@ -9,7 +9,7 @@ import {
   watchEffect,
 } from 'vue'
 import * as defaultCompiler from 'vue/compiler-sfc'
-import { compileFile } from './transform'
+import { compileFile as defaultCompileFile } from './transform'
 import { atou, utoa } from './utils'
 import type {
   SFCAsyncStyleCompileOptions,
@@ -43,6 +43,7 @@ export function useStore(
     sfcOptions = ref({}),
     compiler = shallowRef(defaultCompiler),
     vueVersion = ref(null),
+    compileFile = ref(defaultCompileFile),
 
     locale = ref(),
     typescriptVersion = ref('latest'),
@@ -65,7 +66,9 @@ export function useStore(
 
   function init() {
     watchEffect(() => {
-      compileFile(store, activeFile.value).then((errs) => (errors.value = errs))
+      compileFile
+        .value(store, activeFile.value)
+        .then((errs) => (errors.value = errs))
     })
 
     watch(
@@ -137,7 +140,9 @@ export function useStore(
     errors.value = []
     for (const [filename, file] of Object.entries(files.value)) {
       if (filename !== mainFile.value) {
-        compileFile(store, file).then((errs) => errors.value.push(...errs))
+        compileFile
+          .value(store, file)
+          .then((errs) => errors.value.push(...errs))
       }
     }
   }
@@ -223,7 +228,7 @@ export function useStore(
     if (activeFilename.value === oldFilename) {
       activeFilename.value = newFilename
     } else {
-      compileFile(store, file).then((errs) => (errors.value = errs))
+      compileFile.value(store, file).then((errs) => (errors.value = errs))
     }
   }
   const getImportMap: Store['getImportMap'] = () => {
@@ -326,7 +331,7 @@ export function useStore(
 
     const errors = []
     for (const file of Object.values(files)) {
-      errors.push(...(await compileFile(store, file)))
+      errors.push(...(await compileFile.value(store, file)))
     }
 
     store.mainFile = mainFile
@@ -371,6 +376,7 @@ export function useStore(
     compiler,
     loading,
     vueVersion,
+    compileFile,
 
     locale,
     typescriptVersion,
@@ -433,6 +439,7 @@ export type StoreState = ToRefs<{
   compiler: typeof defaultCompiler
   /* only apply for compiler-sfc */
   vueVersion: string | null
+  compileFile: typeof defaultCompileFile
 
   // volar-related
   locale: string | undefined
