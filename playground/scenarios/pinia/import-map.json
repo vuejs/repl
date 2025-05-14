@@ -1,0 +1,8 @@
+{
+  "imports": {
+    "vue": "https://unpkg.com/vue@3/dist/vue.esm-browser.js",
+    "pinia": "https://unpkg.com/pinia@2/dist/pinia.esm-browser.js",
+    "vue-demi": "https://cdn.jsdelivr.net/npm/vue-demi@0.14.7/lib/v3/index.mjs",
+    "@vue/devtools-api": "https://cdn.jsdelivr.net/npm/@vue/devtools-api@6.6.1/lib/esm/index.js"
+  }
+}
