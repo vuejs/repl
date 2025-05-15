@@ -12,7 +12,7 @@
 <script setup lang="ts">
 import { Repl, useStore } from '../../src'
 import ScenarioSelector from './ScenarioSelector.vue'
-import MonacoEditor from '../../src/editor/MonacoEditor.vue'
+import CodeMirrorEditor from '../../src/editor/CodeMirrorEditor.vue'
 // @ts-ignore
 import playgroundFiles from 'virtual:playground-files'
 import { ref, computed, watchEffect } from 'vue'
@@ -41,7 +41,7 @@ const store = useStore()
 
 const replConfigs = computed(() => ({
   store,
-  editor: MonacoEditor,
+  editor: CodeMirrorEditor,
   editorOptions: {
     autoSaveText: '💾',
   },
