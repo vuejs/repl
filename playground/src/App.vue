@@ -30,6 +30,7 @@ const currentScenario = computed(() => {
 })
 
 watchEffect(() => {
+  console.log('currentScenario', currentScenario.value)
   if (currentScenario.value) {
     const scenario = currentScenario.value
     store.setFiles(scenario.files, scenario.mainFile)
@@ -44,6 +45,7 @@ const replConfigs = computed(() => ({
   editorOptions: {
     autoSaveText: '💾',
   },
+  ...(currentScenario.value.ReplOptions || {}),
 }))
 </script>
 
