@@ -129,7 +129,7 @@ export default function scenarioPlugin() {
 }
 
 /**
- * Scan scenario directory and generate config object
+ * Scan scenario directory and generate config object with parallel processing
  * @param {string} scenariosPath - Path to scenarios directory
  * @returns {Promise<object>} - Config object
  */
@@ -154,16 +154,15 @@ async function generateConfig(scenariosPath) {
 
     const dirs = await fs.promises.readdir(scenariosPath)
 
-    for (const dir of dirs) {
+    // Process all scenario directories in parallel
+    const scenarioPromises = dirs.map(async (dir) => {
       const scenarioPath = path.join(scenariosPath, dir)
       const stat = await fs.promises.stat(scenarioPath)
 
-      if (!stat.isDirectory()) continue
+      if (!stat.isDirectory()) return null
 
       // Read all files in the scenario
-      const files = {}
       const allFiles = await fs.promises.readdir(scenarioPath)
-
       let meta = { mainFile: 'main.ts' } // Default metadata
 
       // Handle metadata file first to get metadata before other files
@@ -171,32 +170,23 @@ async function generateConfig(scenariosPath) {
       if (metaFile) {
         const metaFilePath = path.join(scenarioPath, metaFile)
         try {
-          // Read metadata file and manually parse
-          const metaContent = await fs.promises.readFile(metaFilePath, 'utf-8')
+          // Use dynamic import to properly load the ES module
+          // This is safer and more reliable than regex extraction
+          // Convert to absolute path URL for dynamic import
+          // Add timestamp to URL to bypass module cache
+          const fileUrl = `file://${path.resolve(metaFilePath)}?t=${Date.now()}`
 
-          // Extract default export part
-          // Use simple regex to match export default {...}
-          const defaultExportMatch = metaContent.match(
-            /export\s+default\s+({[\s\S]*?})/m,
-          )
-          if (defaultExportMatch && defaultExportMatch[1]) {
-            try {
-              // Use Function constructor to safely parse JS object
-              // Safer than eval, but can handle JS object syntax
-              const extractedMeta = new Function(
-                `return ${defaultExportMatch[1]}`,
-              )()
-              meta = { ...meta, ...extractedMeta }
-              console.log(
-                `[vite-plugin-scenario] Loaded scenario metadata: ${dir}`,
-                meta,
-              )
-            } catch (parseError) {
-              console.error(
-                `[vite-plugin-scenario] Failed to parse metadata: ${metaFilePath}`,
-                parseError,
-              )
-            }
+          // Dynamically import the metadata module
+          const metaModule = await import(fileUrl)
+
+          if (metaModule.default) {
+            // Deep merge the metadata with defaults
+            // This ensures all ReplOptions properties are properly merged
+            meta = { ...(meta || {}), ...(metaModule.default || {}) }
+            console.log(
+              `[vite-plugin-scenario] Loaded scenario metadata: ${dir}`,
+              meta,
+            )
           }
         } catch (error) {
           console.error(
@@ -206,25 +196,49 @@ async function generateConfig(scenariosPath) {
         }
       }
 
-      // Process all files in the scenario
-      for (const file of allFiles) {
-        // Skip hidden files and metadata file
-        if (file.startsWith('.') || file === '_meta.js') continue
+      // Read all scenario files in parallel
+      const filePromises = allFiles
+        .filter((file) => !file.startsWith('.') && file !== '_meta.js')
+        .map(async (file) => {
+          const filePath = path.join(scenarioPath, file)
+          try {
+            const content = await fs.promises.readFile(filePath, 'utf-8')
+            return [file, content] // Return as key-value pair
+          } catch (error) {
+            console.error(
+              `[vite-plugin-scenario] Error reading file: ${filePath}`,
+              error,
+            )
+            return [file, ''] // Return empty content on error
+          }
+        })
 
-        // Read file content
-        const filePath = path.join(scenarioPath, file)
-        const content = await fs.promises.readFile(filePath, 'utf-8')
+      // Wait for all file reading promises to complete
+      const fileEntries = await Promise.all(filePromises)
+      const files = Object.fromEntries(fileEntries)
 
-        // Store file content in config
-        files[file] = content
-      }
-
-      // Build scenario config
-      config[dir] = {
+      // Build complete scenario configuration
+      // Structure it to match what REPL expects: files object + options
+      const scenarioConfig = {
+        // Files must be in this format for REPL
         files,
+        // all meta config support extend
         ...meta,
       }
-    }
+
+      // Return scenario name and its configuration
+      return [dir, scenarioConfig]
+    })
+
+    // Wait for all scenario processing to complete
+    const scenarioResults = await Promise.all(scenarioPromises)
+
+    // Filter out null results (non-directories) and build config object
+    scenarioResults
+      .filter((result) => result !== null)
+      .forEach(([scenarioName, scenarioConfig]) => {
+        config[scenarioName] = scenarioConfig
+      })
 
     console.log(
       `[vite-plugin-scenario] Config generated, scenarios: ${Object.keys(config).join(', ')}`,
