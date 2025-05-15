@@ -60,7 +60,7 @@ cd vue-repl
 npm install
 
 # Start the development server
-npm run playground
+npm run dev:playground
 ```
 
 Visit the displayed local address (usually http://localhost:5174/) to use the playground.
