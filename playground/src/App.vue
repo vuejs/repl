@@ -10,7 +10,7 @@
 </template>
 
 <script setup lang="ts">
-import { type OutputModes, Repl, useStore, useVueImportMap } from '../../src'
+import { Repl, useStore } from '../../src'
 import ScenarioSelector from './ScenarioSelector.vue'
 import MonacoEditor from '../../src/editor/MonacoEditor.vue'
 // @ts-ignore
