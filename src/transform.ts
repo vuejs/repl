@@ -6,6 +6,7 @@ import type {
 } from 'vue/compiler-sfc'
 import { type Transform, transform } from 'sucrase'
 import hashId from 'hash-sum'
+import { getSourceMap, toVisualizer, trimAnalyzedBindings } from './sourcemap'
 
 export const COMP_IDENTIFIER = `__sfc__`
 
@@ -110,6 +111,11 @@ export async function compileFile(
   const hasScoped = descriptor.styles.some((s) => s.scoped)
   let clientCode = ''
   let ssrCode = ''
+  let ssrScript = ''
+  let clientScriptMap: any
+  let clientTemplateMap: any
+  let ssrScriptMap: any
+  let ssrTemplateMap: any
 
   const appendSharedCode = (code: string) => {
     clientCode += code
@@ -119,14 +125,10 @@ export async function compileFile(
   let clientScript: string
   let bindings: BindingMetadata | undefined
   try {
-    ;[clientScript, bindings] = await doCompileScript(
-      store,
-      descriptor,
-      id,
-      false,
-      isTS,
-      isJSX,
-    )
+    const res = await doCompileScript(store, descriptor, id, false, isTS, isJSX)
+    clientScript = res.code
+    bindings = res.bindings
+    clientScriptMap = res.map
   } catch (e: any) {
     return [e.stack.split('\n').slice(0, 12).join('\n')]
   }
@@ -146,7 +148,9 @@ export async function compileFile(
         isTS,
         isJSX,
       )
-      ssrCode += ssrScriptResult[0]
+      ssrScript = ssrScriptResult.code
+      ssrCode += ssrScript
+      ssrScriptMap = ssrScriptResult.map
     } catch (e) {
       ssrCode = `/* SSR compile error: ${e} */`
     }
@@ -171,10 +175,11 @@ export async function compileFile(
       isTS,
       isJSX,
     )
-    if (Array.isArray(clientTemplateResult)) {
-      return clientTemplateResult
+    if (clientTemplateResult.errors.length) {
+      return clientTemplateResult.errors
     }
-    clientCode += `;${clientTemplateResult}`
+    clientCode += `;${clientTemplateResult.code}`
+    clientTemplateMap = clientTemplateResult.map
 
     const ssrTemplateResult = await doCompileTemplate(
       store,
@@ -185,11 +190,12 @@ export async function compileFile(
       isTS,
       isJSX,
     )
-    if (typeof ssrTemplateResult === 'string') {
+    if (ssrTemplateResult.code) {
       // ssr compile failure is fine
-      ssrCode += `;${ssrTemplateResult}`
+      ssrCode += `;${ssrTemplateResult.code}`
+      ssrTemplateMap = ssrTemplateResult.map
     } else {
-      ssrCode = `/* SSR compile error: ${ssrTemplateResult[0]} */`
+      ssrCode = `/* SSR compile error: ${ssrTemplateResult.errors[0]} */`
     }
   }
 
@@ -264,6 +270,19 @@ export async function compileFile(
     )
     compiled.js = clientCode.trimStart()
     compiled.ssr = ssrCode.trimStart()
+    compiled.clientMap = toVisualizer(
+      trimAnalyzedBindings(compiled.js),
+      getSourceMap(filename, clientScript, clientScriptMap, clientTemplateMap),
+    )
+    compiled.ssrMap = toVisualizer(
+      trimAnalyzedBindings(compiled.ssr),
+      getSourceMap(
+        filename,
+        ssrScript || clientScript,
+        ssrScriptMap,
+        ssrTemplateMap,
+      ),
+    )
   }
 
   return []
@@ -276,7 +295,7 @@ async function doCompileScript(
   ssr: boolean,
   isTS: boolean,
   isJSX: boolean,
-): Promise<[code: string, bindings: BindingMetadata | undefined]> {
+): Promise<{ code: string; bindings: BindingMetadata | undefined; map?: any }> {
   if (descriptor.script || descriptor.scriptSetup) {
     const expressionPlugins: CompilerOptions['expressionPlugins'] = []
     if (isTS) {
@@ -285,7 +304,6 @@ async function doCompileScript(
     if (isJSX) {
       expressionPlugins.push('jsx')
     }
-
     const compiledScript = store.compiler.compileScript(descriptor, {
       inlineTemplate: true,
       ...store.sfcOptions?.script,
@@ -314,11 +332,15 @@ async function doCompileScript(
         )} */\n` + code
     }
 
-    return [code, compiledScript.bindings]
+    return { code, bindings: compiledScript.bindings, map: compiledScript.map }
   } else {
     // @ts-expect-error TODO remove when 3.6 is out
-    const vaporFlag = descriptor.vapor ? '__vapor: true' :''
-    return [`\nconst ${COMP_IDENTIFIER} = { ${vaporFlag} }`, undefined]
+    const vaporFlag = descriptor.vapor ? '__vapor: true' : ''
+    return {
+      code: `\nconst ${COMP_IDENTIFIER} = { ${vaporFlag} }`,
+      bindings: {},
+      map: undefined,
+    }
   }
 }
 
@@ -339,7 +361,7 @@ async function doCompileTemplate(
     expressionPlugins.push('jsx')
   }
 
-  let { code, errors } = store.compiler.compileTemplate({
+  const res = store.compiler.compileTemplate({
     isProd: false,
     ...store.sfcOptions?.template,
     // @ts-expect-error TODO remove expect-error after 3.6
@@ -358,8 +380,9 @@ async function doCompileTemplate(
       expressionPlugins,
     },
   })
+  let { code, errors, map } = res
   if (errors.length) {
-    return errors
+    return { code, map, errors }
   }
 
   const fnName = ssr ? `ssrRender` : `render`
@@ -373,5 +396,5 @@ async function doCompileTemplate(
   if (isTS) {
     code = await transformTS(code, isJSX)
   }
-  return code
+  return { code, map, errors: [] }
 }
