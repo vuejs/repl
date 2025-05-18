@@ -14,8 +14,10 @@ playground/
 ├── scenarios/                # Scenario directory, add dynamically
 │   ├── basic/                # Basic example
 │   ├── customMain/           # Custom main entry
+│   ├── html/                 # html as entry example
 │   ├── pinia/                # Pinia state management example
 │   └── vueRouter/            # Vue Router example
+│   └── vueUse/               # Vue Use example
 └── src/
   └── App.vue               # Main application component
 ```
