@@ -60,6 +60,7 @@ const App = {
         editor: MonacoEditor,
         // layout: 'vertical',
         ssr: true,
+        showConsole: true,
         sfcOptions: {
           script: {
             // inlineTemplate: false

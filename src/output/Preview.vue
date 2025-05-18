@@ -3,7 +3,10 @@ import { computed, inject, useTemplateRef } from 'vue'
 import { injectKeyProps } from '../../src/types'
 import Sandbox from './Sandbox.vue'
 
-const props = defineProps<{ show: boolean; ssr: boolean }>()
+const props = defineProps<{
+  show: boolean
+  ssr: boolean
+}>()
 
 const { store, clearConsole, theme, previewTheme, previewOptions } =
   inject(injectKeyProps)!
@@ -30,5 +33,6 @@ defineExpose({
     :preview-options="previewOptions"
     :ssr="props.ssr"
     :clear-console="clearConsole"
+    @log="store.executeLog"
   />
 </template>

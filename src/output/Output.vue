@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import Preview from './Preview.vue'
+import SplitPane from '../SplitPane.vue'
 import { computed, inject, useTemplateRef } from 'vue'
 import {
+  type ConsoleComponentType,
   type EditorComponentType,
   type OutputModes,
   injectKeyProps,
@@ -9,12 +11,14 @@ import {
 
 const props = defineProps<{
   editorComponent: EditorComponentType
+  consoleComponent: ConsoleComponentType
   showCompileOutput?: boolean
   ssr: boolean
 }>()
 
-const { store } = inject(injectKeyProps)!
+const { store, showConsole } = inject(injectKeyProps)!
 const previewRef = useTemplateRef('preview')
+
 const modes = computed(() =>
   props.showCompileOutput
     ? (['preview', 'js', 'css', 'ssr'] as const)
@@ -35,6 +39,7 @@ const mode = computed<OutputModes>({
 
 function reload() {
   previewRef.value?.reload()
+  store.value.clearConsole?.()
 }
 
 defineExpose({ reload, previewRef })
@@ -53,7 +58,15 @@ defineExpose({ reload, previewRef })
   </div>
 
   <div class="output-container">
-    <Preview ref="preview" :show="mode === 'preview'" :ssr="ssr" />
+    <SplitPane v-if="showConsole" layout="vertical">
+      <template #left>
+        <Preview ref="preview" :show="mode === 'preview'" :ssr="ssr" />
+      </template>
+      <template #right>
+        <props.consoleComponent />
+      </template>
+    </SplitPane>
+    <Preview v-else ref="preview" :show="mode === 'preview'" :ssr="ssr" />
     <props.editorComponent
       v-if="mode !== 'preview'"
       readonly

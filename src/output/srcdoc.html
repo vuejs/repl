@@ -6,8 +6,9 @@
         color-scheme: dark;
       }
       body {
-        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
-          Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+        font-family:
+          -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu,
+          Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
       }
     </style>
     <!-- PREVIEW-OPTIONS-HEAD-HTML -->
@@ -152,50 +153,51 @@
             )
           }
         })
-
-        let previous = { level: null, args: null }
-
-        ;['clear', 'log', 'info', 'dir', 'warn', 'error', 'table'].forEach(
-          (level) => {
-            const original = console[level]
-            console[level] = (...args) => {
-              const msg = args[0]
-              if (typeof msg === 'string') {
-                if (
-                  msg.includes('You are running a development build of Vue') ||
-                  msg.includes('You are running the esm-bundler build of Vue')
-                ) {
-                  return
-                }
-              }
-
-              original(...args)
-
-              const stringifiedArgs = stringify(args)
+        const errorColorStr = 'color: #fb2c36'
+        const errorMsg = 'please open the devtool to see correctly this log'
+        ;[
+          'clear',
+          'log',
+          'info',
+          'dir',
+          'warn',
+          'error',
+          'table',
+          'debug',
+          'time',
+          'timeLog',
+          'timeEnd',
+          'assert',
+          'count',
+          'countReset',
+        ].forEach((level) => {
+          const original = console[level]
+          console[level] = (...args) => {
+            const msg = args[0]
+            if (typeof msg === 'string') {
               if (
-                previous.level === level &&
-                previous.args &&
-                previous.args === stringifiedArgs
+                msg.includes('You are running a development build of Vue') ||
+                msg.includes('You are running the esm-bundler build of Vue')
               ) {
-                parent.postMessage(
-                  { action: 'console', level, duplicate: true },
-                  '*',
-                )
-              } else {
-                previous = { level, args: stringifiedArgs }
-
-                try {
-                  parent.postMessage({ action: 'console', level, args }, '*')
-                } catch (err) {
-                  parent.postMessage(
-                    { action: 'console', level, args: args.map(toString) },
-                    '*',
-                  )
-                }
+                return
               }
             }
-          },
-        )
+            original(...args)
+            const postMessage = () =>
+              parent.postMessage({ action: 'console', level, args }, '*')
+            try {
+              postMessage()
+            } catch {
+              args = args.map(toString)
+              if (!args?.[0]?.startsWith('[Vue warn]'))
+                args = [
+                  `[vue-repl]: %c Cannot clone the message, ${errorMsg}. Supported types are listed here: https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Structured_clone_algorithm#javascript_types`,
+                  errorColorStr,
+                ]
+              postMessage()
+            }
+          }
+        })
         ;[
           { method: 'group', action: 'console_group' },
           { method: 'groupEnd', action: 'console_group_end' },
@@ -208,119 +210,17 @@
             original(label)
           }
         })
-
-        const timers = new Map()
-        const original_time = console.time
-        const original_timelog = console.timeLog
-        const original_timeend = console.timeEnd
-
-        console.time = (label = 'default') => {
-          original_time(label)
-          timers.set(label, performance.now())
-        }
-        console.timeLog = (label = 'default') => {
-          original_timelog(label)
-          const now = performance.now()
-          if (timers.has(label)) {
-            parent.postMessage(
-              {
-                action: 'console',
-                level: 'system-log',
-                args: [`${label}: ${now - timers.get(label)}ms`],
-              },
-              '*',
-            )
-          } else {
-            parent.postMessage(
-              {
-                action: 'console',
-                level: 'system-warn',
-                args: [`Timer '${label}' does not exist`],
-              },
-              '*',
-            )
+        ;['profile', 'profileEnd', 'trace', 'dirXml'].forEach((level) => {
+          const original = console[level]
+          console[level] = () => {
+            original()
+            const args = [
+              `[vue-repl]: %c Cannot handle "${level}" log, ${errorMsg}.`,
+              errorColorStr,
+            ]
+            parent.postMessage({ action: 'console', level: 'log', args }, '*')
           }
-        }
-        console.timeEnd = (label = 'default') => {
-          original_timeend(label)
-          const now = performance.now()
-          if (timers.has(label)) {
-            parent.postMessage(
-              {
-                action: 'console',
-                level: 'system-log',
-                args: [`${label}: ${now - timers.get(label)}ms`],
-              },
-              '*',
-            )
-          } else {
-            parent.postMessage(
-              {
-                action: 'console',
-                level: 'system-warn',
-                args: [`Timer '${label}' does not exist`],
-              },
-              '*',
-            )
-          }
-          timers.delete(label)
-        }
-
-        const original_assert = console.assert
-        console.assert = (condition, ...args) => {
-          if (condition) {
-            const stack = new Error().stack
-            parent.postMessage(
-              { action: 'console', level: 'assert', args, stack },
-              '*',
-            )
-          }
-          original_assert(condition, ...args)
-        }
-
-        const counter = new Map()
-        const original_count = console.count
-        const original_countreset = console.countReset
-
-        console.count = (label = 'default') => {
-          counter.set(label, (counter.get(label) || 0) + 1)
-          parent.postMessage(
-            {
-              action: 'console',
-              level: 'system-log',
-              args: `${label}: ${counter.get(label)}`,
-            },
-            '*',
-          )
-          original_count(label)
-        }
-
-        console.countReset = (label = 'default') => {
-          if (counter.has(label)) {
-            counter.set(label, 0)
-          } else {
-            parent.postMessage(
-              {
-                action: 'console',
-                level: 'system-warn',
-                args: `Count for '${label}' does not exist`,
-              },
-              '*',
-            )
-          }
-          original_countreset(label)
-        }
-
-        const original_trace = console.trace
-
-        console.trace = (...args) => {
-          const stack = new Error().stack
-          parent.postMessage(
-            { action: 'console', level: 'trace', args, stack },
-            '*',
-          )
-          original_trace(...args)
-        }
+        })
 
         function toString(value) {
           if (value instanceof Error) {

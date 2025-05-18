@@ -16,7 +16,7 @@ import type {
   SFCScriptCompileOptions,
   SFCTemplateCompileOptions,
 } from 'vue/compiler-sfc'
-import type { OutputModes } from './types'
+import type { LogPayload, OutputModes } from './types'
 import type { editor } from 'monaco-editor-core'
 import { type ImportMap, mergeImportMap, useVueImportMap } from './import-map'
 
@@ -353,6 +353,8 @@ export function useStore(
   }
   activeFilename ||= ref(mainFile.value)
   const activeFile = computed(() => files.value[activeFilename.value])
+  const executeLog = ref()
+  const clearConsole = ref()
 
   applyBuiltinImportMap()
 
@@ -389,6 +391,8 @@ export function useStore(
     deserialize,
     getFiles,
     setFiles,
+    executeLog,
+    clearConsole,
   })
   return store
 }
@@ -463,6 +467,8 @@ export interface ReplStore extends UnwrapRef<StoreState> {
   deserialize(serializedState: string, checkBuiltinImportMap?: boolean): void
   getFiles(): Record<string, string>
   setFiles(newFiles: Record<string, string>, mainFile?: string): Promise<void>
+  executeLog?(payload: LogPayload): void
+  clearConsole?(): void
 }
 
 export type Store = Pick<
@@ -487,6 +493,8 @@ export type Store = Pick<
   | 'renameFile'
   | 'getImportMap'
   | 'getTsConfig'
+  | 'executeLog'
+  | 'clearConsole'
 >
 
 export class File {

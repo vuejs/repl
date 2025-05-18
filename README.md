@@ -51,6 +51,22 @@ import Monaco from '@vue/repl/monaco-editor'
 </template>
 ```
 
+### With Luna Console (4.5.2)
+
+Console UI to print console logs.
+**Be aware**: Because we are getting logs that pass into a `postMessage` they are some types/logs that are currently not supported such as elements html, declared functions, `console.trace()`, etc... More of the supported types [here](https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Structured_clone_algorithm#things_that_dont_work_with_structured_clone).
+
+```vue
+<script setup>
+import { Repl } from '@vue/repl'
+import LunaConsole from '@vue/repl/luna-console'
+</script>
+
+<template>
+  <Repl showConsole :console="LunaConsole" />
+</template>
+```
+
 ## Advanced Usage
 
 Customize the behavior of the REPL by manually initializing the store.

@@ -317,7 +317,7 @@ async function doCompileScript(
     return [code, compiledScript.bindings]
   } else {
     // @ts-expect-error TODO remove when 3.6 is out
-    const vaporFlag = descriptor.vapor ? '__vapor: true' :''
+    const vaporFlag = descriptor.vapor ? '__vapor: true' : ''
     return [`\nconst ${COMP_IDENTIFIER} = { ${vaporFlag} }`, undefined]
   }
 }

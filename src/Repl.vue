@@ -4,22 +4,26 @@ import Output from './output/Output.vue'
 import { type Store, useStore } from './store'
 import { computed, provide, toRefs, useTemplateRef } from 'vue'
 import {
+  type ConsoleComponentType,
   type EditorComponentType,
   injectKeyPreviewRef,
   injectKeyProps,
 } from './types'
 import EditorContainer from './editor/EditorContainer.vue'
+
 import type * as monaco from 'monaco-editor-core'
 
 export interface Props {
   theme?: 'dark' | 'light'
   previewTheme?: boolean
   editor: EditorComponentType
+  console?: ConsoleComponentType
   store?: Store
   autoResize?: boolean
   showCompileOutput?: boolean
   showImportMap?: boolean
   showTsConfig?: boolean
+  showConsole?: boolean
   clearConsole?: boolean
   layout?: 'horizontal' | 'vertical'
   layoutReverse?: boolean
@@ -55,6 +59,7 @@ const props = withDefaults(defineProps<Props>(), {
   showCompileOutput: true,
   showImportMap: true,
   showTsConfig: true,
+  showConsole: false,
   clearConsole: true,
   layoutReverse: false,
   ssr: false,
@@ -67,6 +72,9 @@ const props = withDefaults(defineProps<Props>(), {
 if (!props.editor) {
   throw new Error('The "editor" prop is now required.')
 }
+const consoleWrapper = computed<ConsoleComponentType>(
+  () => props.console ?? (() => ({})),
+)
 
 const outputRef = useTemplateRef('output')
 
@@ -77,6 +85,7 @@ const outputSlotName = computed(() => (props.layoutReverse ? 'left' : 'right'))
 
 provide(injectKeyProps, {
   ...toRefs(props),
+  console: consoleWrapper,
   autoSave,
 })
 provide(
@@ -104,6 +113,7 @@ defineExpose({ reload })
         <Output
           ref="output"
           :editor-component="editor"
+          :console-component="consoleWrapper"
           :show-compile-output="props.showCompileOutput"
           :ssr="!!props.ssr"
         />
@@ -127,8 +137,9 @@ defineExpose({ reload })
   margin: 0;
   overflow: hidden;
   font-size: 13px;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
-    Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  font-family:
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu,
+    Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
   background-color: var(--bg-soft);
 }
 

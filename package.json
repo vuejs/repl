@@ -26,6 +26,11 @@
       "import": "./dist/codemirror-editor.js",
       "require": null
     },
+    "./luna-console": {
+      "types": "./dist/luna-console.d.ts",
+      "import": "./dist/luna-console.js",
+      "require": null
+    },
     "./core": {
       "types": "./dist/core.d.ts",
       "import": "./dist/core.js",
@@ -110,6 +115,9 @@
     "vite-plugin-dts": "^4.5.0",
     "vscode-uri": "^3.1.0",
     "vue": "^3.5.13",
-    "vue-tsc": "~2.2.2"
+    "vue-tsc": "~2.2.2",
+    "luna-console": "^1.3.5",
+    "luna-data-grid": "^1.3.0",
+    "luna-object-viewer": "^0.3.1"
   }
 }

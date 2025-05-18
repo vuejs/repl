@@ -15,8 +15,7 @@ import srcdoc from './srcdoc.html?raw'
 import { PreviewProxy } from './PreviewProxy'
 import { compileModulesForPreview } from './moduleCompiler'
 import type { Store } from '../store'
-import { injectKeyProps } from '../types'
-
+import { injectKeyProps, type LogLevel, type SandboxEmits } from '../types'
 export interface SandboxProps {
   store: Store
   show?: boolean
@@ -46,6 +45,9 @@ const props = withDefaults(defineProps<SandboxProps>(), {
   previewOptions: () => ({}),
   autoStoreInit: true,
 })
+
+const emit = defineEmits<SandboxEmits>()
+
 const { store, theme, clearConsole, previewOptions } = toRefs(props)
 
 const keyProps = inject(injectKeyProps)
@@ -130,7 +132,8 @@ function createSandbox() {
     )
   sandbox.srcdoc = sandboxSrc
   containerRef.value?.appendChild(sandbox)
-
+  const doLog = (logLevel: LogLevel, data?: any) =>
+    emit('log', { logLevel, data })
   proxy = new PreviewProxy(sandbox, {
     on_fetch_progress: (progress: any) => {
       // pending_imports = progress;
@@ -157,32 +160,32 @@ function createSandbox() {
       runtimeError.value = 'Uncaught (in promise): ' + error.message
     },
     on_console: (log: any) => {
-      if (log.duplicate) {
-        return
-      }
+      const maybeMsg = log.args[0]
       if (log.level === 'error') {
-        if (log.args[0] instanceof Error) {
-          runtimeError.value = log.args[0].message
-        } else {
-          runtimeError.value = log.args[0]
+        if (maybeMsg instanceof Error) {
+          runtimeError.value = maybeMsg.message
+        } else if (!maybeMsg?.startsWith('[vue-repl]')) {
+          runtimeError.value = maybeMsg
         }
-      } else if (log.level === 'warn') {
-        if (log.args[0].toString().includes('[Vue warn]')) {
-          runtimeWarning.value = log.args
-            .join('')
-            .replace(/\[Vue warn\]:/, '')
-            .trim()
-        }
+      } else if (
+        log.level === 'warn' &&
+        maybeMsg.toString().includes('[Vue warn]')
+      ) {
+        runtimeWarning.value = log.args
+          .join('')
+          .replace(/\[Vue warn\]:/, '')
+          .trim()
       }
+      doLog(log.level || 'log', log.args)
     },
     on_console_group: (action: any) => {
-      // group_logs(action.label, false);
+      doLog('group', action.label)
     },
     on_console_group_end: () => {
-      // ungroup_logs();
+      doLog('groupEnd')
     },
     on_console_group_collapsed: (action: any) => {
-      // group_logs(action.label, true);
+      doLog('groupCollapsed', action.label)
     },
   })
 
@@ -312,12 +315,7 @@ defineExpose({ reload, container: containerRef })
 </script>
 
 <template>
-  <div
-    v-show="props.show"
-    ref="container"
-    class="iframe-container"
-    :class="theme"
-  />
+  <div v-show="show" ref="container" class="iframe-container" :class="theme" />
   <Message :err="(previewOptions?.showRuntimeError ?? true) && runtimeError" />
   <Message
     v-if="!runtimeError && (previewOptions?.showRuntimeWarning ?? true)"
