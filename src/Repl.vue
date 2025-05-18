@@ -2,7 +2,7 @@
 import SplitPane from './SplitPane.vue'
 import Output from './output/Output.vue'
 import { type Store, useStore } from './store'
-import { computed, provide, toRefs, useTemplateRef, watchEffect } from 'vue'
+import { computed, provide, toRefs, useTemplateRef } from 'vue'
 import {
   type ConsoleComponentType,
   type EditorComponentType,
@@ -72,12 +72,6 @@ const props = withDefaults(defineProps<Props>(), {
 if (!props.editor) {
   throw new Error('The "editor" prop is now required.')
 }
-watchEffect(() => {
-  if (!!props.showConsole && !props.console)
-    throw new Error(
-      'If you want to enable a console "console" prop is required.',
-    )
-})
 const consoleWrapper = computed<ConsoleComponentType>(
   () => props.console ?? (() => ({})),
 )
