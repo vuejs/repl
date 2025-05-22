@@ -149,7 +149,7 @@ export function createNpmFileSystem(
 				if ((await _stat(path))?.type !== 1 satisfies FileType.File) {
 					return;
 				}
-				const text = await fetchText(`https://unpkg-test.factset.io/${path}`);
+				const text = await fetchText(`https://unpkg.uistandards.k8s.fdscloud.io/${path}`);
 				if (text !== undefined) {
 					onFetch?.(path, text);
 				}
@@ -165,7 +165,7 @@ export function createNpmFileSystem(
 
 		// resolve latest tag
 		if (version === 'latest') {
-			const data = await fetchJson<{ version: string | null; }>(`https://unpkg-test.factset.io/${pkgName}@${version}/package.json`);
+			const data = await fetchJson<{ version: string | null; }>(`https://unpkg.uistandards.k8s.fdscloud.io/${pkgName}@${version}/package.json`);
 			if (!data?.version) {
 				return [];
 			}
@@ -179,7 +179,7 @@ export function createNpmFileSystem(
 				time: string;
 				hash: string;
 			}[];
-		}>(`https://unpkg-test.factset.io/${pkgName}@${version}?flat`);
+		}>(`https://unpkg.uistandards.k8s.fdscloud.io/${pkgName}@${version}?flat`);
 		if (!flat) {
 			return [];
 		}

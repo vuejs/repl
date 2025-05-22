@@ -21,13 +21,13 @@ export function useVueImportMap(
         normalizeDefaults(
           productionMode.value ? defaults.runtimeProd : defaults.runtimeDev,
         )) ||
-      `https://unpkg-test.factset.io/@vue/runtime-dom@${
+      `https://unpkg.uistandards.k8s.fdscloud.io/@vue/runtime-dom@${
         vueVersion.value || currentVersion
       }/dist/runtime-dom.esm-browser${productionMode.value ? `.prod` : ``}.js`
 
     const serverRenderer =
       (!vueVersion.value && normalizeDefaults(defaults.serverRenderer)) ||
-      `https://unpkg-test.factset.io/@vue/server-renderer@${
+      `https://unpkg.uistandards.k8s.fdscloud.io/@vue/server-renderer@${
         vueVersion.value || currentVersion
       }/dist/server-renderer.esm-browser.js`
     return {
@@ -35,7 +35,7 @@ export function useVueImportMap(
         vue,
         'vue/server-renderer': serverRenderer,
 
-        '@fds/': 'https://unpkg-test.factset.io/@fds/',
+        '@fds/': 'https://unpkg.uistandards.k8s.fdscloud.io/@fds/',
       },
     }
   })

@@ -92,7 +92,7 @@ export function useStore(
       vueVersion,
       async (version) => {
         if (version) {
-          const compilerUrl = `https://unpkg-test.factset.io/@vue/compiler-sfc@${version}/dist/compiler-sfc.esm-browser.js`
+          const compilerUrl = `https://unpkg.uistandards.k8s.fdscloud.io/@vue/compiler-sfc@${version}/dist/compiler-sfc.esm-browser.js`
           loading.value = true
           compiler.value = await import(/* @vite-ignore */ compilerUrl).finally(
             () => (loading.value = false),

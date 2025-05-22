@@ -30,6 +30,42 @@
           return Promise.resolve(window.__modules__[key])
         }
 
+        const registerServiceWorker = async () => {
+          console.log('Registering service worker');
+          if ('serviceWorker' in navigator) {
+            try {
+              const registration = await navigator.serviceWorker.register(
+                'sw.js',
+                {
+                  scope: './',
+                }
+              );
+              if (registration.installing) {
+                console.log('Service worker installing');
+              } else if (registration.waiting) {
+                console.log('Service worker installed');
+              } else if (registration.active) {
+                console.log('Service worker active');
+              }
+            } catch (error) {
+              console.error(`Registration failed with ${error}`);
+            }
+          } else {
+            console.log('Service worker not available');
+          }
+        };
+
+        const swPromise = registerServiceWorker();
+
+        let swIsRegistered = false;
+        let evalBuffer = [];
+
+        swPromise.then(() => {
+          swIsRegistered = true;
+          evalBuffer.forEach((ev) => handle_message(ev));
+          evalBuffer = [];
+        });
+
         async function handle_message(ev) {
           let { action, cmd_id } = ev.data
           const send_message = (payload) =>
@@ -40,6 +76,11 @@
             send_reply({ action: 'cmd_error', message, stack })
 
           if (action === 'eval') {
+            if (!swIsRegistered) {
+              evalBuffer.push(ev)
+              return
+            }
+
             try {
               if (scriptEls.length) {
                 scriptEls.forEach((el) => {
@@ -363,7 +404,7 @@
     <!-- ES Module Shims: Import maps polyfill for modules browsers without import maps support (all except Chrome 89+) -->
     <script
       async
-      src="https://unpkg-test.factset.io/es-module-shims@1.5.18/dist/es-module-shims.wasm.js"
+      src="https://unpkg.uistandards.k8s.fdscloud.io/es-module-shims@1.5.18/dist/es-module-shims.wasm.js"
     ></script>
     <script type="importmap">
       <!--IMPORT_MAP-->
