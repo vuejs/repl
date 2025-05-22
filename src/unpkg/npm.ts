@@ -1,333 +1,358 @@
-import type { FileSystem, FileType } from '@volar/language-service';
-import type { URI } from 'vscode-uri';
+import type { FileSystem, FileType } from '@volar/language-service'
+import type { URI } from 'vscode-uri'
 
-const textCache = new Map<string, Promise<string | undefined>>();
-const jsonCache = new Map<string, Promise<any>>();
+const textCache = new Map<string, Promise<string | undefined>>()
+const jsonCache = new Map<string, Promise<any>>()
 
 export function createNpmFileSystem(
-	getCdnPath = (uri: URI): string | undefined => {
-		if (uri.path === '/node_modules') {
-			return '';
-		}
-		else if (uri.path.startsWith('/node_modules/')) {
-			return uri.path.slice('/node_modules/'.length);
-		}
-	},
-	getPackageVersion?: (pkgName: string) => string | undefined,
-	onFetch?: (path: string, content: string) => void
+  getCdnPath = (uri: URI): string | undefined => {
+    if (uri.path === '/node_modules') {
+      return ''
+    } else if (uri.path.startsWith('/node_modules/')) {
+      return uri.path.slice('/node_modules/'.length)
+    }
+  },
+  getPackageVersion?: (pkgName: string) => string | undefined,
+  onFetch?: (path: string, content: string) => void,
 ): FileSystem {
-	const fetchResults = new Map<string, Promise<string | undefined>>();
-	const flatResults = new Map<string, Promise<{
-		name: string;
-		size: number;
-		time: string;
-		hash: string;
-	}[]>>();
+  const fetchResults = new Map<string, Promise<string | undefined>>()
+  const flatResults = new Map<
+    string,
+    Promise<
+      {
+        name: string
+        size: number
+        time: string
+        hash: string
+      }[]
+    >
+  >()
 
-	return {
-		async stat(uri: URI) {
-			const path = getCdnPath(uri);
-			if (path === undefined) {
-				return;
-			}
-			if (path === '') {
-				return {
-					type: 2 satisfies FileType.Directory,
-					size: -1,
-					ctime: -1,
-					mtime: -1,
-				};
-			}
-			return await _stat(path);
-		},
-		async readFile(uri: URI) {
-			const path = getCdnPath(uri);
-			if (path === undefined) {
-				return;
-			}
-			return await _readFile(path);
-		},
-		readDirectory(uri: URI) {
-			const path = getCdnPath(uri);
-			if (path === undefined) {
-				return [];
-			}
-			return _readDirectory(path);
-		},
-	};
+  return {
+    async stat(uri: URI) {
+      const path = getCdnPath(uri)
+      if (path === undefined) {
+        return
+      }
+      if (path === '') {
+        return {
+          type: 2 satisfies FileType.Directory,
+          size: -1,
+          ctime: -1,
+          mtime: -1,
+        }
+      }
+      return await _stat(path)
+    },
+    async readFile(uri: URI) {
+      const path = getCdnPath(uri)
+      if (path === undefined) {
+        return
+      }
+      return await _readFile(path)
+    },
+    readDirectory(uri: URI) {
+      const path = getCdnPath(uri)
+      if (path === undefined) {
+        return []
+      }
+      return _readDirectory(path)
+    },
+  }
 
-	async function _stat(path: string) {
+  async function _stat(path: string) {
+    const [modName, pkgName, pkgVersion, pkgFilePath] = resolvePackageName(path)
+    if (!pkgName) {
+      if (modName.startsWith('@')) {
+        return {
+          type: 2 satisfies FileType.Directory,
+          ctime: -1,
+          mtime: -1,
+          size: -1,
+        }
+      } else {
+        return
+      }
+    }
+    if (!(await isValidPackageName(pkgName))) {
+      return
+    }
 
-		const [modName, pkgName, pkgVersion, pkgFilePath] = resolvePackageName(path);
-		if (!pkgName) {
-			if (modName.startsWith('@')) {
-				return {
-					type: 2 satisfies FileType.Directory,
-					ctime: -1,
-					mtime: -1,
-					size: -1,
-				};
-			}
-			else {
-				return;
-			}
-		}
-		if (!await isValidPackageName(pkgName)) {
-			return;
-		}
+    if (!pkgFilePath) {
+      // perf: skip flat request
+      return {
+        type: 2 satisfies FileType.Directory,
+        ctime: -1,
+        mtime: -1,
+        size: -1,
+      }
+    }
 
-		if (!pkgFilePath) {
-			// perf: skip flat request
-			return {
-				type: 2 satisfies FileType.Directory,
-				ctime: -1,
-				mtime: -1,
-				size: -1,
-			};
-		}
+    if (!flatResults.has(modName)) {
+      flatResults.set(modName, flat(pkgName, pkgVersion))
+    }
 
-		if (!flatResults.has(modName)) {
-			flatResults.set(modName, flat(pkgName, pkgVersion));
-		}
+    const flatResult = await flatResults.get(modName)!
+    const filePath = path.slice(modName.length)
+    const file = flatResult.find((file) => file.name === filePath)
+    if (file) {
+      return {
+        type: 1 satisfies FileType.File,
+        ctime: new Date(file.time).valueOf(),
+        mtime: new Date(file.time).valueOf(),
+        size: file.size,
+      }
+    } else if (
+      flatResult.some((file) => file.name.startsWith(filePath + '/'))
+    ) {
+      return {
+        type: 2 satisfies FileType.Directory,
+        ctime: -1,
+        mtime: -1,
+        size: -1,
+      }
+    }
+  }
 
-		const flatResult = await flatResults.get(modName)!;
-		const filePath = path.slice(modName.length);
-		const file = flatResult.find(file => file.name === filePath);
-		if (file) {
-			return {
-				type: 1 satisfies FileType.File,
-				ctime: new Date(file.time).valueOf(),
-				mtime: new Date(file.time).valueOf(),
-				size: file.size,
-			};
-		}
-		else if (flatResult.some(file => file.name.startsWith(filePath + '/'))) {
-			return {
-				type: 2 satisfies FileType.Directory,
-				ctime: -1,
-				mtime: -1,
-				size: -1,
-			};
-		}
-	}
+  async function _readDirectory(path: string): Promise<[string, FileType][]> {
+    const [modName, pkgName, pkgVersion] = resolvePackageName(path)
+    if (!pkgName || !(await isValidPackageName(pkgName))) {
+      return []
+    }
 
-	async function _readDirectory(path: string): Promise<[string, FileType][]> {
+    if (!flatResults.has(modName)) {
+      flatResults.set(modName, flat(pkgName, pkgVersion))
+    }
 
-		const [modName, pkgName, pkgVersion] = resolvePackageName(path);
-		if (!pkgName || !await isValidPackageName(pkgName)) {
-			return [];
-		}
+    const flatResult = await flatResults.get(modName)!
+    const dirPath = path.slice(modName.length)
+    const files = flatResult
+      .filter((f) => f.name.substring(0, f.name.lastIndexOf('/')) === dirPath)
+      .map((f) => f.name.slice(dirPath.length + 1))
+    const dirs = flatResult
+      .filter(
+        (f) =>
+          f.name.startsWith(dirPath + '/') &&
+          f.name.substring(dirPath.length + 1).split('/').length >= 2,
+      )
+      .map((f) => f.name.slice(dirPath.length + 1).split('/')[0])
 
-		if (!flatResults.has(modName)) {
-			flatResults.set(modName, flat(pkgName, pkgVersion));
-		}
+    return [
+      ...files.map<[string, FileType]>((f) => [f, 1 satisfies FileType.File]),
+      ...[...new Set(dirs)].map<[string, FileType]>((f) => [
+        f,
+        2 satisfies FileType.Directory,
+      ]),
+    ]
+  }
 
-		const flatResult = await flatResults.get(modName)!;
-		const dirPath = path.slice(modName.length);
-		const files = flatResult
-			.filter(f => f.name.substring(0, f.name.lastIndexOf('/')) === dirPath)
-			.map(f => f.name.slice(dirPath.length + 1));
-		const dirs = flatResult
-			.filter(f => f.name.startsWith(dirPath + '/') && f.name.substring(dirPath.length + 1).split('/').length >= 2)
-			.map(f => f.name.slice(dirPath.length + 1).split('/')[0]);
+  async function _readFile(path: string): Promise<string | undefined> {
+    const [_modName, pkgName, _version, pkgFilePath] = resolvePackageName(path)
+    if (!pkgName || !pkgFilePath || !(await isValidPackageName(pkgName))) {
+      return
+    }
 
-		return [
-			...files.map<[string, FileType]>(f => [f, 1 satisfies FileType.File]),
-			...[...new Set(dirs)].map<[string, FileType]>(f => [f, 2 satisfies FileType.Directory]),
-		];
-	}
+    if (!fetchResults.has(path)) {
+      fetchResults.set(
+        path,
+        (async () => {
+          if ((await _stat(path))?.type !== (1 satisfies FileType.File)) {
+            return
+          }
+          const text = await fetchText(
+            `https://unpkg.uistandards.k8s.fdscloud.io/${path}`,
+          )
+          if (text !== undefined) {
+            onFetch?.(path, text)
+          }
+          return text
+        })(),
+      )
+    }
 
-	async function _readFile(path: string): Promise<string | undefined> {
+    return await fetchResults.get(path)!
+  }
 
-		const [_modName, pkgName, _version, pkgFilePath] = resolvePackageName(path);
-		if (!pkgName || !pkgFilePath || !await isValidPackageName(pkgName)) {
-			return;
-		}
+  async function flat(pkgName: string, version: string | undefined) {
+    version ??= 'latest'
 
-		if (!fetchResults.has(path)) {
-			fetchResults.set(path, (async () => {
-				if ((await _stat(path))?.type !== 1 satisfies FileType.File) {
-					return;
-				}
-				const text = await fetchText(`https://unpkg.uistandards.k8s.fdscloud.io/${path}`);
-				if (text !== undefined) {
-					onFetch?.(path, text);
-				}
-				return text;
-			})());
-		}
+    // resolve latest tag
+    if (version === 'latest') {
+      const data = await fetchJson<{ version: string | null }>(
+        `https://unpkg.uistandards.k8s.fdscloud.io/${pkgName}@${version}/package.json`,
+      )
+      if (!data?.version) {
+        return []
+      }
+      version = data.version
+    }
 
-		return await fetchResults.get(path)!;
-	}
+    const flat = await fetchJson<{
+      files: {
+        name: string
+        size: number
+        time: string
+        hash: string
+      }[]
+    }>(`https://unpkg.uistandards.k8s.fdscloud.io/${pkgName}@${version}?flat`)
+    if (!flat) {
+      return []
+    }
 
-	async function flat(pkgName: string, version: string | undefined) {
-		version ??= 'latest';
+    return flat.files
+  }
 
-		// resolve latest tag
-		if (version === 'latest') {
-			const data = await fetchJson<{ version: string | null; }>(`https://unpkg.uistandards.k8s.fdscloud.io/${pkgName}@${version}/package.json`);
-			if (!data?.version) {
-				return [];
-			}
-			version = data.version;
-		}
+  async function isValidPackageName(pkgName: string) {
+    // ignore @aaa/node_modules
+    if (pkgName.endsWith('/node_modules')) {
+      return false
+    }
+    // hard code to skip known invalid package
+    if (
+      pkgName.endsWith('.d.ts') ||
+      pkgName.startsWith('@typescript/') ||
+      pkgName.startsWith('@types/typescript__')
+    ) {
+      return false
+    }
+    // don't check @types if original package already having types
+    if (pkgName.startsWith('@types/')) {
+      let originalPkgName = pkgName.slice('@types/'.length)
+      if (originalPkgName.indexOf('__') >= 0) {
+        originalPkgName = '@' + originalPkgName.replace('__', '/')
+      }
+      const packageJson = await _readFile(`${originalPkgName}/package.json`)
+      if (!packageJson) {
+        return false
+      }
+      const packageJsonObj = JSON.parse(packageJson)
+      if (packageJsonObj.types || packageJsonObj.typings) {
+        return false
+      }
+      const indexDts = await _stat(`${originalPkgName}/index.d.ts`)
+      if (indexDts?.type === (1 satisfies FileType.File)) {
+        return false
+      }
+    }
+    return true
+  }
 
-		const flat = await fetchJson<{
-			files: {
-				name: string;
-				size: number;
-				time: string;
-				hash: string;
-			}[];
-		}>(`https://unpkg.uistandards.k8s.fdscloud.io/${pkgName}@${version}?flat`);
-		if (!flat) {
-			return [];
-		}
-
-		return flat.files;
-	}
-
-	async function isValidPackageName(pkgName: string) {
-		// ignore @aaa/node_modules
-		if (pkgName.endsWith('/node_modules')) {
-			return false;
-		}
-		// hard code to skip known invalid package
-		if (pkgName.endsWith('.d.ts') || pkgName.startsWith('@typescript/') || pkgName.startsWith('@types/typescript__')) {
-			return false;
-		}
-		// don't check @types if original package already having types
-		if (pkgName.startsWith('@types/')) {
-			let originalPkgName = pkgName.slice('@types/'.length);
-			if (originalPkgName.indexOf('__') >= 0) {
-				originalPkgName = '@' + originalPkgName.replace('__', '/');
-			}
-			const packageJson = await _readFile(`${originalPkgName}/package.json`);
-			if (!packageJson) {
-				return false;
-			}
-			const packageJsonObj = JSON.parse(packageJson);
-			if (packageJsonObj.types || packageJsonObj.typings) {
-				return false;
-			}
-			const indexDts = await _stat(`${originalPkgName}/index.d.ts`);
-			if (indexDts?.type === 1 satisfies FileType.File) {
-				return false;
-			}
-		}
-		return true;
-	}
-
-	/**
-	 * @example
-	 * "a/b/c" -> ["a", "a", undefined, "b/c"]
-	 * "@a" -> ["@a", undefined, undefined, ""]
-	 * "@a/b/c" -> ["@a/b", "@a/b", undefined, "c"]
-	 * "@a/b@1.2.3/c" -> ["@a/b@1.2.3", "@a/b", "1.2.3", "c"]
-	 */
-	function resolvePackageName(input: string): [
-		modName: string,
-		pkgName: string | undefined,
-		version: string | undefined,
-		path: string,
-	] {
-		const parts = input.split('/');
-		let modName = parts[0];
-		let path: string;
-		if (modName.startsWith('@')) {
-			if (!parts[1]) {
-				return [modName, undefined, undefined, ''];
-			}
-			modName += '/' + parts[1];
-			path = parts.slice(2).join('/');
-		}
-		else {
-			path = parts.slice(1).join('/');
-		}
-		let pkgName = modName;
-		let version: string | undefined;
-		if (modName.lastIndexOf('@') >= 1) {
-			pkgName = modName.substring(0, modName.lastIndexOf('@'));
-			version = modName.substring(modName.lastIndexOf('@') + 1);
-		}
-		if (!version && getPackageVersion) {
-			getPackageVersion?.(pkgName);
-		}
-		return [modName, pkgName, version, path];
-	}
+  /**
+   * @example
+   * "a/b/c" -> ["a", "a", undefined, "b/c"]
+   * "@a" -> ["@a", undefined, undefined, ""]
+   * "@a/b/c" -> ["@a/b", "@a/b", undefined, "c"]
+   * "@a/b@1.2.3/c" -> ["@a/b@1.2.3", "@a/b", "1.2.3", "c"]
+   */
+  function resolvePackageName(
+    input: string,
+  ): [
+    modName: string,
+    pkgName: string | undefined,
+    version: string | undefined,
+    path: string,
+  ] {
+    const parts = input.split('/')
+    let modName = parts[0]
+    let path: string
+    if (modName.startsWith('@')) {
+      if (!parts[1]) {
+        return [modName, undefined, undefined, '']
+      }
+      modName += '/' + parts[1]
+      path = parts.slice(2).join('/')
+    } else {
+      path = parts.slice(1).join('/')
+    }
+    let pkgName = modName
+    let version: string | undefined
+    if (modName.lastIndexOf('@') >= 1) {
+      pkgName = modName.substring(0, modName.lastIndexOf('@'))
+      version = modName.substring(modName.lastIndexOf('@') + 1)
+    }
+    if (!version && getPackageVersion) {
+      getPackageVersion?.(pkgName)
+    }
+    return [modName, pkgName, version, path]
+  }
 }
 
-let inflightRequests = 0;
-const maxInflightRequests = 10;
+let inflightRequests = 0
+const maxInflightRequests = 10
 const queue = new Array<{
-	resolve: (value: any) => void;
-	reject: (reason?: any) => void;
-	fn: () => Promise<any>;
-}>();
-
+  resolve: (value: any) => void
+  reject: (reason?: any) => void
+  fn: () => Promise<any>
+}>()
 
 async function runWithRateLimiting<T>(fn: () => Promise<T>) {
-	async function run() {
-		if (inflightRequests >= maxInflightRequests || !queue.length) {
-			// Either we have no more work to do, or we already have the max number of requests in flight, so we can't start another one.
-			// Another worker will pick up the next item in the queue when one of them finishes.
-			return;
-		}
+  async function run() {
+    if (inflightRequests >= maxInflightRequests || !queue.length) {
+      // Either we have no more work to do, or we already have the max number of requests in flight, so we can't start another one.
+      // Another worker will pick up the next item in the queue when one of them finishes.
+      return
+    }
 
-		const item = queue.shift()!;
+    const item = queue.shift()!
 
-		inflightRequests++;
+    inflightRequests++
 
-		try {
-			await item.fn();
-		} catch (e) {
-			item.reject(e);
-		}
+    try {
+      await item.fn()
+    } catch (e) {
+      item.reject(e)
+    }
 
-		inflightRequests--;
-	}
+    inflightRequests--
+  }
 
-	return new Promise<T>((resolve, reject) => {
-		queue.push({
-			resolve,
-			reject,
-			fn,
-		});
+  return new Promise<T>((resolve, reject) => {
+    queue.push({
+      resolve,
+      reject,
+      fn,
+    })
 
-		run();
-	});
+    run()
+  })
 }
 
 async function fetchText(url: string) {
-	console.log('fetching text', url);
-	if (!textCache.has(url)) {
-		textCache.set(url, (async () => {
-			try {
-				const res = await fetch(url);
-				if (res.status === 200) {
-					return await res.text();
-				}
-			} catch {
-				// ignore
-			}
-		})());
-	}
-	return await runWithRateLimiting(() => textCache.get(url)!);
+  console.log('fetching text', url)
+  if (!textCache.has(url)) {
+    textCache.set(
+      url,
+      (async () => {
+        try {
+          const res = await fetch(url)
+          if (res.status === 200) {
+            return await res.text()
+          }
+        } catch {
+          // ignore
+        }
+      })(),
+    )
+  }
+  return await textCache.get(url)!
 }
 
 async function fetchJson<T>(url: string) {
-	console.log('fetching json', url);
-	if (!jsonCache.has(url)) {
-		jsonCache.set(url, (async () => {
-			try {
-				const res = await fetch(url);
-				if (res.status === 200) {
-					return await res.json();
-				}
-			} catch {
-				// ignore
-			}
-		})());
-	}
-	return await runWithRateLimiting<T>(() => jsonCache.get(url)!);
+  console.log('fetching json', url)
+  if (!jsonCache.has(url)) {
+    jsonCache.set(
+      url,
+      (async () => {
+        try {
+          const res = await fetch(url)
+          if (res.status === 200) {
+            return await res.json()
+          }
+        } catch {
+          // ignore
+        }
+      })(),
+    )
+  }
+  return await jsonCache.get(url)!
 }
