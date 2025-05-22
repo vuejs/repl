@@ -17,6 +17,7 @@ export default defineConfig({
     },
   },
   build: {
+    minify: false,
     commonjsOptions: {
       ignore: ['typescript'],
     },
