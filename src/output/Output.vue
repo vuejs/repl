@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import Preview from './Preview.vue'
-import { computed, inject, useTemplateRef } from 'vue'
+import SsrOutput from './SsrOutput.vue'
+import { computed, inject, useTemplateRef, watchEffect } from 'vue'
 import {
   type EditorComponentType,
   type OutputModes,
@@ -10,27 +11,32 @@ import {
 const props = defineProps<{
   editorComponent: EditorComponentType
   showCompileOutput?: boolean
+  showSsrOutput?: boolean
   ssr: boolean
 }>()
 
 const { store } = inject(injectKeyProps)!
 const previewRef = useTemplateRef('preview')
-const modes = computed(() =>
-  props.showCompileOutput
-    ? (['preview', 'js', 'css', 'ssr'] as const)
-    : (['preview'] as const),
-)
+const modes = computed(() => {
+  const outputModes: OutputModes[] = ['preview']
+  if (props.showCompileOutput) {
+    outputModes.push('js', 'css', 'ssr')
+  }
+  if (props.ssr && props.showSsrOutput) {
+    outputModes.push('ssr output')
+  }
+  return outputModes
+})
 
 const mode = computed<OutputModes>({
-  get: () =>
-    (modes.value as readonly string[]).includes(store.value.outputMode)
-      ? store.value.outputMode
-      : 'preview',
-  set(value) {
-    if ((modes.value as readonly string[]).includes(store.value.outputMode)) {
-      store.value.outputMode = value
-    }
-  },
+  get: () => store.value.outputMode,
+  set: (value) => (store.value.outputMode = value),
+})
+
+watchEffect(() => {
+  if (!modes.value.includes(mode.value)) {
+    mode.value = modes.value[0]
+  }
 })
 
 function reload() {
@@ -54,8 +60,13 @@ defineExpose({ reload, previewRef })
 
   <div class="output-container">
     <Preview ref="preview" :show="mode === 'preview'" :ssr="ssr" />
+    <SsrOutput
+      v-if="mode === 'ssr output'"
+      :context="store.ssrOutput.context"
+      :html="store.ssrOutput.html"
+    />
     <props.editorComponent
-      v-if="mode !== 'preview'"
+      v-else-if="mode !== 'preview'"
       readonly
       :filename="store.activeFile.filename"
       :value="store.activeFile.compiled[mode]"
