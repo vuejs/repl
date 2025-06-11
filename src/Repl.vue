@@ -18,6 +18,7 @@ export interface Props {
   store?: Store
   autoResize?: boolean
   showCompileOutput?: boolean
+  showOpenSource?: boolean
   showImportMap?: boolean
   showTsConfig?: boolean
   clearConsole?: boolean
@@ -53,6 +54,7 @@ const props = withDefaults(defineProps<Props>(), {
   store: () => useStore(),
   autoResize: true,
   showCompileOutput: true,
+  showOpenSource: false,
   showImportMap: true,
   showTsConfig: true,
   clearConsole: true,
@@ -105,6 +107,7 @@ defineExpose({ reload })
           ref="output"
           :editor-component="editor"
           :show-compile-output="props.showCompileOutput"
+          :show-open-source="props.showOpenSource"
           :ssr="!!props.ssr"
         />
       </template>
