@@ -500,6 +500,8 @@ export class File {
     js: '',
     css: '',
     ssr: '',
+    clientMap: '',
+    ssrMap: '',
   }
   editorViewState: editor.ICodeEditorViewState | null = null
 

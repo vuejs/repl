@@ -11,6 +11,7 @@ import {
 const props = defineProps<{
   editorComponent: EditorComponentType
   showCompileOutput?: boolean
+  showOpenSourceMap?: boolean
   showSsrOutput?: boolean
   ssr: boolean
 }>()
@@ -38,6 +39,15 @@ watchEffect(() => {
     mode.value = modes.value[0]
   }
 })
+
+const showSourceMap = computed(() => {
+  return props.showOpenSourceMap && (mode.value === 'js' || mode.value === 'ssr')
+})
+
+function openSourceMap() {
+  const { clientMap, ssrMap } = store.value.activeFile.compiled
+  window.open(mode.value === 'js' ? clientMap : ssrMap)
+}
 
 function reload() {
   previewRef.value?.reload()
@@ -73,6 +83,12 @@ defineExpose({ reload, previewRef })
       :mode="mode"
     />
   </div>
+
+  <div v-if="showSourceMap" class="tab-buttons open-sourcemap">
+    <button>
+      <span @click="openSourceMap">open sourceMap</span>
+    </button>
+  </div>
 </template>
 
 <style scoped>
@@ -105,5 +121,10 @@ defineExpose({ reload, previewRef })
 button.active {
   color: var(--color-branding-dark);
   border-bottom: 3px solid var(--color-branding-dark);
+}
+.open-sourcemap {
+  position: absolute;
+  right: 0;
+  top: 0;
 }
 </style>

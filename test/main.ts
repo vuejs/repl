@@ -58,6 +58,7 @@ const App = {
         theme: theme.value,
         previewTheme: previewTheme.value,
         editor: MonacoEditor,
+        showOpenSourceMap: true,
         // layout: 'vertical',
         ssr: true,
         showSsrOutput: true,
