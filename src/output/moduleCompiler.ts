@@ -201,7 +201,7 @@ function processModule(store: Store, src: string, filename: string) {
           }
         }
         s.remove(node.start!, node.declaration.start!)
-      } else if (node.source) {
+      } else if (node.source && node.source.value.startsWith('./')) {
         // export { foo, bar } from './foo'
         const importId = defineImport(node, node.source.value)
         for (const spec of node.specifiers) {
