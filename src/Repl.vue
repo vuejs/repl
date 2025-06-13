@@ -19,6 +19,7 @@ export interface Props {
   autoResize?: boolean
   showCompileOutput?: boolean
   showImportMap?: boolean
+  showSsrOutput?: boolean
   showTsConfig?: boolean
   clearConsole?: boolean
   layout?: 'horizontal' | 'vertical'
@@ -54,6 +55,7 @@ const props = withDefaults(defineProps<Props>(), {
   autoResize: true,
   showCompileOutput: true,
   showImportMap: true,
+  showSsrOutput: false,
   showTsConfig: true,
   clearConsole: true,
   layoutReverse: false,
@@ -105,6 +107,7 @@ defineExpose({ reload })
           ref="output"
           :editor-component="editor"
           :show-compile-output="props.showCompileOutput"
+          :show-ssr-output="props.showSsrOutput"
           :ssr="!!props.ssr"
         />
       </template>

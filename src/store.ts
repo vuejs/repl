@@ -368,6 +368,7 @@ export function useStore(
     showOutput,
     outputMode,
     sfcOptions,
+    ssrOutput: { html: '', context: '' },
     compiler,
     loading,
     vueVersion,
@@ -429,6 +430,10 @@ export type StoreState = ToRefs<{
   showOutput: boolean
   outputMode: OutputModes
   sfcOptions: SFCOptions
+  ssrOutput: {
+    html: string
+    context: unknown
+  }
   /** `@vue/compiler-sfc` */
   compiler: typeof defaultCompiler
   /* only apply for compiler-sfc */
@@ -474,6 +479,7 @@ export type Store = Pick<
   | 'showOutput'
   | 'outputMode'
   | 'sfcOptions'
+  | 'ssrOutput'
   | 'compiler'
   | 'vueVersion'
   | 'locale'
