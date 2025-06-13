@@ -1,6 +1,6 @@
 {
   "name": "@vue/repl",
-  "version": "4.5.1",
+  "version": "4.6.0",
   "description": "Vue component for editing Vue components",
   "packageManager": "pnpm@9.15.5",
   "type": "module",
