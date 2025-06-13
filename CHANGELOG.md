@@ -1,3 +1,12 @@
+## [4.6.1](https://github.com/vuejs/repl/compare/v4.6.0...v4.6.1) (2025-06-13)
+
+
+### Bug Fixes
+
+* the line number offset in the DEV ([#344](https://github.com/vuejs/repl/issues/344)) ([cc292d3](https://github.com/vuejs/repl/commit/cc292d3dba25ac872edf147e14b6c9bbf6a0c577))
+
+
+
 # [4.6.0](https://github.com/vuejs/repl/compare/v4.5.1...v4.6.0) (2025-06-13)
 
 
