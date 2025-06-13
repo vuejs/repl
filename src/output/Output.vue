@@ -11,7 +11,7 @@ const props = defineProps<{
   editorComponent: EditorComponentType
   showCompileOutput?: boolean
   ssr: boolean,
-  showOpenSource?: boolean
+  showOpenSourceMap?: boolean
 }>()
 
 const { store } = inject(injectKeyProps)!
@@ -35,7 +35,7 @@ const mode = computed<OutputModes>({
 })
 
 const showSourceMap = computed(() => {
-  return props.showOpenSource && mode.value === 'js' || mode.value === 'ssr'
+  return props.showOpenSourceMap && (mode.value === 'js' || mode.value === 'ssr')
 })
 
 function openSourceMap() {
