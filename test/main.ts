@@ -61,6 +61,7 @@ const App = {
         showOpenSourceMap: true,
         // layout: 'vertical',
         ssr: true,
+        showSsrOutput: true,
         sfcOptions: {
           script: {
             // inlineTemplate: false

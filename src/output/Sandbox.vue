@@ -223,7 +223,8 @@ async function updatePreview() {
       console.info(
         `[@vue/repl] successfully compiled ${ssrModules.length} modules for SSR.`,
       )
-      await proxy.eval([
+      store.value.ssrOutput.html = store.value.ssrOutput.context = ''
+      const response = await proxy.eval([
         `const __modules__ = {};`,
         ...ssrModules,
         `import { renderToString as _renderToString } from 'vue/server-renderer'
@@ -235,15 +236,41 @@ async function updatePreview() {
            app.config.unwrapInjectedRef = true
          }
          app.config.warnHandler = () => {}
-         window.__ssr_promise__ = _renderToString(app).then(html => {
+         const rawContext = {}
+         window.__ssr_promise__ = _renderToString(app, rawContext).then(html => {
            document.body.innerHTML = '<div id="app">' + html + '</div>' + \`${
              previewOptions.value?.bodyHTML || ''
            }\`
+           const safeContext = {}
+           const isSafe = (v) =>
+             v === null ||
+             typeof v === 'boolean' ||
+             typeof v === 'string' ||
+             Number.isFinite(v)
+           const toSafe = (v) => (isSafe(v) ? v : '[' + typeof v + ']')
+           for (const prop in rawContext) {
+             const value = rawContext[prop]
+             safeContext[prop] = isSafe(value)
+               ? value
+               : Array.isArray(value)
+                 ? value.map(toSafe)
+                 : typeof value === 'object'
+                   ? Object.fromEntries(
+                       Object.entries(value).map(([k, v]) => [k, toSafe(v)]),
+                     )
+                   : toSafe(value)
+           }
+           return { ssrHtml: html, ssrContext: safeContext }
          }).catch(err => {
            console.error("SSR Error", err)
          })
         `,
       ])
+
+      if (response) {
+        store.value.ssrOutput.html = String((response as any).ssrHtml ?? '')
+        store.value.ssrOutput.context = (response as any).ssrContext || ''
+      }
     }
 
     // compile code to simulated module system

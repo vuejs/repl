@@ -20,6 +20,7 @@ export interface Props {
   showCompileOutput?: boolean
   showOpenSourceMap?: boolean
   showImportMap?: boolean
+  showSsrOutput?: boolean
   showTsConfig?: boolean
   clearConsole?: boolean
   layout?: 'horizontal' | 'vertical'
@@ -56,6 +57,7 @@ const props = withDefaults(defineProps<Props>(), {
   showCompileOutput: true,
   showOpenSourceMap: false,
   showImportMap: true,
+  showSsrOutput: false,
   showTsConfig: true,
   clearConsole: true,
   layoutReverse: false,
@@ -108,6 +110,7 @@ defineExpose({ reload })
           :editor-component="editor"
           :show-compile-output="props.showCompileOutput"
           :show-open-source-map="props.showOpenSourceMap"
+          :show-ssr-output="props.showSsrOutput"
           :ssr="!!props.ssr"
         />
       </template>
