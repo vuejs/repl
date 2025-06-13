@@ -40,7 +40,7 @@ export function getSourceMap(
       templateMap as Omit<RawSourceMap, 'version'> as TraceEncodedSourceMap,
     )
     const offset =
-      (trimAnalyzedBindings(scriptCode).match(/\r?\n/g)?.length ?? 0) + 1
+      (trimAnalyzedBindings(scriptCode).match(/\r?\n/g)?.length ?? 0) 
     eachMapping(tracer, (m) => {
       if (m.source == null) return
       addMapping(gen, {
