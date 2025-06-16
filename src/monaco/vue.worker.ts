@@ -6,12 +6,13 @@ import {
   createTypeScriptWorkerLanguageService,
 } from '@volar/monaco/worker'
 import { createNpmFileSystem } from '@volar/jsdelivr'
+import { create as createTypeScriptPlugins } from 'volar-service-typescript'
+import { createVueLanguageServicePlugins } from '@vue/language-service'
 import {
-  type VueCompilerOptions,
-  getFullLanguageServicePlugins,
   createVueLanguagePlugin,
-  resolveVueCompilerOptions,
-} from '@vue/language-service'
+  getDefaultCompilerOptions,
+  type VueCompilerOptions,
+} from '@vue/language-core'
 import type { WorkerHost, WorkerMessage } from './env'
 import { URI } from 'vscode-uri'
 
@@ -68,10 +69,17 @@ self.onmessage = async (msg: MessageEvent<WorkerMessage>) => {
         tsconfig?.compilerOptions || {},
         '',
       )
-      const vueCompilerOptions = resolveVueCompilerOptions(
-        tsconfig.vueCompilerOptions || {},
-      )
+      const vueCompilerOptions = {
+        ...getDefaultCompilerOptions(),
+        ...(tsconfig.vueCompilerOptions || {}),
+      }
 
+      const vuePlugin = createVueLanguagePlugin(
+        ts,
+        compilerOptions,
+        vueCompilerOptions,
+        asFileName,
+      )
       return createTypeScriptWorkerLanguageService({
         typescript: ts,
         compilerOptions,
@@ -81,15 +89,13 @@ self.onmessage = async (msg: MessageEvent<WorkerMessage>) => {
           asFileName,
           asUri,
         },
-        languagePlugins: [
-          createVueLanguagePlugin(
-            ts,
-            compilerOptions,
-            vueCompilerOptions,
-            asFileName,
-          ),
+        languagePlugins: [vuePlugin],
+        languageServicePlugins: [
+          createTypeScriptPlugins(ts).find(
+            (i) => i.name === 'typescript-semantic',
+          )!,
+          ...createVueLanguageServicePlugins(ts, undefined),
         ],
-        languageServicePlugins: getFullLanguageServicePlugins(ts),
         setup({ project }) {
           project.vue = { compilerOptions: vueCompilerOptions }
         },
