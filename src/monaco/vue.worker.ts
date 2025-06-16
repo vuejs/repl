@@ -74,12 +74,6 @@ self.onmessage = async (msg: MessageEvent<WorkerMessage>) => {
         ...(tsconfig.vueCompilerOptions || {}),
       }
 
-      const vuePlugin = createVueLanguagePlugin(
-        ts,
-        compilerOptions,
-        vueCompilerOptions,
-        asFileName,
-      )
       return createTypeScriptWorkerLanguageService({
         typescript: ts,
         compilerOptions,
@@ -89,7 +83,14 @@ self.onmessage = async (msg: MessageEvent<WorkerMessage>) => {
           asFileName,
           asUri,
         },
-        languagePlugins: [vuePlugin],
+        languagePlugins: [
+          createVueLanguagePlugin(
+            ts,
+            compilerOptions,
+            vueCompilerOptions,
+            asFileName,
+          ),
+        ],
         languageServicePlugins: [
           createTypeScriptPlugins(ts).find(
             (i) => i.name === 'typescript-semantic',
