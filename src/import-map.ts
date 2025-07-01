@@ -21,21 +21,14 @@ export function useVueImportMap(
         normalizeDefaults(
           productionMode.value ? defaults.runtimeProd : defaults.runtimeDev,
         )) ||
-      `https://unpkg.uistandards.k8s.fdscloud.io/@vue/runtime-dom@${
-        vueVersion.value || currentVersion
-      }/dist/runtime-dom.esm-browser${productionMode.value ? `.prod` : ``}.js`
+      `https://esmsh.factset.io/vue@${vueVersion.value || currentVersion}`
 
-    const serverRenderer =
-      (!vueVersion.value && normalizeDefaults(defaults.serverRenderer)) ||
-      `https://unpkg.uistandards.k8s.fdscloud.io/@vue/server-renderer@${
-        vueVersion.value || currentVersion
-      }/dist/server-renderer.esm-browser.js`
     return {
       imports: {
         vue,
-        'vue/server-renderer': serverRenderer,
-
-        '@fds/': 'https://unpkg.uistandards.k8s.fdscloud.io/@fds/',
+        '@fds/fusion':
+          'https://esmsh.factset.io/@fds/fusion?standalone&external=vue',
+        '@fds/': 'https://esmsh.factset.io/@fds/',
       },
     }
   })
