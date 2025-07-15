@@ -15,15 +15,24 @@ export function useVueImportMap(
 
   const productionMode = ref(false)
   const vueVersion = ref<string | null>(defaults.vueVersion || null)
+
+  function getVueURL() {
+    const version = vueVersion.value || currentVersion
+    const [major, minor] = version.split('.').map(Number)
+    const isVaporSupported = major > 3 || (major === 3 && minor >= 6)
+
+    return isVaporSupported
+      ? `https://cdn.jsdelivr.net/npm/vue@${version}/dist/vue.runtime-with-vapor.esm-browser${productionMode.value ? `.prod` : ``}.js`
+      : `https://cdn.jsdelivr.net/npm/@vue/runtime-dom@${version}/dist/runtime-dom.esm-browser${productionMode.value ? `.prod` : ``}.js`
+  }
+
   const importMap = computed<ImportMap>(() => {
     const vue =
       (!vueVersion.value &&
         normalizeDefaults(
           productionMode.value ? defaults.runtimeProd : defaults.runtimeDev,
         )) ||
-      `https://cdn.jsdelivr.net/npm/@vue/runtime-dom@${
-        vueVersion.value || currentVersion
-      }/dist/runtime-dom.esm-browser${productionMode.value ? `.prod` : ``}.js`
+      getVueURL()
 
     const serverRenderer =
       (!vueVersion.value && normalizeDefaults(defaults.serverRenderer)) ||
