@@ -1,5 +1,15 @@
 import { computed, version as currentVersion, ref } from 'vue'
 
+export function getVersions(version: string): number[] {
+  return version.split('.').map((v) => parseInt(v, 10))
+}
+
+export function isVaporSupported(version: string): boolean{
+  const [major, minor] = getVersions(version)
+  // vapor mode is supported in v3.6+
+  return major > 3 || (major === 3 && minor >= 6)
+}
+
 export function useVueImportMap(
   defaults: {
     runtimeDev?: string | (() => string)
@@ -18,10 +28,7 @@ export function useVueImportMap(
 
   function getVueURL() {
     const version = vueVersion.value || currentVersion
-    const [major, minor] = version.split('.').map(Number)
-    const isVaporSupported = major > 3 || (major === 3 && minor >= 6)
-
-    return isVaporSupported
+    return isVaporSupported(version)
       ? `https://cdn.jsdelivr.net/npm/vue@${version}/dist/vue.runtime-with-vapor.esm-browser${productionMode.value ? `.prod` : ``}.js`
       : `https://cdn.jsdelivr.net/npm/@vue/runtime-dom@${version}/dist/runtime-dom.esm-browser${productionMode.value ? `.prod` : ``}.js`
   }
