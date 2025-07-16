@@ -6,7 +6,9 @@ import {
   type EditorComponentType,
   type OutputModes,
   injectKeyProps,
+  injectKeyShowPreviewRef,
 } from '../types'
+import ToggleButton from '../editor/ToggleButton.vue'
 
 const props = defineProps<{
   editorComponent: EditorComponentType
@@ -54,18 +56,24 @@ function reload() {
 }
 
 defineExpose({ reload, previewRef })
+
+const showPreview = inject(injectKeyShowPreviewRef)
 </script>
 
 <template>
   <div class="tab-buttons">
-    <button
-      v-for="m of modes"
-      :key="m"
-      :class="{ active: mode === m }"
-      @click="mode = m"
-    >
-      <span>{{ m }}</span>
-    </button>
+    <div>
+      <button
+        v-for="m of modes"
+        :key="m"
+        :class="{ active: mode === m }"
+        @click="mode = m"
+      >
+        <span>{{ m }}</span>
+      </button>
+    </div>
+
+    <ToggleButton v-model="showPreview" text="Show Preview" />
   </div>
 
   <div class="output-container">
@@ -104,6 +112,10 @@ defineExpose({ reload, previewRef })
   background-color: var(--bg);
   height: var(--header-height);
   overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: space-between; /* 양쪽 끝에 버튼들을 배치 */
+  padding: 0 16px; /* 좌우 간격 추가 */
 }
 .tab-buttons button {
   padding: 0;

@@ -1,6 +1,10 @@
 <script setup lang="ts">
 import { computed, inject, reactive, useTemplateRef } from 'vue'
-import { injectKeyPreviewRef, injectKeyProps } from './types'
+import {
+  injectKeyPreviewRef,
+  injectKeyProps,
+  injectKeyShowPreviewRef,
+} from './types'
 
 const props = defineProps<{ layout?: 'horizontal' | 'vertical' }>()
 const isVertical = computed(() => props.layout === 'vertical')
@@ -18,7 +22,12 @@ const state = reactive({
   viewWidth: 0,
 })
 
+const showPreview = inject(injectKeyShowPreviewRef)
+
 const boundSplit = computed(() => {
+  if (!showPreview || !showPreview.value) {
+    return 0
+  }
   const { split } = state
   return split < 20 ? 20 : split > 80 ? 80 : split
 })
@@ -74,6 +83,7 @@ function changeViewSize() {
     @mouseleave="dragEnd"
   >
     <div
+      v-if="showPreview"
       class="left"
       :style="{ [isVertical ? 'height' : 'width']: boundSplit + '%' }"
     >
@@ -90,7 +100,11 @@ function changeViewSize() {
       <slot name="right" />
     </div>
 
-    <button class="toggler" @click="store.showOutput = !store.showOutput">
+    <button
+      v-if="showPreview"
+      class="toggler"
+      @click="store.showOutput = !store.showOutput"
+    >
       {{
         store.showOutput
           ? splitPaneOptions?.codeTogglerText || '< Code'
