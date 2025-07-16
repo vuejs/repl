@@ -1,3 +1,12 @@
+## [4.6.2](https://github.com/vuejs/repl/compare/v4.6.1...v4.6.2) (2025-07-16)
+
+
+### Bug Fixes
+
+* handle Vue 3.6+ vapor runtime imports correctly ([#357](https://github.com/vuejs/repl/issues/357)) ([c4bac9c](https://github.com/vuejs/repl/commit/c4bac9c9d22813cdb343f850da516e84a0700e4d)), closes [#356](https://github.com/vuejs/repl/issues/356)
+
+
+
 ## [4.6.1](https://github.com/vuejs/repl/compare/v4.6.0...v4.6.1) (2025-06-13)
 
 

@@ -16,6 +16,7 @@ import { PreviewProxy } from './PreviewProxy'
 import { compileModulesForPreview } from './moduleCompiler'
 import type { Store } from '../store'
 import { injectKeyProps } from '../types'
+import { getVersions, isVaporSupported } from '../import-map'
 
 export interface SandboxProps {
   store: Store
@@ -202,9 +203,7 @@ async function updatePreview() {
 
   let isSSR = props.ssr
   if (store.value.vueVersion) {
-    const [major, minor, patch] = store.value.vueVersion
-      .split('.')
-      .map((v) => parseInt(v, 10))
+    const [major, minor, patch] = getVersions(store.value.vueVersion)
     if (major === 3 && (minor < 2 || (minor === 2 && patch < 27))) {
       alert(
         `The selected version of Vue (${store.value.vueVersion}) does not support in-browser SSR.` +
@@ -213,6 +212,10 @@ async function updatePreview() {
       isSSR = false
     }
   }
+
+  const vaporSupported = isVaporSupported(
+    store.value.vueVersion || store.value.compiler?.version
+  )
 
   try {
     const { mainFile } = store.value
@@ -228,10 +231,11 @@ async function updatePreview() {
         `const __modules__ = {};`,
         ...ssrModules,
         `import { renderToString as _renderToString } from 'vue/server-renderer'
-         import { createSSRApp as _createApp } from 'vue'
+         import { createSSRApp as _createApp ${vaporSupported ? ', createVaporSSRApp as _createVaporApp' : ''} } from 'vue'
          const AppComponent = __modules__["${mainFile}"].default
          AppComponent.name = 'Repl'
-         const app = _createApp(AppComponent)
+         const vaporSupported = ${vaporSupported}
+         const app = (vaporSupported && AppComponent.__vapor ? _createVaporApp : _createApp)(AppComponent)
          if (!app.config.hasOwnProperty('unwrapInjectedRef')) {
            app.config.unwrapInjectedRef = true
          }
@@ -297,14 +301,19 @@ async function updatePreview() {
     // if main file is a vue file, mount it.
     if (mainFile.endsWith('.vue')) {
       codeToEval.push(
-        `import { ${
-          isSSR ? `createSSRApp` : `createApp`
-        } as _createApp } from "vue"
+        `import { ${isSSR ? `createSSRApp` : `createApp`} as _createApp ${
+          vaporSupported
+            ? `, ${
+                isSSR ? 'createVaporSSRApp' : 'createVaporApp'
+              } as _createVaporApp`
+            : ''
+        } } from "vue"
         ${previewOptions.value?.customCode?.importCode || ''}
         const _mount = () => {
           const AppComponent = __modules__["${mainFile}"].default
           AppComponent.name = 'Repl'
-          const app = window.__app__ = _createApp(AppComponent)
+          const vaporSupported = ${vaporSupported}
+          const app = window.__app__ = (vaporSupported && AppComponent.__vapor ? _createVaporApp : _createApp)(AppComponent)
           if (!app.config.hasOwnProperty('unwrapInjectedRef')) {
             app.config.unwrapInjectedRef = true
           }
