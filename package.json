@@ -87,7 +87,7 @@
     "@types/codemirror": "^5.60.15",
     "@types/hash-sum": "^1.0.2",
     "@types/node": "^22.13.4",
-    "@vitejs/plugin-vue": "^5.2.1",
+    "@vitejs/plugin-vue": "^6.0.1",
     "@volar/jsdelivr": "~2.4.11",
     "@volar/monaco": "~2.4.11",
     "@vue/babel-plugin-jsx": "^1.2.5",
