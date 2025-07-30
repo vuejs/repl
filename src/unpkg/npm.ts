@@ -159,7 +159,9 @@ export function createNpmFileSystem(
           if ((await _stat(path))?.type !== (1 satisfies FileType.File)) {
             return
           }
-          const text = await fetchText(`https://unpkg.factset.io/${path}`)
+          const text = await fetchText(
+            `https://esmsh.factset.io/${path}?bundle=false&raw`,
+          )
           if (text !== undefined) {
             onFetch?.(path, text)
           }
@@ -177,7 +179,7 @@ export function createNpmFileSystem(
     // resolve latest tag
     if (version === 'latest') {
       const data = await fetchJson<{ version: string | null }>(
-        `https://unpkg.factset.io/${pkgName}@${version}/package.json`,
+        `https://esmsh.factset.io/${pkgName}@${version}/package.json`,
       )
       if (!data?.version) {
         return []

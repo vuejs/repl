@@ -1,10 +1,14 @@
 <script setup>
 import { ref } from 'vue'
+import { FusionAppContainer, FusionButton } from '@fds/fusion'
 
-const msg = ref('Hello World!')
+const count = ref(0)
 </script>
 
 <template>
-  <h1>{{ msg }}</h1>
-  <input v-model="msg" />
+  <FusionAppContainer>
+    <FusionButton @press="count++"
+      >You've clicked this button {{ count }} times!</FusionButton
+    >
+  </FusionAppContainer>
 </template>
