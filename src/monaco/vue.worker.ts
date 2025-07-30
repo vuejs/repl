@@ -110,6 +110,5 @@ self.onmessage = async (msg: MessageEvent<WorkerMessage>) => {
 
 async function importTsFromCdn(tsVersion: string) {
   const tsUrl = `https://esmsh.factset.io/typescript@${tsVersion}/lib/typescript.js`
-  await import(/* @vite-ignore */ tsUrl)
-  return ts as typeof import('typescript')
+  return await import(/* @vite-ignore */ tsUrl)
 }
