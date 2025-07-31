@@ -97,7 +97,7 @@
     "codemirror": "^5.65.18",
     "conventional-changelog-cli": "^5.0.0",
     "eslint": "^9.20.1",
-    "eslint-plugin-vue": "^9.32.0",
+    "eslint-plugin-vue": "^10.4.0",
     "fflate": "^0.8.2",
     "hash-sum": "^2.0.0",
     "lint-staged": "^15.4.3",
