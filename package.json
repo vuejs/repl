@@ -93,7 +93,7 @@
     "@vue/babel-plugin-jsx": "^1.2.5",
     "@vue/language-service": "~2.2.2",
     "assert": "^2.1.0",
-    "bumpp": "^9.11.1",
+    "bumpp": "^10.2.2",
     "codemirror": "^5.65.18",
     "conventional-changelog-cli": "^5.0.0",
     "eslint": "^9.20.1",
