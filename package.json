@@ -100,7 +100,7 @@
     "eslint-plugin-vue": "^9.32.0",
     "fflate": "^0.8.2",
     "hash-sum": "^2.0.0",
-    "lint-staged": "^15.4.3",
+    "lint-staged": "^16.1.4",
     "monaco-editor-core": "^0.52.2",
     "prettier": "^3.5.1",
     "shiki": "^1.29.2",
