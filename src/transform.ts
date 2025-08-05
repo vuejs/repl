@@ -122,10 +122,22 @@ export async function compileFile(
     ssrCode += code
   }
 
+  const ceFilter = store.sfcOptions.script?.customElement || /\.ce\.vue$/
+  function isCustomElement(filters: typeof ceFilter): boolean {
+    if (typeof filters === 'boolean') {
+      return filters
+    }
+    if (typeof filters === 'function') {
+      return filters(filename)
+    }
+    return filters.test(filename)
+  }
+  let isCE = isCustomElement(ceFilter)
+
   let clientScript: string
   let bindings: BindingMetadata | undefined
   try {
-    const res = await doCompileScript(store, descriptor, id, false, isTS, isJSX)
+    const res = await doCompileScript(store, descriptor, id, false, isTS, isJSX, isCE)
     clientScript = res.code
     bindings = res.bindings
     clientScriptMap = res.map
@@ -147,6 +159,7 @@ export async function compileFile(
         true,
         isTS,
         isJSX,
+        isCE
       )
       ssrScript = ssrScriptResult.code
       ssrCode += ssrScript
@@ -212,18 +225,6 @@ export async function compileFile(
   }
 
   // styles
-  const ceFilter = store.sfcOptions.script?.customElement || /\.ce\.vue$/
-  function isCustomElement(filters: typeof ceFilter): boolean {
-    if (typeof filters === 'boolean') {
-      return filters
-    }
-    if (typeof filters === 'function') {
-      return filters(filename)
-    }
-    return filters.test(filename)
-  }
-  let isCE = isCustomElement(ceFilter)
-
   let css = ''
   let styles: string[] = []
   for (const style of descriptor.styles) {
@@ -295,6 +296,7 @@ async function doCompileScript(
   ssr: boolean,
   isTS: boolean,
   isJSX: boolean,
+  isCustomElement: boolean,
 ): Promise<{ code: string; bindings: BindingMetadata | undefined; map?: any }> {
   if (descriptor.script || descriptor.scriptSetup) {
     const expressionPlugins: CompilerOptions['expressionPlugins'] = []
@@ -318,6 +320,7 @@ async function doCompileScript(
           expressionPlugins,
         },
       },
+      customElement: isCustomElement,
     })
     let code = compiledScript.content
     if (isTS) {
