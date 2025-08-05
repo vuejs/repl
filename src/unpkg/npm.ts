@@ -324,7 +324,10 @@ async function fetchText(url: string) {
       url,
       (async () => {
         try {
-          const res = await fetch(url)
+          const res = await fetch(url, {
+            mode: 'cors',
+          })
+
           if (res.status === 200) {
             return await res.text()
           }
@@ -344,7 +347,10 @@ async function fetchJson<T>(url: string) {
       url,
       (async () => {
         try {
-          const res = await fetch(url)
+          const res = await fetch(url, {
+            mode: 'cors',
+          })
+
           if (res.status === 200) {
             return await res.json()
           }
