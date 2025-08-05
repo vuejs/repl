@@ -3,13 +3,7 @@ import vue from '@vitejs/plugin-vue'
 import replace from '@rollup/plugin-replace'
 
 export default defineConfig({
-  plugins: [
-    vue({
-      script: {
-        defineModel: true,
-      },
-    }),
-  ],
+  plugins: [vue()],
   resolve: {
     alias: {
       '@vue/compiler-dom': '@vue/compiler-dom/dist/compiler-dom.cjs.js',

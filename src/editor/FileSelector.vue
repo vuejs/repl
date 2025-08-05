@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { injectKeyStore } from '../../src/types'
+import { injectKeyProps } from '../../src/types'
 import { importMapFile, stripSrcPrefix, tsconfigFile } from '../store'
-import { type Ref, type VNode, computed, inject, ref } from 'vue'
+import { type VNode, computed, inject, ref, useTemplateRef } from 'vue'
 
-const store = inject(injectKeyStore)!
+const { store, showTsConfig, showImportMap } = inject(injectKeyProps)!
 
 /**
  * When `true`: indicates adding a new file
@@ -16,10 +16,9 @@ const pending = ref<boolean | string>(false)
  * This is a display name so it should always strip off the `src/` prefix.
  */
 const pendingFilename = ref('Comp.vue')
-const showTsConfig = inject<Ref<boolean>>('tsconfig')
-const showImportMap = inject<Ref<boolean>>('import-map')
+
 const files = computed(() =>
-  Object.entries(store.files)
+  Object.entries(store.value.files)
     .filter(
       ([name, file]) =>
         name !== importMapFile && name !== tsconfigFile && !file.hidden,
@@ -33,7 +32,7 @@ function startAddFile() {
 
   while (true) {
     let hasConflict = false
-    for (const filename in store.files) {
+    for (const filename in store.value.files) {
       if (stripSrcPrefix(filename) === name) {
         hasConflict = true
         name = `Comp${++i}.vue`
@@ -59,23 +58,28 @@ function focus({ el }: VNode) {
 
 function doneNameFile() {
   if (!pending.value) return
+  if (!pendingFilename.value) {
+    pending.value = false
+    return
+  }
+
   // add back the src prefix
   const filename = 'src/' + pendingFilename.value
   const oldFilename = pending.value === true ? '' : pending.value
 
   if (!/\.(vue|jsx?|tsx?|css|json)$/.test(filename)) {
-    store.errors = [
+    store.value.errors = [
       `Playground only supports *.vue, *.jsx?, *.tsx?, *.css, *.json files.`,
     ]
     return
   }
 
-  if (filename !== oldFilename && filename in store.files) {
-    store.errors = [`File "${filename}" already exists.`]
+  if (filename !== oldFilename && filename in store.value.files) {
+    store.value.errors = [`File "${filename}" already exists.`]
     return
   }
 
-  store.errors = []
+  store.value.errors = []
   cancelNameFile()
 
   if (filename === oldFilename) {
@@ -83,9 +87,9 @@ function doneNameFile() {
   }
 
   if (oldFilename) {
-    store.renameFile(oldFilename, filename)
+    store.value.renameFile(oldFilename, filename)
   } else {
-    store.addFile(filename)
+    store.value.addFile(filename)
   }
 }
 
@@ -94,10 +98,10 @@ function editFileName(file: string) {
   pending.value = file
 }
 
-const fileSel = ref(null)
+const fileSelector = useTemplateRef('fileSelector')
 function horizontalScroll(e: WheelEvent) {
   e.preventDefault()
-  const el = fileSel.value! as HTMLElement
+  const el = fileSelector.value!
   const direction =
     Math.abs(e.deltaX) >= Math.abs(e.deltaY) ? e.deltaX : e.deltaY
   const distance = 30 * (direction > 0 ? 1 : -1)
@@ -109,7 +113,7 @@ function horizontalScroll(e: WheelEvent) {
 
 <template>
   <div
-    ref="fileSel"
+    ref="fileSelector"
     class="file-selector"
     :class="{ 'has-import-map': showImportMap }"
     @wheel="horizontalScroll"
@@ -192,6 +196,13 @@ function horizontalScroll(e: WheelEvent) {
 
 .file-selector::-webkit-scrollbar-thumb {
   background-color: var(--color-branding);
+}
+
+@-moz-document url-prefix() {
+  .file-selector {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-branding) var(--border);
+  }
 }
 
 .file-selector.has-import-map .add {

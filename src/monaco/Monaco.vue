@@ -1,19 +1,19 @@
 <script lang="ts" setup>
 import {
-  type Ref,
   computed,
   inject,
-  nextTick,
   onBeforeUnmount,
   onMounted,
-  ref,
+  onWatcherCleanup,
   shallowRef,
+  useTemplateRef,
   watch,
 } from 'vue'
 import * as monaco from 'monaco-editor-core'
 import { initMonaco } from './env'
 import { getOrCreateModel } from './utils'
-import { type EditorMode, injectKeyStore } from '../types'
+import { type EditorMode, injectKeyProps } from '../types'
+import { registerHighlighter } from './highlight'
 
 const props = withDefaults(
   defineProps<{
@@ -33,27 +33,30 @@ const emit = defineEmits<{
   (e: 'change', value: string): void
 }>()
 
-const containerRef = ref<HTMLDivElement>()
-const ready = ref(false)
+const containerRef = useTemplateRef('container')
 const editor = shallowRef<monaco.editor.IStandaloneCodeEditor>()
-const store = inject(injectKeyStore)!
-const autoSave = inject('autosave')!
+const {
+  store,
+  autoSave,
+  theme: replTheme,
+  editorOptions,
+} = inject(injectKeyProps)!
 
-initMonaco(store)
+initMonaco(store.value)
 
 const lang = computed(() => (props.mode === 'css' ? 'css' : 'javascript'))
 
-const replTheme = inject<Ref<'dark' | 'light'>>('theme')!
-onMounted(async () => {
-  const theme = await import('./highlight').then((r) => r.registerHighlighter())
-  ready.value = true
-  await nextTick()
+let editorInstance: monaco.editor.IStandaloneCodeEditor
+function emitChangeEvent() {
+  emit('change', editorInstance.getValue())
+}
 
+onMounted(() => {
+  const theme = registerHighlighter()
   if (!containerRef.value) {
     throw new Error('Cannot find containerRef')
   }
-
-  const editorInstance = monaco.editor.create(containerRef.value, {
+  editorInstance = monaco.editor.create(containerRef.value, {
     ...(props.readonly
       ? { value: props.value, language: lang.value }
       : { model: null }),
@@ -70,6 +73,7 @@ onMounted(async () => {
       enabled: false,
     },
     fixedOverflowWidgets: true,
+    ...editorOptions.value.monacoOptions,
   })
   editor.value = editorInstance
 
@@ -114,7 +118,7 @@ onMounted(async () => {
       () => props.filename,
       (_, oldFilename) => {
         if (!editorInstance) return
-        const file = store.files[props.filename]
+        const file = store.value.files[props.filename]
         if (!file) return null
         const model = getOrCreateModel(
           monaco.Uri.parse(`file:///${props.filename}`),
@@ -122,7 +126,7 @@ onMounted(async () => {
           file.code,
         )
 
-        const oldFile = oldFilename ? store.files[oldFilename] : null
+        const oldFile = oldFilename ? store.value.files[oldFilename] : null
         if (oldFile) {
           oldFile.editorViewState = editorInstance.saveViewState()
         }
@@ -142,18 +146,17 @@ onMounted(async () => {
     // ignore save event
   })
 
-  if (autoSave) {
-    editorInstance.onDidChangeModelContent(() => {
-      emit('change', editorInstance.getValue())
-    })
-  } else {
-    containerRef.value.addEventListener('keydown', (e: KeyboardEvent) => {
-      if (e.ctrlKey && e.key === 's') {
-        e.preventDefault()
-        emit('change', editorInstance.getValue())
+  watch(
+    autoSave,
+    (autoSave) => {
+      if (autoSave) {
+        const disposable =
+          editorInstance.onDidChangeModelContent(emitChangeEvent)
+        onWatcherCleanup(() => disposable.dispose())
       }
-    })
-  }
+    },
+    { immediate: true },
+  )
 
   // update theme
   watch(replTheme, (n) => {
@@ -169,7 +172,12 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <div ref="containerRef" class="editor" />
+  <div
+    ref="container"
+    class="editor"
+    @keydown.ctrl.s.prevent="emitChangeEvent"
+    @keydown.meta.s.prevent="emitChangeEvent"
+  />
 </template>
 
 <style>

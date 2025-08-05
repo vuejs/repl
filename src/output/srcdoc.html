@@ -6,8 +6,9 @@
         color-scheme: dark;
       }
       body {
-        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
-          Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+        font-family:
+          -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu,
+          Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
       }
     </style>
     <!-- PREVIEW-OPTIONS-HEAD-HTML -->
@@ -35,7 +36,8 @@
           const send_message = (payload) =>
             parent.postMessage({ ...payload }, ev.origin)
           const send_reply = (payload) => send_message({ ...payload, cmd_id })
-          const send_ok = () => send_reply({ action: 'cmd_ok' })
+          const send_ok = (response) =>
+            send_reply({ action: 'cmd_ok', args: response })
           const send_error = (message, stack) =>
             send_reply({ action: 'cmd_error', message, stack })
 
@@ -65,7 +67,11 @@
                 scriptEls.push(scriptEl)
                 await done
               }
-              send_ok()
+              if (window.__ssr_promise__) {
+                send_ok(await window.__ssr_promise__)
+              } else {
+                send_ok()
+              }
             } catch (e) {
               send_error(e.message, e.stack)
             }

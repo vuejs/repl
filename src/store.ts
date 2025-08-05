@@ -142,7 +142,11 @@ export function useStore(
     }
   }
 
-  function setImportMap(map: ImportMap) {
+  function setImportMap(map: ImportMap, merge = false) {
+    if (merge) {
+      map = mergeImportMap(getImportMap(), map)
+    }
+
     if (map.imports)
       for (const [key, value] of Object.entries(map.imports)) {
         if (value) {
@@ -266,9 +270,15 @@ export function useStore(
       }
     }
     if (vueVersion.value) files._version = vueVersion.value
+    if (typescriptVersion.value !== 'latest' || files._tsVersion) {
+      files._tsVersion = typescriptVersion.value
+    }
     return '#' + utoa(JSON.stringify(files))
   }
-  const deserialize: ReplStore['deserialize'] = (serializedState: string) => {
+  const deserialize: ReplStore['deserialize'] = (
+    serializedState: string,
+    checkBuiltinImportMap = true,
+  ) => {
     if (serializedState.startsWith('#'))
       serializedState = serializedState.slice(1)
     let saved: any
@@ -282,9 +292,14 @@ export function useStore(
     for (const filename in saved) {
       if (filename === '_version') {
         vueVersion.value = saved[filename]
+      } else if (filename === '_tsVersion') {
+        typescriptVersion.value = saved[filename]
       } else {
         setFile(files.value, filename, saved[filename])
       }
+    }
+    if (checkBuiltinImportMap) {
+      applyBuiltinImportMap()
     }
   }
   const getFiles: ReplStore['getFiles'] = () => {
@@ -329,7 +344,7 @@ export function useStore(
   }
 
   if (serializedState) {
-    deserialize(serializedState)
+    deserialize(serializedState, false)
   } else {
     setDefaultFile()
   }
@@ -353,6 +368,7 @@ export function useStore(
     showOutput,
     outputMode,
     sfcOptions,
+    ssrOutput: { html: '', context: '' },
     compiler,
     loading,
     vueVersion,
@@ -368,6 +384,7 @@ export function useStore(
     deleteFile,
     renameFile,
     getImportMap,
+    setImportMap,
     getTsConfig,
     serialize,
     deserialize,
@@ -413,6 +430,10 @@ export type StoreState = ToRefs<{
   showOutput: boolean
   outputMode: OutputModes
   sfcOptions: SFCOptions
+  ssrOutput: {
+    html: string
+    context: unknown
+  }
   /** `@vue/compiler-sfc` */
   compiler: typeof defaultCompiler
   /* only apply for compiler-sfc */
@@ -436,9 +457,15 @@ export interface ReplStore extends UnwrapRef<StoreState> {
   deleteFile(filename: string): void
   renameFile(oldFilename: string, newFilename: string): void
   getImportMap(): ImportMap
+  setImportMap(map: ImportMap, merge?: boolean): void
   getTsConfig(): Record<string, any>
   serialize(): string
-  deserialize(serializedState: string): void
+  /**
+   * Deserializes the given string to restore the REPL store state.
+   * @param serializedState - The serialized state string.
+   * @param checkBuiltinImportMap - Whether to check the built-in import map. Default to true
+   */
+  deserialize(serializedState: string, checkBuiltinImportMap?: boolean): void
   getFiles(): Record<string, string>
   setFiles(newFiles: Record<string, string>, mainFile?: string): Promise<void>
 }
@@ -452,6 +479,7 @@ export type Store = Pick<
   | 'showOutput'
   | 'outputMode'
   | 'sfcOptions'
+  | 'ssrOutput'
   | 'compiler'
   | 'vueVersion'
   | 'locale'
@@ -472,6 +500,8 @@ export class File {
     js: '',
     css: '',
     ssr: '',
+    clientMap: '',
+    ssrMap: '',
   }
   editorViewState: editor.ICodeEditorViewState | null = null
 

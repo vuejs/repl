@@ -2,9 +2,14 @@
 import SplitPane from './SplitPane.vue'
 import Output from './output/Output.vue'
 import { type Store, useStore } from './store'
-import { computed, provide, ref, toRef } from 'vue'
-import { type EditorComponentType, injectKeyStore } from './types'
+import { computed, provide, toRefs, useTemplateRef } from 'vue'
+import {
+  type EditorComponentType,
+  injectKeyPreviewRef,
+  injectKeyProps,
+} from './types'
 import EditorContainer from './editor/EditorContainer.vue'
+import type * as monaco from 'monaco-editor-core'
 
 export interface Props {
   theme?: 'dark' | 'light'
@@ -12,9 +17,10 @@ export interface Props {
   editor: EditorComponentType
   store?: Store
   autoResize?: boolean
-  autoSave?: boolean // auto save and compile, default to true, if false, user need to press ctrl + s to save and compile
   showCompileOutput?: boolean
+  showOpenSourceMap?: boolean
   showImportMap?: boolean
+  showSsrOutput?: boolean
   showTsConfig?: boolean
   clearConsole?: boolean
   layout?: 'horizontal' | 'vertical'
@@ -28,54 +34,59 @@ export interface Props {
       importCode?: string
       useCode?: string
     }
+    showRuntimeError?: boolean
+    showRuntimeWarning?: boolean
+  }
+  editorOptions?: {
+    showErrorText?: string | false
+    autoSaveText?: string | false
+    monacoOptions?: monaco.editor.IStandaloneEditorConstructionOptions
+  }
+  splitPaneOptions?: {
+    codeTogglerText?: string
+    outputTogglerText?: string
   }
 }
 
+const autoSave = defineModel<boolean>({ default: true })
 const props = withDefaults(defineProps<Props>(), {
   theme: 'light',
   previewTheme: false,
   store: () => useStore(),
   autoResize: true,
-  autoSave: true,
   showCompileOutput: true,
+  showOpenSourceMap: false,
   showImportMap: true,
+  showSsrOutput: false,
   showTsConfig: true,
   clearConsole: true,
   layoutReverse: false,
   ssr: false,
-  previewOptions: () => ({
-    headHTML: '',
-    bodyHTML: '',
-    placeholderHTML: '',
-    customCode: {
-      importCode: '',
-      useCode: '',
-    },
-  }),
   layout: 'horizontal',
+  previewOptions: () => ({}),
+  editorOptions: () => ({}),
+  splitPaneOptions: () => ({}),
 })
 
 if (!props.editor) {
   throw new Error('The "editor" prop is now required.')
 }
 
-const outputRef = ref<InstanceType<typeof Output>>()
+const outputRef = useTemplateRef('output')
 
 props.store.init()
 
 const editorSlotName = computed(() => (props.layoutReverse ? 'right' : 'left'))
 const outputSlotName = computed(() => (props.layoutReverse ? 'left' : 'right'))
 
-provide(injectKeyStore, props.store)
-provide('autoresize', props.autoResize)
-provide('autosave', props.autoSave)
-provide('import-map', toRef(props, 'showImportMap'))
-provide('tsconfig', toRef(props, 'showTsConfig'))
-provide('clear-console', toRef(props, 'clearConsole'))
-provide('preview-options', props.previewOptions)
-provide('theme', toRef(props, 'theme'))
-provide('preview-theme', toRef(props, 'previewTheme'))
-provide('preview-ref', () => outputRef.value?.previewRef?.container)
+provide(injectKeyProps, {
+  ...toRefs(props),
+  autoSave,
+})
+provide(
+  injectKeyPreviewRef,
+  computed(() => outputRef.value?.previewRef?.container ?? null),
+)
 
 /**
  * Reload the preview iframe
@@ -95,9 +106,11 @@ defineExpose({ reload })
       </template>
       <template #[outputSlotName]>
         <Output
-          ref="outputRef"
+          ref="output"
           :editor-component="editor"
           :show-compile-output="props.showCompileOutput"
+          :show-open-source-map="props.showOpenSourceMap"
+          :show-ssr-output="props.showSsrOutput"
           :ssr="!!props.ssr"
         />
       </template>
@@ -120,8 +133,9 @@ defineExpose({ reload })
   margin: 0;
   overflow: hidden;
   font-size: 13px;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
-    Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  font-family:
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu,
+    Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
   background-color: var(--bg-soft);
 }
 

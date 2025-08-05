@@ -84,19 +84,9 @@ self.onmessage = async (msg: MessageEvent<WorkerMessage>) => {
         languagePlugins: [
           createVueLanguagePlugin(
             ts,
-            asFileName,
-            () => '', // TODO getProjectVersion
-            (fileName) => {
-              const uri = asUri(fileName)
-              for (const model of ctx.getMirrorModels()) {
-                if (model.uri.toString() === uri.toString()) {
-                  return true
-                }
-              }
-              return false
-            },
             compilerOptions,
             vueCompilerOptions,
+            asFileName,
           ),
         ],
         languageServicePlugins: getFullLanguageServicePlugins(ts),

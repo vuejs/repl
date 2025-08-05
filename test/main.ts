@@ -58,8 +58,10 @@ const App = {
         theme: theme.value,
         previewTheme: previewTheme.value,
         editor: MonacoEditor,
+        showOpenSourceMap: true,
         // layout: 'vertical',
-        ssr: false,
+        ssr: true,
+        showSsrOutput: true,
         sfcOptions: {
           script: {
             // inlineTemplate: false
@@ -67,6 +69,13 @@ const App = {
         },
         // showCompileOutput: false,
         // showImportMap: false
+        editorOptions: {
+          autoSaveText: '💾',
+          monacoOptions: {
+            // wordWrap: 'on',
+          },
+        },
+        // autoSave: false,
       })
   },
 }

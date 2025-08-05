@@ -1,10 +1,11 @@
 <script setup lang="ts">
-const visible = defineModel<boolean>()
+defineProps<{ text: string }>()
+const active = defineModel<boolean>()
 </script>
 
 <template>
-  <div class="wrapper" @click="visible = !visible">
-    <span>Show Error</span>
+  <div class="wrapper" @click="active = !active">
+    <span>{{ text }}</span>
     <div class="toggle" :class="[{ active: modelValue }]">
       <div class="indicator" />
     </div>
@@ -13,19 +14,12 @@ const visible = defineModel<boolean>()
 
 <style scoped>
 .wrapper {
-  position: absolute;
-  bottom: 8px;
-  right: 15px;
-  z-index: 11;
   display: flex;
   align-items: center;
-  background-color: var(--bg);
-  color: var(--text-light);
   cursor: pointer;
-  padding: 4px 8px;
-  border-radius: 2px;
   user-select: none;
 }
+
 .toggle {
   display: inline-block;
   margin-left: 4px;

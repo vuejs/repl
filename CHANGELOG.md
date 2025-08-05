@@ -1,3 +1,118 @@
+## [4.6.3](https://github.com/vuejs/repl/compare/v4.6.2...v4.6.3) (2025-08-05)
+
+
+
+## [4.6.2](https://github.com/vuejs/repl/compare/v4.6.1...v4.6.2) (2025-07-16)
+
+
+### Bug Fixes
+
+* handle Vue 3.6+ vapor runtime imports correctly ([#357](https://github.com/vuejs/repl/issues/357)) ([c4bac9c](https://github.com/vuejs/repl/commit/c4bac9c9d22813cdb343f850da516e84a0700e4d)), closes [#356](https://github.com/vuejs/repl/issues/356)
+
+
+
+## [4.6.1](https://github.com/vuejs/repl/compare/v4.6.0...v4.6.1) (2025-06-13)
+
+
+### Bug Fixes
+
+* the line number offset in the DEV ([#344](https://github.com/vuejs/repl/issues/344)) ([cc292d3](https://github.com/vuejs/repl/commit/cc292d3dba25ac872edf147e14b6c9bbf6a0c577))
+
+
+
+# [4.6.0](https://github.com/vuejs/repl/compare/v4.5.1...v4.6.0) (2025-06-13)
+
+
+### Features
+
+* add support for viewing sourcemap ([#341](https://github.com/vuejs/repl/issues/341)) ([5714d5b](https://github.com/vuejs/repl/commit/5714d5b706d7c945ee5393bef545dcf70c189db3))
+* show SSR output ([#343](https://github.com/vuejs/repl/issues/343)) ([52a193a](https://github.com/vuejs/repl/commit/52a193a8a658d0059ee8c30345ca10ff52af7c04))
+
+
+
+## [4.5.1](https://github.com/vuejs/repl/compare/v4.5.0...v4.5.1) (2025-02-19)
+
+
+### Bug Fixes
+
+* apply builtin import map after deserialize ([#315](https://github.com/vuejs/repl/issues/315)) ([e62ddda](https://github.com/vuejs/repl/commit/e62ddda06fe3339a467f88b13b0271c2a5c7e96d))
+* **split-pane:** rendering order comes from the store.show-output ([0bd4c17](https://github.com/vuejs/repl/commit/0bd4c17b6dd26d4e17387f50e089dd3ffefaf054))
+* ts error ([a927083](https://github.com/vuejs/repl/commit/a927083734f1d4dae5be0d200aafd26e49ce82aa))
+
+
+### Features
+
+* add core entry for node usage ([#310](https://github.com/vuejs/repl/issues/310)) ([da105a4](https://github.com/vuejs/repl/commit/da105a42618899d214701a5fb6549719f73331bb))
+* **editor:** scrollbar style for firefox ([#320](https://github.com/vuejs/repl/issues/320)) ([bbc740b](https://github.com/vuejs/repl/commit/bbc740bfa840dfb6c77824470f1ffdc4a6261e85))
+* export `Sandbox` as standalone output component ([#309](https://github.com/vuejs/repl/issues/309)) ([b549715](https://github.com/vuejs/repl/commit/b5497152fefe8f190eca59755bedb27b2f3178f2))
+* **store:** return `setImportMap` and add `merge` parameter ([9f53bd1](https://github.com/vuejs/repl/commit/9f53bd11aee1d75984e5597878e53bec4ae168e5))
+* support cache selected typescript version ([#305](https://github.com/vuejs/repl/issues/305)) ([33ca3c0](https://github.com/vuejs/repl/commit/33ca3c0317aa0418c094ec8f9e6712d81fa11465))
+* support vapor template-only component ([#322](https://github.com/vuejs/repl/issues/322)) ([9ae056b](https://github.com/vuejs/repl/commit/9ae056b701ff54446c5c1ec9f29444d5239e0931))
+
+
+
+# [4.5.0](https://github.com/vuejs/repl/compare/v4.4.3...v4.5.0) (2025-02-03)
+
+
+### Features
+
+* pass on descriptor vapor flag when compiling template ([adaaceb](https://github.com/vuejs/repl/commit/adaaceb24984435ae02ab3eda071f10dba9e0362))
+
+
+
+## [4.4.3](https://github.com/vuejs/repl/compare/v4.4.2...v4.4.3) (2025-01-02)
+
+
+### Bug Fixes
+
+* transform jsx for entire file ([48325f9](https://github.com/vuejs/repl/commit/48325f99e010c3065c99efd4fb3e95950cda9596)), closes [#301](https://github.com/vuejs/repl/issues/301) [#300](https://github.com/vuejs/repl/issues/300)
+
+
+
+## [4.4.2](https://github.com/vuejs/repl/compare/v4.4.1...v4.4.2) (2024-09-16)
+
+
+### Bug Fixes
+
+* output toggle button ([#279](https://github.com/vuejs/repl/issues/279)) ([93051f3](https://github.com/vuejs/repl/commit/93051f35a232b53d01dd0a40623cab5b11baa3ee))
+* upgrade vue language tools ([ec393cf](https://github.com/vuejs/repl/commit/ec393cfe4b8b8008976e4fd2017bd112d98fa599))
+
+
+
+## [4.4.1](https://github.com/vuejs/repl/compare/v4.4.0...v4.4.1) (2024-09-08)
+
+
+### Bug Fixes
+
+* cancel creating new file ([#281](https://github.com/vuejs/repl/issues/281)) ([7467f38](https://github.com/vuejs/repl/commit/7467f38f65e4b05dacc389644a8001b24f86fcdb))
+* type error ([6653d0e](https://github.com/vuejs/repl/commit/6653d0e4b0b30eeee4bfe0c0c92bf00a84c0c753))
+
+
+### Features
+
+* add `autoSave` toggle button ([#283](https://github.com/vuejs/repl/issues/283)) ([83d8e48](https://github.com/vuejs/repl/commit/83d8e487de724261cf709c5648cc2512b4c33732))
+* export `languageToolsVersion` ([5a92a92](https://github.com/vuejs/repl/commit/5a92a9259da01da4aa30b09ed6dcedfb4503c71d))
+
+
+
+# [4.4.0](https://github.com/vuejs/repl/compare/v4.3.1...v4.4.0) (2024-09-07)
+
+
+### Bug Fixes
+
+* debounce reloadLanguageTools in monaco ([f9f650a](https://github.com/vuejs/repl/commit/f9f650ada945f7ea597b7e7b51c132c4594bd5cb)), closes [#275](https://github.com/vuejs/repl/issues/275) [#263](https://github.com/vuejs/repl/issues/263)
+* no default value for object props ([d786626](https://github.com/vuejs/repl/commit/d78662652ec18f4610facc8f3e2a50f38c01f93f))
+* rollback & pin volar version ([c6f58c7](https://github.com/vuejs/repl/commit/c6f58c7f4d04799a64f788251362f8349728bea4))
+
+
+### Features
+
+* add more customization options ([#274](https://github.com/vuejs/repl/issues/274)) ([c73b786](https://github.com/vuejs/repl/commit/c73b7868d73d3dad792c80a36507ce92234443d4))
+* expose `editorOptions.monacoOptions` ([00176d0](https://github.com/vuejs/repl/commit/00176d007ff5eb74e216abff3de87e625cde543b)), closes [#277](https://github.com/vuejs/repl/issues/277) [#232](https://github.com/vuejs/repl/issues/232)
+* reactivity `autoSave` option ([#266](https://github.com/vuejs/repl/issues/266)) ([d90082a](https://github.com/vuejs/repl/commit/d90082a2e44956e08fc64d296661b30ea4590506))
+
+
+
 ## [4.3.1](https://github.com/vuejs/repl/compare/v4.3.0...v4.3.1) (2024-07-03)
 
 

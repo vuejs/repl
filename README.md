@@ -6,6 +6,17 @@ Vue SFC REPL as a Vue 3 component.
 
 **Note: `@vue/repl` >= 2 now supports Monaco Editor, but also requires explicitly passing in the editor to be used for tree-shaking.**
 
+```ts
+// vite.config.ts
+import { defineConfig } from 'vite'
+export default defineConfig({
+  optimizeDeps: {
+    exclude: ['@vue/repl'],
+  },
+  // ...
+})
+```
+
 ### With CodeMirror Editor
 
 Basic editing experience with no intellisense. Lighter weight, fewer network requests, better for embedding use cases.
@@ -94,5 +105,30 @@ productionMode.value = true
 
 <template>
   <Repl :store="store" :editor="Monaco" :showCompileOutput="true" />
+</template>
+```
+
+Use only the Preview without the editor
+
+```vue
+<script setup>
+import { ref } from 'vue'
+import { Sandbox, useStore } from '@vue/repl'
+
+// retrieve some configuration options from the URL
+const query = new URLSearchParams(location.search)
+
+const store = useStore(
+  {
+    // custom vue version
+    vueVersion: ref(query.get('vue')),
+  },
+  // initialize repl with previously serialized state
+  location.hash,
+)
+</script>
+
+<template>
+  <Sandbox :store="store" />
 </template>
 ```

@@ -1,5 +1,5 @@
-import type { Component, InjectionKey } from 'vue'
-import type { Store } from './store'
+import type { Component, ComputedRef, InjectionKey, ToRefs } from 'vue'
+import { Props } from './Repl.vue'
 
 export type EditorMode = 'js' | 'css' | 'ssr'
 export interface EditorProps {
@@ -13,6 +13,11 @@ export interface EditorEmits {
 }
 export type EditorComponentType = Component<EditorProps>
 
-export type OutputModes = 'preview' | EditorMode
+export type OutputModes = 'preview' | 'ssr output' | EditorMode
 
-export const injectKeyStore: InjectionKey<Store> = Symbol('store')
+export const injectKeyProps: InjectionKey<
+  ToRefs<Required<Props & { autoSave: boolean }>>
+> = Symbol('props')
+export const injectKeyPreviewRef: InjectionKey<
+  ComputedRef<HTMLDivElement | null>
+> = Symbol('preview-ref')

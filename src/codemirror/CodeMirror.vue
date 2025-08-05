@@ -1,12 +1,25 @@
 <template>
-  <div ref="el" class="editor" />
+  <div
+    ref="container"
+    class="editor"
+    @keydown.ctrl.s.prevent="emitChangeEvent"
+    @keydown.meta.s.prevent="emitChangeEvent"
+  />
 </template>
 
 <script setup lang="ts">
 import type { ModeSpec, ModeSpecOptions } from 'codemirror'
-import { inject, onMounted, ref, watchEffect } from 'vue'
+import {
+  inject,
+  onMounted,
+  onWatcherCleanup,
+  useTemplateRef,
+  watch,
+  watchEffect,
+} from 'vue'
 import { debounce } from '../utils'
 import CodeMirror from './codemirror'
+import { injectKeyProps } from '../../src/types'
 
 export interface Props {
   mode?: string | ModeSpec<ModeSpecOptions>
@@ -22,9 +35,13 @@ const props = withDefaults(defineProps<Props>(), {
 
 const emit = defineEmits<(e: 'change', value: string) => void>()
 
-const el = ref()
-const needAutoResize = inject('autoresize')
-const autoSave = inject('autosave')
+const el = useTemplateRef('container')
+const { autoResize, autoSave } = inject(injectKeyProps)!
+let editor: CodeMirror.Editor
+
+const emitChangeEvent = () => {
+  emit('change', editor.getValue())
+}
 
 onMounted(() => {
   const addonOptions = props.readonly
@@ -37,7 +54,7 @@ onMounted(() => {
         keyMap: 'sublime',
       }
 
-  const editor = CodeMirror(el.value!, {
+  editor = CodeMirror(el.value!, {
     value: '',
     mode: props.mode,
     readOnly: props.readonly,
@@ -62,7 +79,7 @@ onMounted(() => {
     editor.refresh()
   }, 50)
 
-  if (needAutoResize) {
+  if (autoResize.value) {
     window.addEventListener(
       'resize',
       debounce(() => {
@@ -71,18 +88,16 @@ onMounted(() => {
     )
   }
 
-  if (autoSave) {
-    editor.on('change', () => {
-      emit('change', editor.getValue())
-    })
-  } else {
-    el.value!.addEventListener('keydown', (e: KeyboardEvent) => {
-      if (e.ctrlKey && e.key === 's') {
-        e.preventDefault()
-        emit('change', editor.getValue())
+  watch(
+    autoSave,
+    (autoSave) => {
+      if (autoSave) {
+        editor.on('change', emitChangeEvent)
+        onWatcherCleanup(() => editor.off('change', emitChangeEvent))
       }
-    })
-  }
+    },
+    { immediate: true },
+  )
 })
 </script>
 
