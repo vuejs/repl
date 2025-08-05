@@ -1,3 +1,7 @@
+## [4.6.3](https://github.com/vuejs/repl/compare/v4.6.2...v4.6.3) (2025-08-05)
+
+
+
 ## [4.6.2](https://github.com/vuejs/repl/compare/v4.6.1...v4.6.2) (2025-07-16)
 
 
