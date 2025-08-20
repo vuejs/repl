@@ -91,7 +91,7 @@
     "@volar/jsdelivr": "~2.4.11",
     "@volar/monaco": "~2.4.11",
     "@vue/babel-plugin-jsx": "^1.4.0",
-    "@vue/language-service": "~2.2.2",
+    "@vue/language-service": "~3.0.6",
     "assert": "^2.1.0",
     "bumpp": "^10.2.2",
     "codemirror": "^5.65.18",
