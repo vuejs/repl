@@ -1,19 +1,39 @@
-// @ts-expect-error
-import * as worker from 'monaco-editor-core/esm/vs/editor/editor.worker'
-import type * as monaco from 'monaco-editor-core'
+/// <reference types="@volar/typescript" />
+
+import { createNpmFileSystem } from '@volar/jsdelivr'
 import {
   type LanguageServiceEnvironment,
   createTypeScriptWorkerLanguageService,
+  Language,
 } from '@volar/monaco/worker'
-import { createNpmFileSystem } from '@volar/jsdelivr'
 import {
   type VueCompilerOptions,
-  getFullLanguageServicePlugins,
+  VueVirtualCode,
   createVueLanguagePlugin,
-  resolveVueCompilerOptions,
+  getDefaultCompilerOptions,
+} from '@vue/language-core'
+import {
+  LanguageService,
+  createVueLanguageServicePlugins,
 } from '@vue/language-service'
-import type { WorkerHost, WorkerMessage } from './env'
+import type * as monaco from 'monaco-editor-core'
+// @ts-expect-error
+import * as worker from 'monaco-editor-core/esm/vs/editor/editor.worker'
+import { create as createTypeScriptPlugins } from 'volar-service-typescript'
 import { URI } from 'vscode-uri'
+import type { WorkerHost, WorkerMessage } from './env'
+
+import { createVueLanguageServiceProxy } from '@vue/typescript-plugin/lib/common'
+import { collectExtractProps } from '@vue/typescript-plugin/lib/requests/collectExtractProps'
+import { getComponentDirectives } from '@vue/typescript-plugin/lib/requests/getComponentDirectives'
+import { getComponentEvents } from '@vue/typescript-plugin/lib/requests/getComponentEvents'
+import { getComponentNames } from '@vue/typescript-plugin/lib/requests/getComponentNames'
+import { getComponentProps } from '@vue/typescript-plugin/lib/requests/getComponentProps'
+import { getComponentSlots } from '@vue/typescript-plugin/lib/requests/getComponentSlots'
+import { getElementAttrs } from '@vue/typescript-plugin/lib/requests/getElementAttrs'
+import { getElementNames } from '@vue/typescript-plugin/lib/requests/getElementNames'
+import { getImportPathForFile } from '@vue/typescript-plugin/lib/requests/getImportPathForFile'
+import { getPropertiesAtLocation } from '@vue/typescript-plugin/lib/requests/getPropertiesAtLocation'
 
 export interface CreateData {
   tsconfig: {
@@ -68,11 +88,161 @@ self.onmessage = async (msg: MessageEvent<WorkerMessage>) => {
         tsconfig?.compilerOptions || {},
         '',
       )
-      const vueCompilerOptions = resolveVueCompilerOptions(
-        tsconfig.vueCompilerOptions || {},
+      const vueCompilerOptions: VueCompilerOptions = {
+        ...getDefaultCompilerOptions(),
+        ...tsconfig.vueCompilerOptions,
+      }
+      const vueLanguagePlugin = createVueLanguagePlugin(
+        ts,
+        compilerOptions,
+        vueCompilerOptions,
+        asFileName,
       )
+      const ignoreVueServicePlugins = new Set([
+        'volar-service-emmet',
+        'volar-service-pug',
+        'vue-document-highlights',
+        'typescript-semantic-tokens',
+      ])
+      const vueServicePlugins = createVueLanguageServicePlugins(ts, {
+        collectExtractProps(fileName, templateCodeRange) {
+          const { sourceScript, virtualCode } = getVirtualCode(fileName)
+          return collectExtractProps(
+            ts,
+            languageService.context.language,
+            getProgram(),
+            sourceScript,
+            virtualCode,
+            templateCodeRange,
+          )
+        },
+        getComponentDirectives(fileName) {
+          return getComponentDirectives(ts, getProgram(), fileName)
+        },
+        getComponentEvents(fileName, tag) {
+          return getComponentEvents(ts, getProgram(), fileName, tag)
+        },
+        getComponentNames(fileName) {
+          return getComponentNames(ts, getProgram(), fileName)
+        },
+        getComponentProps(fileName, tag) {
+          return getComponentProps(ts, getProgram(), fileName, tag)
+        },
+        getComponentSlots(fileName) {
+          const { virtualCode } = getVirtualCode(fileName)
+          return getComponentSlots(ts, getProgram(), virtualCode)
+        },
+        getElementAttrs(fileName, tag) {
+          return getElementAttrs(ts, getProgram(), fileName, tag)
+        },
+        getElementNames(fileName) {
+          return getElementNames(ts, getProgram(), fileName)
+        },
+        getImportPathForFile(fileName, incomingFileName, preferences) {
+          return getImportPathForFile(
+            ts,
+            getLanguageServiceHost(),
+            getProgram(),
+            fileName,
+            incomingFileName,
+            preferences,
+          )
+        },
+        getPropertiesAtLocation(fileName, position) {
+          const { sourceScript, virtualCode } = getVirtualCode(fileName)
+          return getPropertiesAtLocation(
+            ts,
+            languageService.context.language,
+            getProgram(),
+            sourceScript,
+            virtualCode,
+            position,
+          )
+        },
+        getDocumentHighlights(fileName, position) {
+          throw new Error('Not implemented')
+        },
+        getEncodedSemanticClassifications() {
+          throw new Error('Not implemented')
+        },
+        async getQuickInfoAtPosition(fileName, position) {
+          const uri = asUri(fileName)
+          const sourceScript = languageService.context.language.scripts.get(uri)
+          if (!sourceScript) {
+            return
+          }
+          const hover = await languageService.getHover(uri, position)
+          let text = ''
+          if (typeof hover?.contents === 'string') {
+            text = hover.contents
+          } else if (Array.isArray(hover?.contents)) {
+            text = hover.contents
+              .map((c) => (typeof c === 'string' ? c : c.value))
+              .join('\n')
+          } else if (hover) {
+            text = hover.contents.value
+          }
+          text = text.replace(/```typescript/g, '')
+          text = text.replace(/```/g, '')
+          text = text.replace(/---/g, '')
+          text = text.trim()
+          while (true) {
+            const newText = text.replace(/\n\n/g, '\n')
+            if (newText === text) {
+              break
+            }
+            text = newText
+          }
+          text = text.replace(/\n/g, ' | ')
+          return text
+        },
+      }).filter((plugin) => !ignoreVueServicePlugins.has(plugin.name!))
 
-      return createTypeScriptWorkerLanguageService({
+      const tsServicePlugins = createTypeScriptPlugins(ts)
+      for (let i = 0; i < tsServicePlugins.length; i++) {
+        const plugin = tsServicePlugins[i]
+        if (plugin.name === 'typescript-semantic') {
+          tsServicePlugins[i] = {
+            ...plugin,
+            create(context) {
+              const created = plugin.create(context)
+              if (!context.project.typescript) {
+                return created
+              }
+              const tsLs = (
+                created.provide as import('volar-service-typescript').Provide
+              )['typescript/languageService']()
+              const proxy = createVueLanguageServiceProxy(
+                ts,
+                new Proxy(
+                  {},
+                  {
+                    get(_target, prop, receiver) {
+                      return Reflect.get(
+                        languageService.context.language,
+                        prop,
+                        receiver,
+                      )
+                    },
+                  },
+                ) as unknown as Language,
+                tsLs,
+                vueCompilerOptions,
+                asUri,
+              )
+              tsLs.getCompletionsAtPosition = proxy.getCompletionsAtPosition
+              tsLs.getCompletionEntryDetails = proxy.getCompletionEntryDetails
+              tsLs.getCodeFixesAtPosition = proxy.getCodeFixesAtPosition
+              tsLs.getDefinitionAndBoundSpan = proxy.getDefinitionAndBoundSpan
+              tsLs.getQuickInfoAtPosition = proxy.getQuickInfoAtPosition
+              return created
+            },
+          }
+          break
+        }
+      }
+
+      const workerService = createTypeScriptWorkerLanguageService({
         typescript: ts,
         compilerOptions,
         workerContext: ctx,
@@ -81,19 +251,41 @@ self.onmessage = async (msg: MessageEvent<WorkerMessage>) => {
           asFileName,
           asUri,
         },
-        languagePlugins: [
-          createVueLanguagePlugin(
-            ts,
-            compilerOptions,
-            vueCompilerOptions,
-            asFileName,
-          ),
-        ],
-        languageServicePlugins: getFullLanguageServicePlugins(ts),
-        setup({ project }) {
-          project.vue = { compilerOptions: vueCompilerOptions }
-        },
+        languagePlugins: [vueLanguagePlugin],
+        languageServicePlugins: [...tsServicePlugins, ...vueServicePlugins],
       })
+      const languageService = (workerService as any)
+        .languageService as LanguageService
+
+      return workerService
+
+      function getProgram() {
+        const tsService: import('typescript').LanguageService =
+          languageService.context.inject('typescript/languageService')
+        return tsService.getProgram()!
+      }
+
+      function getLanguageServiceHost() {
+        const host: import('typescript').LanguageServiceHost =
+          languageService.context.inject('typescript/languageServiceHost')
+        return host
+      }
+
+      function getVirtualCode(fileName: string) {
+        const uri = asUri(fileName)
+        const sourceScript = languageService.context.language.scripts.get(uri)
+        if (!sourceScript) {
+          throw new Error('No source script found for file: ' + fileName)
+        }
+        const virtualCode = sourceScript.generated?.root
+        if (!(virtualCode instanceof VueVirtualCode)) {
+          throw new Error('No virtual code found for file: ' + fileName)
+        }
+        return {
+          sourceScript,
+          virtualCode,
+        }
+      }
     },
   )
 }
