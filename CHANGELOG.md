@@ -1,3 +1,18 @@
+# [4.7.0](https://github.com/vuejs/repl/compare/v4.6.3...v4.7.0) (2025-09-04)
+
+
+### Bug Fixes
+
+* add support for custom elements for CompileScript ([#354](https://github.com/vuejs/repl/issues/354)) ([c393b60](https://github.com/vuejs/repl/commit/c393b60cfe5921ca32eab16b2b0ab0f64cfd724f))
+* only handle `./` prefix modules for ExportNamedDeclaration ([#327](https://github.com/vuejs/repl/issues/327)) ([8cc908a](https://github.com/vuejs/repl/commit/8cc908a519bf70a897fb91a9fbb8584fd98bf544))
+
+
+### Features
+
+* update language tools to 3.0 ([#360](https://github.com/vuejs/repl/issues/360)) ([a34f630](https://github.com/vuejs/repl/commit/a34f6306b0fc5817ce4d4f0e63ef58fa6ac102ee))
+
+
+
 ## [4.6.3](https://github.com/vuejs/repl/compare/v4.6.2...v4.6.3) (2025-08-05)
 
 
