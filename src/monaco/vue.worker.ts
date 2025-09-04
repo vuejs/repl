@@ -98,9 +98,15 @@ self.onmessage = async (msg: MessageEvent<WorkerMessage>) => {
         '/node_modules/' + getGlobalTypesFileName(vueCompilerOptions)
       vueCompilerOptions.globalTypesPath = () => globalTypesPath
       const { stat, readFile } = env.fs!
-      env.fs!.stat = (uri) => {
+      const ctime = Date.now()
+      env.fs!.stat = async (uri) => {
         if (uri.path === globalTypesPath) {
-          return { type: 1, ctime: 0, mtime: 0, size: globalTypes.length }
+          return {
+            type: 1,
+            ctime: ctime,
+            mtime: ctime,
+            size: globalTypes.length,
+          }
         }
         return stat(uri)
       }
@@ -124,9 +130,6 @@ self.onmessage = async (msg: MessageEvent<WorkerMessage>) => {
         'typescript-semantic-tokens',
       ])
       const vueServicePlugins = createVueLanguageServicePlugins(ts, {
-        collectExtractProps() {
-          throw new Error('Not implemented')
-        },
         getComponentDirectives(fileName) {
           return getComponentDirectives(ts, getProgram(), fileName)
         },
@@ -149,9 +152,6 @@ self.onmessage = async (msg: MessageEvent<WorkerMessage>) => {
         getElementNames(fileName) {
           return getElementNames(ts, getProgram(), fileName)
         },
-        getImportPathForFile() {
-          throw new Error('Not implemented')
-        },
         getPropertiesAtLocation(fileName, position) {
           const { sourceScript, virtualCode } = getVirtualCode(fileName)
           return getPropertiesAtLocation(
@@ -162,12 +162,6 @@ self.onmessage = async (msg: MessageEvent<WorkerMessage>) => {
             virtualCode,
             position,
           )
-        },
-        getDocumentHighlights() {
-          throw new Error('Not implemented')
-        },
-        getEncodedSemanticClassifications() {
-          throw new Error('Not implemented')
         },
         async getQuickInfoAtPosition(fileName, position) {
           const uri = asUri(fileName)
@@ -199,6 +193,18 @@ self.onmessage = async (msg: MessageEvent<WorkerMessage>) => {
           }
           text = text.replace(/\n/g, ' | ')
           return text
+        },
+        collectExtractProps() {
+          throw new Error('Not implemented')
+        },
+        getImportPathForFile() {
+          throw new Error('Not implemented')
+        },
+        getDocumentHighlights() {
+          throw new Error('Not implemented')
+        },
+        getEncodedSemanticClassifications() {
+          throw new Error('Not implemented')
         },
       }).filter((plugin) => !ignoreVueServicePlugins.has(plugin.name!))
 
