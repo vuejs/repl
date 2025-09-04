@@ -1,5 +1,3 @@
-/// <reference types="@volar/typescript" />
-
 import { createNpmFileSystem } from '@volar/jsdelivr'
 import {
   type LanguageServiceEnvironment,
@@ -220,12 +218,9 @@ self.onmessage = async (msg: MessageEvent<WorkerMessage>) => {
             ...plugin,
             create(context) {
               const created = plugin.create(context)
-              if (!context.project.typescript) {
-                return created
-              }
-              const tsLs = (
-                created.provide as import('volar-service-typescript').Provide
-              )['typescript/languageService']()
+              const tsLs = created.provide[
+                'typescript/languageService'
+              ]() as import('typescript').LanguageService
               const proxy = createVueLanguageServiceProxy(
                 ts,
                 new Proxy(
