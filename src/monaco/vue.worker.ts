@@ -11,6 +11,8 @@ import {
   VueVirtualCode,
   createVueLanguagePlugin,
   getDefaultCompilerOptions,
+  generateGlobalTypes,
+  getGlobalTypesFileName,
 } from '@vue/language-core'
 import {
   LanguageService,
@@ -41,6 +43,9 @@ export interface CreateData {
   dependencies: Record<string, string>
 }
 
+const asFileName = (uri: URI) => uri.path
+const asUri = (fileName: string): URI => URI.file(fileName)
+
 let ts: typeof import('typescript')
 let locale: string | undefined
 
@@ -57,8 +62,6 @@ self.onmessage = async (msg: MessageEvent<WorkerMessage>) => {
       ctx: monaco.worker.IWorkerContext<WorkerHost>,
       { tsconfig, dependencies }: CreateData,
     ) => {
-      const asFileName = (uri: URI) => uri.path
-      const asUri = (fileName: string): URI => URI.file(fileName)
       const env: LanguageServiceEnvironment = {
         workspaceFolders: [URI.file('/')],
         locale,
@@ -90,6 +93,24 @@ self.onmessage = async (msg: MessageEvent<WorkerMessage>) => {
         ...getDefaultCompilerOptions(),
         ...tsconfig.vueCompilerOptions,
       }
+      const globalTypes = generateGlobalTypes(vueCompilerOptions)
+      const globalTypesPath =
+        '/node_modules/' + getGlobalTypesFileName(vueCompilerOptions)
+      vueCompilerOptions.globalTypesPath = () => globalTypesPath
+      const { stat, readFile } = env.fs!
+      env.fs!.stat = (uri) => {
+        if (uri.path === globalTypesPath) {
+          return { type: 1, ctime: 0, mtime: 0, size: globalTypes.length }
+        }
+        return stat(uri)
+      }
+      env.fs!.readFile = async (uri) => {
+        if (uri.path === globalTypesPath) {
+          return globalTypes
+        }
+        return readFile(uri)
+      }
+
       const vueLanguagePlugin = createVueLanguagePlugin(
         ts,
         compilerOptions,
