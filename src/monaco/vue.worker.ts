@@ -19,7 +19,8 @@ import {
 import type * as monaco from 'monaco-editor-core'
 // @ts-expect-error
 import * as worker from 'monaco-editor-core/esm/vs/editor/editor.worker'
-import { create as createTypeScriptPlugins } from 'volar-service-typescript'
+import { create as createTypeScriptDirectiveCommentPlugin } from 'volar-service-typescript/lib/plugins/directiveComment'
+import { create as createTypeScriptSemanticPlugin } from 'volar-service-typescript/lib/plugins/semantic'
 import { URI } from 'vscode-uri'
 import type { WorkerHost, WorkerMessage } from './env'
 
@@ -91,165 +92,7 @@ self.onmessage = async (msg: MessageEvent<WorkerMessage>) => {
         ...getDefaultCompilerOptions(),
         ...tsconfig.vueCompilerOptions,
       }
-      const globalTypes = generateGlobalTypes(vueCompilerOptions)
-      const globalTypesPath =
-        '/node_modules/' + getGlobalTypesFileName(vueCompilerOptions)
-      vueCompilerOptions.globalTypesPath = () => globalTypesPath
-      const { stat, readFile } = env.fs!
-      const ctime = Date.now()
-      env.fs!.stat = async (uri) => {
-        if (uri.path === globalTypesPath) {
-          return {
-            type: 1,
-            ctime: ctime,
-            mtime: ctime,
-            size: globalTypes.length,
-          }
-        }
-        return stat(uri)
-      }
-      env.fs!.readFile = async (uri) => {
-        if (uri.path === globalTypesPath) {
-          return globalTypes
-        }
-        return readFile(uri)
-      }
-
-      const vueLanguagePlugin = createVueLanguagePlugin(
-        ts,
-        compilerOptions,
-        vueCompilerOptions,
-        asFileName,
-      )
-      const ignoreVueServicePlugins = new Set([
-        'vue-extract-file',
-        'vue-document-drop',
-        'vue-document-highlights',
-        'typescript-semantic-tokens',
-        // dedupe
-        'typescript-doc-comment-template',
-        'typescript-syntactic',
-      ])
-      const vueServicePlugins = createVueLanguageServicePlugins(ts, {
-        getComponentDirectives(fileName) {
-          return getComponentDirectives(ts, getProgram(), fileName)
-        },
-        getComponentEvents(fileName, tag) {
-          return getComponentEvents(ts, getProgram(), fileName, tag)
-        },
-        getComponentNames(fileName) {
-          return getComponentNames(ts, getProgram(), fileName)
-        },
-        getComponentProps(fileName, tag) {
-          return getComponentProps(ts, getProgram(), fileName, tag)
-        },
-        getComponentSlots(fileName) {
-          const { virtualCode } = getVirtualCode(fileName)
-          return getComponentSlots(ts, getProgram(), virtualCode)
-        },
-        getElementAttrs(fileName, tag) {
-          return getElementAttrs(ts, getProgram(), fileName, tag)
-        },
-        getElementNames(fileName) {
-          return getElementNames(ts, getProgram(), fileName)
-        },
-        getPropertiesAtLocation(fileName, position) {
-          const { sourceScript, virtualCode } = getVirtualCode(fileName)
-          return getPropertiesAtLocation(
-            ts,
-            languageService.context.language,
-            getProgram(),
-            sourceScript,
-            virtualCode,
-            position,
-            false,
-          )
-        },
-        async getQuickInfoAtPosition(fileName, position) {
-          const uri = asUri(fileName)
-          const sourceScript = languageService.context.language.scripts.get(uri)
-          if (!sourceScript) {
-            return
-          }
-          const hover = await languageService.getHover(uri, position)
-          let text = ''
-          if (typeof hover?.contents === 'string') {
-            text = hover.contents
-          } else if (Array.isArray(hover?.contents)) {
-            text = hover.contents
-              .map((c) => (typeof c === 'string' ? c : c.value))
-              .join('\n')
-          } else if (hover) {
-            text = hover.contents.value
-          }
-          text = text.replace(/```typescript/g, '')
-          text = text.replace(/```/g, '')
-          text = text.replace(/---/g, '')
-          text = text.trim()
-          while (true) {
-            const newText = text.replace(/\n\n/g, '\n')
-            if (newText === text) {
-              break
-            }
-            text = newText
-          }
-          text = text.replace(/\n/g, ' | ')
-          return text
-        },
-        collectExtractProps() {
-          throw new Error('Not implemented')
-        },
-        getImportPathForFile() {
-          throw new Error('Not implemented')
-        },
-        getDocumentHighlights() {
-          throw new Error('Not implemented')
-        },
-        getEncodedSemanticClassifications() {
-          throw new Error('Not implemented')
-        },
-      }).filter((plugin) => !ignoreVueServicePlugins.has(plugin.name!))
-
-      const tsServicePlugins = createTypeScriptPlugins(ts)
-      for (let i = 0; i < tsServicePlugins.length; i++) {
-        const plugin = tsServicePlugins[i]
-        if (plugin.name === 'typescript-semantic') {
-          tsServicePlugins[i] = {
-            ...plugin,
-            create(context) {
-              const created = plugin.create(context)
-              const tsLs = created.provide[
-                'typescript/languageService'
-              ]() as import('typescript').LanguageService
-              const proxy = createVueLanguageServiceProxy(
-                ts,
-                new Proxy(
-                  {},
-                  {
-                    get(_target, prop, receiver) {
-                      return Reflect.get(
-                        languageService.context.language,
-                        prop,
-                        receiver,
-                      )
-                    },
-                  },
-                ) as unknown as Language,
-                tsLs,
-                vueCompilerOptions,
-                asUri,
-              )
-              tsLs.getCompletionsAtPosition = proxy.getCompletionsAtPosition
-              tsLs.getCompletionEntryDetails = proxy.getCompletionEntryDetails
-              tsLs.getCodeFixesAtPosition = proxy.getCodeFixesAtPosition
-              tsLs.getDefinitionAndBoundSpan = proxy.getDefinitionAndBoundSpan
-              tsLs.getQuickInfoAtPosition = proxy.getQuickInfoAtPosition
-              return created
-            },
-          }
-          break
-        }
-      }
+      setupGlobalTypes(vueCompilerOptions, env)
 
       const workerService = createTypeScriptWorkerLanguageService({
         typescript: ts,
@@ -260,33 +103,199 @@ self.onmessage = async (msg: MessageEvent<WorkerMessage>) => {
           asFileName,
           asUri,
         },
-        languagePlugins: [vueLanguagePlugin],
-        languageServicePlugins: [...tsServicePlugins, ...vueServicePlugins],
+        languagePlugins: [
+          createVueLanguagePlugin(
+            ts,
+            compilerOptions,
+            vueCompilerOptions,
+            asFileName,
+          ),
+        ],
+        languageServicePlugins: [
+          ...getTsLanguageServicePlugins(),
+          ...getVueLanguageServicePlugins(),
+        ],
       })
-      const languageService = (workerService as any)
-        .languageService as LanguageService
 
       return workerService
 
-      function getProgram() {
-        const tsService: import('typescript').LanguageService =
-          languageService.context.inject('typescript/languageService')
-        return tsService.getProgram()!
+      function setupGlobalTypes(
+        options: VueCompilerOptions,
+        env: LanguageServiceEnvironment,
+      ) {
+        const globalTypes = generateGlobalTypes(options)
+        const globalTypesPath =
+          '/node_modules/' + getGlobalTypesFileName(options)
+        options.globalTypesPath = () => globalTypesPath
+        const { stat, readFile } = env.fs!
+        const ctime = Date.now()
+        env.fs!.stat = async (uri) => {
+          if (uri.path === globalTypesPath) {
+            return {
+              type: 1,
+              ctime: ctime,
+              mtime: ctime,
+              size: globalTypes.length,
+            }
+          }
+          return stat(uri)
+        }
+        env.fs!.readFile = async (uri) => {
+          if (uri.path === globalTypesPath) {
+            return globalTypes
+          }
+          return readFile(uri)
+        }
       }
 
-      function getVirtualCode(fileName: string) {
-        const uri = asUri(fileName)
-        const sourceScript = languageService.context.language.scripts.get(uri)
-        if (!sourceScript) {
-          throw new Error('No source script found for file: ' + fileName)
+      function getTsLanguageServicePlugins() {
+        const semanticPlugin = createTypeScriptSemanticPlugin(ts)
+        const { create } = semanticPlugin
+        semanticPlugin.create = (context) => {
+          const created = create(context)
+          const ls = created.provide[
+            'typescript/languageService'
+          ]() as import('typescript').LanguageService
+          const proxy = createVueLanguageServiceProxy(
+            ts,
+            new Proxy(
+              {},
+              {
+                get(_target, prop, receiver) {
+                  return Reflect.get(context.language, prop, receiver)
+                },
+              },
+            ) as unknown as Language,
+            ls,
+            vueCompilerOptions,
+            asUri,
+          )
+          ls.getCompletionsAtPosition = proxy.getCompletionsAtPosition
+          ls.getCompletionEntryDetails = proxy.getCompletionEntryDetails
+          ls.getCodeFixesAtPosition = proxy.getCodeFixesAtPosition
+          ls.getDefinitionAndBoundSpan = proxy.getDefinitionAndBoundSpan
+          ls.getQuickInfoAtPosition = proxy.getQuickInfoAtPosition
+          return created
         }
-        const virtualCode = sourceScript.generated?.root
-        if (!(virtualCode instanceof VueVirtualCode)) {
-          throw new Error('No virtual code found for file: ' + fileName)
+        return [semanticPlugin, createTypeScriptDirectiveCommentPlugin()]
+      }
+
+      function getVueLanguageServicePlugins() {
+        const plugins = createVueLanguageServicePlugins(ts, {
+          getComponentDirectives(fileName) {
+            return getComponentDirectives(ts, getProgram(), fileName)
+          },
+          getComponentEvents(fileName, tag) {
+            return getComponentEvents(ts, getProgram(), fileName, tag)
+          },
+          getComponentNames(fileName) {
+            return getComponentNames(ts, getProgram(), fileName)
+          },
+          getComponentProps(fileName, tag) {
+            return getComponentProps(ts, getProgram(), fileName, tag)
+          },
+          getComponentSlots(fileName) {
+            const { virtualCode } = getVirtualCode(fileName)
+            return getComponentSlots(ts, getProgram(), virtualCode)
+          },
+          getElementAttrs(fileName, tag) {
+            return getElementAttrs(ts, getProgram(), fileName, tag)
+          },
+          getElementNames(fileName) {
+            return getElementNames(ts, getProgram(), fileName)
+          },
+          getPropertiesAtLocation(fileName, position) {
+            const { sourceScript, virtualCode } = getVirtualCode(fileName)
+            return getPropertiesAtLocation(
+              ts,
+              getLanguageService().context.language,
+              getProgram(),
+              sourceScript,
+              virtualCode,
+              position,
+              false,
+            )
+          },
+          async getQuickInfoAtPosition(fileName, position) {
+            const uri = asUri(fileName)
+            const sourceScript =
+              getLanguageService().context.language.scripts.get(uri)
+            if (!sourceScript) {
+              return
+            }
+            const hover = await getLanguageService().getHover(uri, position)
+            let text = ''
+            if (typeof hover?.contents === 'string') {
+              text = hover.contents
+            } else if (Array.isArray(hover?.contents)) {
+              text = hover.contents
+                .map((c) => (typeof c === 'string' ? c : c.value))
+                .join('\n')
+            } else if (hover) {
+              text = hover.contents.value
+            }
+            text = text.replace(/```typescript/g, '')
+            text = text.replace(/```/g, '')
+            text = text.replace(/---/g, '')
+            text = text.trim()
+            while (true) {
+              const newText = text.replace(/\n\n/g, '\n')
+              if (newText === text) {
+                break
+              }
+              text = newText
+            }
+            text = text.replace(/\n/g, ' | ')
+            return text
+          },
+          collectExtractProps() {
+            throw new Error('Not implemented')
+          },
+          getImportPathForFile() {
+            throw new Error('Not implemented')
+          },
+          getDocumentHighlights() {
+            throw new Error('Not implemented')
+          },
+          getEncodedSemanticClassifications() {
+            throw new Error('Not implemented')
+          },
+        })
+        const ignoreVueServicePlugins = new Set([
+          'vue-extract-file',
+          'vue-document-drop',
+          'vue-document-highlights',
+          'typescript-semantic-tokens',
+        ])
+        return plugins.filter(
+          (plugin) => !ignoreVueServicePlugins.has(plugin.name!),
+        )
+
+        function getVirtualCode(fileName: string) {
+          const uri = asUri(fileName)
+          const sourceScript =
+            getLanguageService().context.language.scripts.get(uri)
+          if (!sourceScript) {
+            throw new Error('No source script found for file: ' + fileName)
+          }
+          const virtualCode = sourceScript.generated?.root
+          if (!(virtualCode instanceof VueVirtualCode)) {
+            throw new Error('No virtual code found for file: ' + fileName)
+          }
+          return {
+            sourceScript,
+            virtualCode,
+          }
         }
-        return {
-          sourceScript,
-          virtualCode,
+
+        function getProgram() {
+          const tsService: import('typescript').LanguageService =
+            getLanguageService().context.inject('typescript/languageService')
+          return tsService.getProgram()!
+        }
+
+        function getLanguageService() {
+          return (workerService as any).languageService as LanguageService
         }
       }
     },
