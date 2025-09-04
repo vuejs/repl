@@ -24,7 +24,6 @@ import { URI } from 'vscode-uri'
 import type { WorkerHost, WorkerMessage } from './env'
 
 import { createVueLanguageServiceProxy } from '@vue/typescript-plugin/lib/common'
-import { collectExtractProps } from '@vue/typescript-plugin/lib/requests/collectExtractProps'
 import { getComponentDirectives } from '@vue/typescript-plugin/lib/requests/getComponentDirectives'
 import { getComponentEvents } from '@vue/typescript-plugin/lib/requests/getComponentEvents'
 import { getComponentNames } from '@vue/typescript-plugin/lib/requests/getComponentNames'
@@ -32,7 +31,6 @@ import { getComponentProps } from '@vue/typescript-plugin/lib/requests/getCompon
 import { getComponentSlots } from '@vue/typescript-plugin/lib/requests/getComponentSlots'
 import { getElementAttrs } from '@vue/typescript-plugin/lib/requests/getElementAttrs'
 import { getElementNames } from '@vue/typescript-plugin/lib/requests/getElementNames'
-import { getImportPathForFile } from '@vue/typescript-plugin/lib/requests/getImportPathForFile'
 import { getPropertiesAtLocation } from '@vue/typescript-plugin/lib/requests/getPropertiesAtLocation'
 
 export interface CreateData {
@@ -99,22 +97,14 @@ self.onmessage = async (msg: MessageEvent<WorkerMessage>) => {
         asFileName,
       )
       const ignoreVueServicePlugins = new Set([
-        'volar-service-emmet',
-        'volar-service-pug',
+        'vue-extract-file',
+        'vue-document-drop',
         'vue-document-highlights',
         'typescript-semantic-tokens',
       ])
       const vueServicePlugins = createVueLanguageServicePlugins(ts, {
-        collectExtractProps(fileName, templateCodeRange) {
-          const { sourceScript, virtualCode } = getVirtualCode(fileName)
-          return collectExtractProps(
-            ts,
-            languageService.context.language,
-            getProgram(),
-            sourceScript,
-            virtualCode,
-            templateCodeRange,
-          )
+        collectExtractProps() {
+          throw new Error('Not implemented')
         },
         getComponentDirectives(fileName) {
           return getComponentDirectives(ts, getProgram(), fileName)
@@ -138,15 +128,8 @@ self.onmessage = async (msg: MessageEvent<WorkerMessage>) => {
         getElementNames(fileName) {
           return getElementNames(ts, getProgram(), fileName)
         },
-        getImportPathForFile(fileName, incomingFileName, preferences) {
-          return getImportPathForFile(
-            ts,
-            getLanguageServiceHost(),
-            getProgram(),
-            fileName,
-            incomingFileName,
-            preferences,
-          )
+        getImportPathForFile() {
+          throw new Error('Not implemented')
         },
         getPropertiesAtLocation(fileName, position) {
           const { sourceScript, virtualCode } = getVirtualCode(fileName)
@@ -159,7 +142,7 @@ self.onmessage = async (msg: MessageEvent<WorkerMessage>) => {
             position,
           )
         },
-        getDocumentHighlights(fileName, position) {
+        getDocumentHighlights() {
           throw new Error('Not implemented')
         },
         getEncodedSemanticClassifications() {
@@ -263,12 +246,6 @@ self.onmessage = async (msg: MessageEvent<WorkerMessage>) => {
         const tsService: import('typescript').LanguageService =
           languageService.context.inject('typescript/languageService')
         return tsService.getProgram()!
-      }
-
-      function getLanguageServiceHost() {
-        const host: import('typescript').LanguageServiceHost =
-          languageService.context.inject('typescript/languageServiceHost')
-        return host
       }
 
       function getVirtualCode(fileName: string) {
