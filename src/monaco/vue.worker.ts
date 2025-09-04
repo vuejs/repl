@@ -161,6 +161,7 @@ self.onmessage = async (msg: MessageEvent<WorkerMessage>) => {
             sourceScript,
             virtualCode,
             position,
+            false,
           )
         },
         async getQuickInfoAtPosition(fileName, position) {
