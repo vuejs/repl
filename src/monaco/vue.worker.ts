@@ -128,6 +128,9 @@ self.onmessage = async (msg: MessageEvent<WorkerMessage>) => {
         'vue-document-drop',
         'vue-document-highlights',
         'typescript-semantic-tokens',
+        // dedupe
+        'typescript-doc-comment-template',
+        'typescript-syntactic',
       ])
       const vueServicePlugins = createVueLanguageServicePlugins(ts, {
         getComponentDirectives(fileName) {
