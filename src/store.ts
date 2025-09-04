@@ -521,7 +521,7 @@ export class File {
     if (this.filename.endsWith('.css')) {
       return 'css'
     }
-    if (this.filename.endsWith('.ts')) {
+    if (this.filename.endsWith('.ts') || this.filename.endsWith('.tsx')) {
       return 'typescript'
     }
     return 'javascript'
