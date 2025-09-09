@@ -49,6 +49,8 @@ export default mergeConfig(base, {
       'monaco-editor-core/esm/vs/editor/editor.worker',
       'vue/server-renderer',
     ],
+    // ignore playground just for dev
+    exclude: ['playground'],
   },
   base: './',
   build: {
