@@ -169,6 +169,11 @@ onMounted(() => {
 onBeforeUnmount(() => {
   editor.value?.dispose()
 })
+
+defineExpose({
+  getEditorIns: () => editor.value,
+  getMonacoEditor: () => monaco.editor,
+})
 </script>
 
 <template>
