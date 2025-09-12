@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import CodeMirror, { type Props } from '../codemirror/CodeMirror.vue'
-import { computed } from 'vue'
-import type { EditorEmits, EditorProps } from '../types'
+import { computed, useTemplateRef } from 'vue'
+import type { EditorEmits, EditorMethods, EditorProps } from '../types'
 
 defineOptions({
   editorType: 'codemirror',
@@ -9,6 +9,8 @@ defineOptions({
 
 const props = defineProps<EditorProps>()
 const emit = defineEmits<EditorEmits>()
+
+const codeMirrorRef = useTemplateRef('codeMirror')
 
 const onChange = (code: string) => {
   emit('change', code)
@@ -36,10 +38,16 @@ const activeMode = computed(() => {
   const mode = modes[forcedMode || filename.split('.').pop()!]
   return filename.lastIndexOf('.') !== -1 && mode ? mode : modes.js
 })
+
+defineExpose({
+  getEditorIns: (() =>
+    codeMirrorRef.value?.getEditorIns()) as EditorMethods['getEditorIns'],
+})
 </script>
 
 <template>
   <CodeMirror
+    ref="codeMirror"
     :value="value"
     :mode="activeMode"
     :readonly="readonly"

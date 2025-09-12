@@ -99,6 +99,10 @@ onMounted(() => {
     { immediate: true },
   )
 })
+
+defineExpose({
+  getEditorIns: () => editor,
+})
 </script>
 
 <style>

@@ -5,6 +5,7 @@ import { type Store, useStore } from './store'
 import { computed, provide, toRefs, useTemplateRef } from 'vue'
 import {
   type EditorComponentType,
+  type EditorMethods,
   injectKeyPreviewRef,
   injectKeyProps,
 } from './types'
@@ -73,6 +74,7 @@ if (!props.editor) {
 }
 
 const outputRef = useTemplateRef('output')
+const editorContainerRef = useTemplateRef('editorContainer')
 
 props.store.init()
 
@@ -95,14 +97,19 @@ function reload() {
   outputRef.value?.reload()
 }
 
-defineExpose({ reload })
+defineExpose({
+  reload,
+  getEditorInstance: (() =>
+    editorContainerRef.value?.getEditorIns()) as EditorMethods['getEditorIns'],
+  getMonacoEditor: () => editorContainerRef.value?.getMonacoEditor?.(),
+})
 </script>
 
 <template>
   <div class="vue-repl">
     <SplitPane :layout="layout">
       <template #[editorSlotName]>
-        <EditorContainer :editor-component="editor" />
+        <EditorContainer ref="editorContainer" :editor-component="editor" />
       </template>
       <template #[outputSlotName]>
         <Output

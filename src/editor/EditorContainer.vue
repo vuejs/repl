@@ -2,9 +2,13 @@
 import FileSelector from './FileSelector.vue'
 import Message from '../Message.vue'
 import { debounce } from '../utils'
-import { inject, ref, watch } from 'vue'
+import { inject, ref, useTemplateRef, watch } from 'vue'
 import ToggleButton from './ToggleButton.vue'
-import { type EditorComponentType, injectKeyProps } from '../types'
+import {
+  type EditorComponentType,
+  type EditorMethods,
+  injectKeyProps,
+} from '../types'
 
 const SHOW_ERROR_KEY = 'repl_show_error'
 
@@ -14,6 +18,7 @@ const props = defineProps<{
 
 const { store, autoSave, editorOptions } = inject(injectKeyProps)!
 const showMessage = ref(getItem())
+const editorRef = useTemplateRef<EditorMethods>('editor')
 
 const onChange = debounce((code: string) => {
   store.value.activeFile.code = code
@@ -25,11 +30,17 @@ function setItem() {
 
 function getItem() {
   const item = localStorage.getItem(SHOW_ERROR_KEY)
-  return !(item === 'false')
+  return item !== 'false'
 }
 
 watch(showMessage, () => {
   setItem()
+})
+
+defineExpose({
+  getEditorIns: (() =>
+    editorRef.value?.getEditorIns?.()) as EditorMethods['getEditorIns'],
+  getMonacoEditor: () => editorRef.value?.getMonacoEditor?.(),
 })
 </script>
 
@@ -37,6 +48,7 @@ watch(showMessage, () => {
   <FileSelector />
   <div class="editor-container">
     <props.editorComponent
+      ref="editor"
       :value="store.activeFile.code"
       :filename="store.activeFile.filename"
       @change="onChange"
