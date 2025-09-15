@@ -32,7 +32,7 @@ import { getComponentProps } from '@vue/typescript-plugin/lib/requests/getCompon
 import { getComponentSlots } from '@vue/typescript-plugin/lib/requests/getComponentSlots'
 import { getElementAttrs } from '@vue/typescript-plugin/lib/requests/getElementAttrs'
 import { getElementNames } from '@vue/typescript-plugin/lib/requests/getElementNames'
-import { getPropertiesAtLocation } from '@vue/typescript-plugin/lib/requests/getPropertiesAtLocation'
+import { isRefAtPosition } from '@vue/typescript-plugin/lib/requests/isRefAtPosition'
 
 export interface CreateData {
   tsconfig: {
@@ -204,16 +204,15 @@ self.onmessage = async (msg: MessageEvent<WorkerMessage>) => {
           getElementNames(fileName) {
             return getElementNames(ts, getProgram(), fileName)
           },
-          getPropertiesAtLocation(fileName, position) {
+          isRefAtPosition(fileName, position) {
             const { sourceScript, virtualCode } = getVirtualCode(fileName)
-            return getPropertiesAtLocation(
+            return isRefAtPosition(
               ts,
               getLanguageService().context.language,
               getProgram(),
               sourceScript,
               virtualCode,
               position,
-              false,
             )
           },
           async getQuickInfoAtPosition(fileName, position) {
@@ -258,6 +257,9 @@ self.onmessage = async (msg: MessageEvent<WorkerMessage>) => {
             throw new Error('Not implemented')
           },
           getEncodedSemanticClassifications() {
+            throw new Error('Not implemented')
+          },
+          getReactiveReferences() {
             throw new Error('Not implemented')
           },
         })
