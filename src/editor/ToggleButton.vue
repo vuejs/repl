@@ -5,7 +5,7 @@ const active = defineModel<boolean>()
 
 <template>
   <div class="wrapper" @click="active = !active">
-    <span>{{ text }}</span>
+    <span class="text">{{ text }}</span>
     <div class="toggle" :class="[{ active: modelValue }]">
       <div class="indicator" />
     </div>
@@ -18,6 +18,10 @@ const active = defineModel<boolean>()
   align-items: center;
   cursor: pointer;
   user-select: none;
+}
+
+.text {
+  color: var(--text-light);
 }
 
 .toggle {
