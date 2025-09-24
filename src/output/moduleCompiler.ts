@@ -203,12 +203,32 @@ function processModule(store: Store, src: string, filename: string) {
         s.remove(node.start!, node.declaration.start!)
       } else if (node.source && node.source.value.startsWith('./')) {
         // export { foo, bar } from './foo'
-        const importId = defineImport(node, node.source.value)
-        for (const spec of node.specifiers) {
-          defineExport(
-            (spec.exported as Identifier).name,
-            `${importId}.${(spec as ExportSpecifier).local.name}`,
-          )
+        // export * as foo from './foo'
+        if (node.source.value.startsWith('./')) {
+          const importId = defineImport(node, node.source.value)
+          for (const spec of node.specifiers) {
+            defineExport(
+              (spec.exported as Identifier).name,
+              spec.type === 'ExportNamespaceSpecifier'
+                ? importId
+                : `${importId}.${(spec as ExportSpecifier).local.name}`,
+            )
+          }
+        } else {
+          // export { foo, bar } from 'module'
+          // export * as foo from 'module'
+          // export { default as foo } from 'module'
+          for (const spec of node.specifiers) {
+            const localName = (spec as ExportSpecifier).local?.name
+            const exportName = (spec.exported as Identifier).name
+            const isSameName = localName === exportName
+            s.prepend(
+              spec.type === 'ExportNamespaceSpecifier'
+                ? `import * as ${exportName} from '${node.source.value}';\n`
+                : `import { ${isSameName ? exportName : localName + ' as ' + exportName} } from '${node.source.value}';\n`,
+            )
+            defineExport(exportName, exportName)
+          }
         }
         s.remove(node.start!, node.end!)
       } else {
