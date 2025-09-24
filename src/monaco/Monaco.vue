@@ -143,7 +143,7 @@ onMounted(() => {
   }
 
   editorInstance.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS, () => {
-    // ignore save event
+    editorInstance.getAction('editor.action.formatDocument')?.run()
   })
 
   watch(
