@@ -47,6 +47,9 @@ importers:
       '@volar/jsdelivr':
         specifier: 2.4.23
         version: 2.4.23
+      '@volar/language-service':
+        specifier: ~2.4.11
+        version: 2.4.23
       '@volar/monaco':
         specifier: 2.4.23
         version: 2.4.23
