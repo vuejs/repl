@@ -1,6 +1,6 @@
 {
   "name": "@vue/repl",
-  "version": "4.6.3",
+  "version": "4.7.0",
   "description": "Vue component for editing Vue components",
   "packageManager": "pnpm@10.14.0",
   "type": "module",
@@ -89,10 +89,13 @@
     "@types/hash-sum": "^1.0.2",
     "@types/node": "^24.2.0",
     "@vitejs/plugin-vue": "^6.0.1",
-    "@volar/jsdelivr": "~2.4.11",
-    "@volar/monaco": "~2.4.11",
+    "@volar/jsdelivr": "2.4.23",
+    "@volar/monaco": "2.4.23",
+    "@volar/typescript": "2.4.23",
     "@vue/babel-plugin-jsx": "^1.4.0",
-    "@vue/language-service": "~2.2.2",
+    "@vue/language-core": "3.0.8",
+    "@vue/language-service": "3.0.8",
+    "@vue/typescript-plugin": "3.0.8",
     "assert": "^2.1.0",
     "bumpp": "^10.2.2",
     "codemirror": "^5.65.18",
@@ -113,7 +116,8 @@
     "vite": "^7.0.6",
     "vite-plugin-dts": "^4.5.4",
     "vscode-uri": "^3.1.0",
+    "volar-service-typescript": "0.0.65",
     "vue": "^3.5.18",
-    "vue-tsc": "~3.0.5"
+    "vue-tsc": "3.0.8"
   }
 }
