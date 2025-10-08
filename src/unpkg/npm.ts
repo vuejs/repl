@@ -194,7 +194,7 @@ export function createNpmFileSystem(
         time: string
         hash: string
       }[]
-    }>(`https://unpkg.factset.io/${pkgName}@${version}?flat`)
+    }>(`https://esmsh.factset.io/${pkgName}@${version}?flat`)
     if (!flat) {
       return []
     }
@@ -318,7 +318,6 @@ async function runWithRateLimiting<T>(fn: () => Promise<T>) {
 }
 
 async function fetchText(url: string) {
-  console.log('fetching text', url)
   if (!textCache.has(url)) {
     textCache.set(
       url,
@@ -341,7 +340,6 @@ async function fetchText(url: string) {
 }
 
 async function fetchJson<T>(url: string) {
-  console.log('fetching json', url)
   if (!jsonCache.has(url)) {
     jsonCache.set(
       url,
