@@ -129,6 +129,7 @@ self.onmessage = async (msg: MessageEvent<WorkerMessage>) => {
         options.globalTypesPath = () => globalTypesPath
         const { stat, readFile } = env.fs!
         const ctime = Date.now()
+
         env.fs!.stat = async (uri) => {
           if (uri.path === globalTypesPath) {
             return {

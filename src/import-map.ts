@@ -45,7 +45,7 @@ export function useVueImportMap(
       imports: {
         vue,
         '@fds/fusion':
-          'https://esmsh.factset.io/@fds/fusion?standalone&external=vue',
+          'https://esmsh.factset.io/@fds/fusion?standalone&external=vue&inject-css-in-js',
         '@fds/': 'https://esmsh.factset.io/@fds/',
       },
     }
