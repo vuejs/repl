@@ -214,7 +214,7 @@ async function updatePreview() {
   }
 
   const vaporSupported = isVaporSupported(
-    store.value.vueVersion || store.value.compiler?.version
+    store.value.vueVersion || store.value.compiler?.version,
   )
 
   try {

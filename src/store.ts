@@ -48,6 +48,8 @@ export function useStore(
     typescriptVersion = ref('latest'),
     dependencyVersion = ref(Object.create(null)),
     reloadLanguageTools = ref(),
+
+    customData = ref({}),
   }: Partial<StoreState> = {},
   serializedState?: string,
 ): ReplStore {
@@ -273,6 +275,9 @@ export function useStore(
     if (typescriptVersion.value !== 'latest' || files._tsVersion) {
       files._tsVersion = typescriptVersion.value
     }
+    if (customData.value && Object.keys(customData.value).length) {
+      files.__metadata = JSON.stringify(customData.value)
+    }
     return '#' + utoa(JSON.stringify(files))
   }
   const deserialize: ReplStore['deserialize'] = (
@@ -294,6 +299,8 @@ export function useStore(
         vueVersion.value = saved[filename]
       } else if (filename === '_tsVersion') {
         typescriptVersion.value = saved[filename]
+      } else if (filename === '__metadata') {
+        customData.value = JSON.parse(saved[filename])
       } else {
         setFile(files.value, filename, saved[filename])
       }
@@ -372,6 +379,7 @@ export function useStore(
     compiler,
     loading,
     vueVersion,
+    customData,
 
     locale,
     typescriptVersion,
@@ -438,6 +446,7 @@ export type StoreState = ToRefs<{
   compiler: typeof defaultCompiler
   /* only apply for compiler-sfc */
   vueVersion: string | null
+  customData: Record<string, any>
 
   // volar-related
   locale: string | undefined

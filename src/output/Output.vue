@@ -41,7 +41,9 @@ watchEffect(() => {
 })
 
 const showSourceMap = computed(() => {
-  return props.showOpenSourceMap && (mode.value === 'js' || mode.value === 'ssr')
+  return (
+    props.showOpenSourceMap && (mode.value === 'js' || mode.value === 'ssr')
+  )
 })
 
 function openSourceMap() {

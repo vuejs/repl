@@ -137,7 +137,15 @@ export async function compileFile(
   let clientScript: string
   let bindings: BindingMetadata | undefined
   try {
-    const res = await doCompileScript(store, descriptor, id, false, isTS, isJSX, isCE)
+    const res = await doCompileScript(
+      store,
+      descriptor,
+      id,
+      false,
+      isTS,
+      isJSX,
+      isCE,
+    )
     clientScript = res.code
     bindings = res.bindings
     clientScriptMap = res.map
@@ -159,7 +167,7 @@ export async function compileFile(
         true,
         isTS,
         isJSX,
-        isCE
+        isCE,
       )
       ssrScript = ssrScriptResult.code
       ssrCode += ssrScript
