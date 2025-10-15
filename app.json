@@ -1,0 +1,22 @@
+{
+  "name": "Vue Playground",
+  "repository": "https://github.factset.com/factset/vue-playground",
+  "env": {
+    "NODE_ENV": "production",
+    "NPM_CONFIG_PRODUCTION": "true"
+  },
+  "formation": {
+    "web": {
+      "quantity": 1,
+      "size": "1X"
+    }
+  },
+  "buildpacks": [
+    {
+      "url": "heroku/nodejs"
+    },
+    {
+      "url": "https://github.com/heroku/heroku-buildpack-nginx"
+    }
+  ]
+}
