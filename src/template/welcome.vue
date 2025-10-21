@@ -1,5 +1,6 @@
 <script setup>
 import { ref } from 'vue'
+import { SomeComponent, SomeOtherComponent, Box } from 'sample-vue-library'
 
 const msg = ref('Hello World!')
 </script>

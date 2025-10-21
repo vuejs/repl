@@ -19,6 +19,7 @@ const App = {
       serverRenderer: import.meta.env.PROD
         ? undefined
         : `${location.origin}/src/vue-server-renderer-dev-proxy`,
+      'sample-vue-library': `${location.origin}/src/sample-vue-library`,
     })
     const store = (window.store = useStore(
       {

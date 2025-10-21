@@ -4,7 +4,7 @@ export function getVersions(version: string): number[] {
   return version.split('.').map((v) => parseInt(v, 10))
 }
 
-export function isVaporSupported(version: string): boolean{
+export function isVaporSupported(version: string): boolean {
   const [major, minor] = getVersions(version)
   // vapor mode is supported in v3.6+
   return major > 3 || (major === 3 && minor >= 6)
@@ -16,6 +16,7 @@ export function useVueImportMap(
     runtimeProd?: string | (() => string)
     serverRenderer?: string | (() => string)
     vueVersion?: string | null
+    'sample-vue-library'?: string
   } = {},
 ) {
   function normalizeDefaults(defaults?: string | (() => string)) {
@@ -50,6 +51,7 @@ export function useVueImportMap(
       imports: {
         vue,
         'vue/server-renderer': serverRenderer,
+        'sample-vue-library': defaults['sample-vue-library'],
       },
     }
   })
