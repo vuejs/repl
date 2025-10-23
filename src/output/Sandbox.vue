@@ -27,6 +27,7 @@ export interface SandboxProps {
   previewOptions?: {
     headHTML?: string
     bodyHTML?: string
+    css?: string
     placeholderHTML?: string
     customCode?: {
       importCode?: string
@@ -120,6 +121,15 @@ function createSandbox() {
   const importMap = store.value.getImportMap()
   const sandboxSrc = srcdoc
     .replace(/<html>/, `<html class="${theme.value}">`)
+    .replace(
+      /<!-- TEMPLATE CSS -->/,
+      `
+      <style>
+      ${previewOptions.value.css ?? ''}
+              </style>
+        `,
+    )
+
     .replace(/<!--IMPORT_MAP-->/, JSON.stringify(importMap))
     .replace(
       /<!-- PREVIEW-OPTIONS-HEAD-HTML -->/,
@@ -214,7 +224,7 @@ async function updatePreview() {
   }
 
   const vaporSupported = isVaporSupported(
-    store.value.vueVersion || store.value.compiler?.version
+    store.value.vueVersion || store.value.compiler?.version,
   )
 
   try {
@@ -301,7 +311,9 @@ async function updatePreview() {
     // if main file is a vue file, mount it.
     if (mainFile.endsWith('.vue')) {
       codeToEval.push(
-        `import { ${isSSR ? `createSSRApp` : `createApp`} as _createApp ${
+        `
+
+        import { ${isSSR ? `createSSRApp` : `createApp`} as _createApp ${
           vaporSupported
             ? `, ${
                 isSSR ? 'createVaporSSRApp' : 'createVaporApp'

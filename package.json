@@ -55,7 +55,8 @@
     "typecheck": "vue-tsc --noEmit",
     "release": "bumpp --all",
     "version": "conventional-changelog -p angular -i CHANGELOG.md -s -r 0",
-    "prepublishOnly": "npm run build"
+    "prepublishOnly": "npm run build",
+    "postinstall": "node scripts/generateCssTs.js"
   },
   "simple-git-hooks": {
     "pre-commit": "pnpm exec lint-staged --concurrent false"
@@ -120,6 +121,6 @@
     "vue-tsc": "3.0.8"
   },
   "dependencies": {
-    "sample-vue-library": "^0.0.2"
+    "sample-vue-library": "^0.0.4"
   }
 }

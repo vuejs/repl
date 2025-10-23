@@ -5,7 +5,7 @@ import { type OutputModes, Repl, useStore, useVueImportMap } from '../src'
 import MonacoEditor from '../src/editor/MonacoEditor.vue'
 // @ts-ignore
 import CodeMirrorEditor from '../src/editor/CodeMirrorEditor.vue'
-
+import { css } from '../src/generated/css'
 const window = globalThis.window as any
 window.process = { env: {} }
 
@@ -58,6 +58,9 @@ const App = {
         store,
         theme: theme.value,
         previewTheme: previewTheme.value,
+        previewOptions: {
+          css,
+        },
         editor: MonacoEditor,
         showOpenSourceMap: true,
         // layout: 'vertical',
