@@ -89,6 +89,7 @@
     "@types/node": "^24.2.0",
     "@vitejs/plugin-vue": "^6.0.1",
     "@volar/jsdelivr": "2.4.23",
+    "@volar/language-service": "~2.4.11",
     "@volar/monaco": "2.4.23",
     "@volar/typescript": "2.4.23",
     "@vue/babel-plugin-jsx": "^1.4.0",

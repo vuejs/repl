@@ -129,6 +129,11 @@ function createSandbox() {
       /<!--PREVIEW-OPTIONS-PLACEHOLDER-HTML-->/,
       previewOptions.value?.placeholderHTML || '',
     )
+    .replace(
+      /<!--ES-MODULE-SHIMS-LINK-->/,
+      store.value.resourceLinks?.esModuleShims ||
+        'https://cdn.jsdelivr.net/npm/es-module-shims@1.5.18/dist/es-module-shims.wasm.js',
+    )
   sandbox.srcdoc = sandboxSrc
   containerRef.value?.appendChild(sandbox)
 

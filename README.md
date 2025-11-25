@@ -132,3 +132,73 @@ const store = useStore(
   <Sandbox :store="store" />
 </template>
 ```
+
+<details>
+<summary>Configuration options for resource links. (replace CDN resources)</summary>
+
+```ts
+export type ResourceLinkConfigs = {
+  /** URL for ES Module Shims. */
+  esModuleShims?: string
+  /** Function that generates the Vue compiler URL based on the version. */
+  vueCompilerUrl?: (version: string) => string
+  /** Function that generates the TypeScript library URL based on the version. */
+  typescriptLib?: (version: string) => string
+
+  /** [monaco] Function that generates a URL to fetch the latest version of a package. */
+  pkgLatestVersionUrl?: (pkgName: string) => string
+  /** [monaco] Function that generates a URL to browse a package directory. */
+  pkgDirUrl?: (pkgName: string, pkgVersion: string, pkgPath: string) => string
+  /** [monaco] Function that generates a URL to fetch the content of a file from a package. */
+  pkgFileTextUrl?: (
+    pkgName: string,
+    pkgVersion: string | undefined,
+    pkgPath: string,
+  ) => string
+}
+```
+
+**unpkg**
+
+```ts
+const store = useStore({
+  resourceLinks: ref({
+    esModuleShims:
+      'https://unpkg.com/es-module-shims@1.5.18/dist/es-module-shims.wasm.js',
+    vueCompilerUrl: (version) =>
+      `https://unpkg.com/@vue/compiler-sfc@${version}/dist/compiler-sfc.esm-browser.js`,
+    typescriptLib: (version) =>
+      `https://unpkg.com/typescript@${version}/lib/typescript.js`,
+    pkgLatestVersionUrl: (pkgName) =>
+      `https://unpkg.com/${pkgName}@latest/package.json`,
+    pkgDirUrl: (pkgName, pkgVersion, pkgPath) =>
+      `https://unpkg.com/${pkgName}@${pkgVersion}/${pkgPath}/?meta`,
+    pkgFileTextUrl: (pkgName, pkgVersion, pkgPath) =>
+      `https://unpkg.com/${pkgName}@${pkgVersion || 'latest'}/${pkgPath}`,
+  }),
+})
+```
+
+**npmmirror**
+
+```ts
+const store = useStore({
+  resourceLinks: ref({
+    esModuleShims:
+      'https://registry.npmmirror.com/es-module-shims/1.5.18/files/dist/es-module-shims.wasm.js',
+    vueCompilerUrl: (version) =>
+      `https://registry.npmmirror.com/@vue/compiler-sfc/${version}/files/dist/compiler-sfc.esm-browser.js`,
+    typescriptLib: (version) =>
+      `https://registry.npmmirror.com/typescript/${version}/files/lib/typescript.js`,
+
+    pkgLatestVersionUrl: (pkgName) =>
+      `https://registry.npmmirror.com/${pkgName}/latest/files/package.json`,
+    pkgDirUrl: (pkgName, pkgVersion, pkgPath) =>
+      `https://registry.npmmirror.com/${pkgName}/${pkgVersion}/files/${pkgPath}/?meta`,
+    pkgFileTextUrl: (pkgName, pkgVersion, pkgPath) =>
+      `https://registry.npmmirror.com/${pkgName}/${pkgVersion || 'latest'}/files/${pkgPath}`,
+  }),
+})
+```
+
+</details>

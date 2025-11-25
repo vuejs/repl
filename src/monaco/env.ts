@@ -122,6 +122,10 @@ export interface WorkerMessage {
   event: 'init'
   tsVersion: string
   tsLocale?: string
+  pkgDirUrl?: string
+  pkgFileTextUrl?: string
+  pkgLatestVersionUrl?: string
+  typescriptLib?: string
 }
 
 export function loadMonacoEnv(store: Store) {
@@ -135,11 +139,27 @@ export function loadMonacoEnv(store: Store) {
               resolve()
             }
           })
-          worker.postMessage({
+
+          const {
+            pkgDirUrl,
+            pkgFileTextUrl,
+            pkgLatestVersionUrl,
+            typescriptLib,
+          } = store.resourceLinks || {}
+
+          const message: WorkerMessage = {
             event: 'init',
             tsVersion: store.typescriptVersion,
             tsLocale: store.locale,
-          } satisfies WorkerMessage)
+            pkgDirUrl: pkgDirUrl ? String(pkgDirUrl) : undefined,
+            pkgFileTextUrl: pkgFileTextUrl ? String(pkgFileTextUrl) : undefined,
+            pkgLatestVersionUrl: pkgLatestVersionUrl
+              ? String(pkgLatestVersionUrl)
+              : undefined,
+            typescriptLib: typescriptLib ? String(typescriptLib) : undefined,
+          }
+
+          worker.postMessage(message)
         })
         await init
         return worker
