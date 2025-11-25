@@ -92,9 +92,9 @@
     "@volar/monaco": "2.4.23",
     "@volar/typescript": "2.4.23",
     "@vue/babel-plugin-jsx": "^1.4.0",
-    "@vue/language-core": "3.0.7-alpha.1",
-    "@vue/language-service": "3.0.7-alpha.1",
-    "@vue/typescript-plugin": "3.0.7-alpha.1",
+    "@vue/language-core": "3.0.8",
+    "@vue/language-service": "3.0.8",
+    "@vue/typescript-plugin": "3.0.8",
     "assert": "^2.1.0",
     "bumpp": "^10.2.2",
     "codemirror": "^5.65.18",
@@ -117,6 +117,6 @@
     "vscode-uri": "^3.1.0",
     "volar-service-typescript": "0.0.65",
     "vue": "^3.5.18",
-    "vue-tsc": "3.0.7-alpha.1"
+    "vue-tsc": "3.0.8"
   }
 }
