@@ -502,6 +502,7 @@ export class File {
     ssr: '',
     clientMap: '',
     ssrMap: '',
+    vapor: false
   }
   editorViewState: editor.ICodeEditorViewState | null = null
 

@@ -218,7 +218,8 @@ async function updatePreview() {
   )
 
   try {
-    const { mainFile } = store.value
+    const { mainFile, files } = store.value
+    const isVapor = files[mainFile].compiled.vapor || false
 
     // if SSR, generate the SSR bundle and eval it to render the HTML
     if (isSSR && mainFile.endsWith('.vue')) {
@@ -235,7 +236,8 @@ async function updatePreview() {
          const AppComponent = __modules__["${mainFile}"].default
          AppComponent.name = 'Repl'
          const vaporSupported = ${vaporSupported}
-         const app = (vaporSupported && AppComponent.__vapor ? _createVaporApp : _createApp)(AppComponent)
+         const isVapor = ${isVapor}
+         const app = (vaporSupported && isVapor ? _createVaporApp : _createApp)(AppComponent)
          if (!app.config.hasOwnProperty('unwrapInjectedRef')) {
            app.config.unwrapInjectedRef = true
          }

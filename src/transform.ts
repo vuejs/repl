@@ -284,6 +284,7 @@ export async function compileFile(
         ssrTemplateMap,
       ),
     )
+    compiled.vapor = !!(descriptor.scriptSetup && descriptor.scriptSetup.attrs.vapor)
   }
 
   return []
