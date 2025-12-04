@@ -7,6 +7,7 @@ import type {
 import { type Transform, transform } from 'sucrase'
 import hashId from 'hash-sum'
 import { getSourceMap, toVisualizer, trimAnalyzedBindings } from './sourcemap'
+import { importLessFromCdn } from './style-preprocessor'
 
 export const COMP_IDENTIFIER = `__sfc__`
 
@@ -78,7 +79,9 @@ export async function compileFile(
     return errors
   }
 
-  const styleLangs = descriptor.styles.map((s) => s.lang).filter(Boolean)
+  const styleLangs = descriptor.styles
+    .map((s) => s.lang)
+    .filter(Boolean) as string[]
   const templateLang = descriptor.template?.lang
   if (styleLangs.length && templateLang) {
     return [
@@ -88,11 +91,20 @@ export async function compileFile(
         `for <template> are currently not supported.`,
     ]
   } else if (styleLangs.length) {
-    return [
-      `lang="${styleLangs.join(
-        ',',
-      )}" pre-processors for <style> are currently not supported.`,
-    ]
+    const hasLess = styleLangs.includes('less')
+    if (hasLess) {
+      await importLessFromCdn().catch(() => {
+        return [
+          `lang="less" pre-processors for <style> are currently not supported.`,
+        ]
+      })
+    }
+    const restTasks = styleLangs.filter((lang) => lang !== 'less')
+    if (restTasks.length) {
+      return [
+        `lang="${restTasks.join(',')}" pre-processors for <style> are currently not supported.`,
+      ]
+    }
   } else if (templateLang) {
     return [
       `lang="${templateLang}" pre-processors for ` +
@@ -137,7 +149,15 @@ export async function compileFile(
   let clientScript: string
   let bindings: BindingMetadata | undefined
   try {
-    const res = await doCompileScript(store, descriptor, id, false, isTS, isJSX, isCE)
+    const res = await doCompileScript(
+      store,
+      descriptor,
+      id,
+      false,
+      isTS,
+      isJSX,
+      isCE,
+    )
     clientScript = res.code
     bindings = res.bindings
     clientScriptMap = res.map
@@ -159,7 +179,7 @@ export async function compileFile(
         true,
         isTS,
         isJSX,
-        isCE
+        isCE,
       )
       ssrScript = ssrScriptResult.code
       ssrCode += ssrScript
@@ -239,6 +259,13 @@ export async function compileFile(
       id,
       scoped: style.scoped,
       modules: !!style.module,
+      ...(style?.lang && { preprocessLang: style.lang as any }),
+      preprocessCustomRequire: (lang: string) => {
+        if (lang === 'less') {
+          return (window as any)?.less || null
+        }
+        return null
+      },
     })
     if (styleResult.errors.length) {
       // postcss uses pathToFileURL which isn't polyfilled in the browser
