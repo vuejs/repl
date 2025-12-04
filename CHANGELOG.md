@@ -1,3 +1,18 @@
+## [4.7.1](https://github.com/vuejs/repl/compare/v4.7.0...v4.7.1) (2025-12-04)
+
+
+### Bug Fixes
+
+* recompile vue sfc files when compiler changes ([#374](https://github.com/vuejs/repl/issues/374)) ([cd22490](https://github.com/vuejs/repl/commit/cd224909c0514d5ef076b4135b538632824835fe))
+
+
+### Features
+
+* update language tools to 3.0.7 ([29db88e](https://github.com/vuejs/repl/commit/29db88e3d79fc707ee8bc30b2affb30905097c24))
+* update language tools to 3.0.8 ([8102654](https://github.com/vuejs/repl/commit/810265402e7c820af66853028b25e58660488aff))
+
+
+
 # [4.7.0](https://github.com/vuejs/repl/compare/v4.6.3...v4.7.0) (2025-09-04)
 
 
