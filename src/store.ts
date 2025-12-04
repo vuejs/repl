@@ -112,7 +112,7 @@ export function useStore(
       // skip initial (oldCompiler is undefined on first run)
       if (!oldCompiler) return
       for (const file of Object.values(files.value)) {
-        compileFile(store, file)
+        compileFile(store, file).then((errs) => errors.value.push(...errs))
       }
     })
 
