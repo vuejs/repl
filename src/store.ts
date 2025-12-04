@@ -107,12 +107,14 @@ export function useStore(
       { immediate: true },
     )
 
-    // recompile all files when compiler changes
+    // recompile vue sfc files when compiler changes
     watch(compiler, (_, oldCompiler) => {
       // skip initial (oldCompiler is undefined on first run)
       if (!oldCompiler) return
       for (const file of Object.values(files.value)) {
-        compileFile(store, file).then((errs) => errors.value.push(...errs))
+        if (file.filename.endsWith('.vue')) {
+          compileFile(store, file).then((errs) => errors.value.push(...errs))
+        }
       }
     })
 
