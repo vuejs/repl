@@ -5,6 +5,7 @@ import type { CompilerError } from 'vue/compiler-sfc'
 const props = defineProps<{
   err?: string | Error | false
   warn?: string | Error
+  permanent?: boolean
 }>()
 
 const dismissed = ref(false)
@@ -38,7 +39,7 @@ function formatMessage(err: string | Error): string {
       :class="err ? 'err' : 'warn'"
     >
       <pre>{{ formatMessage(err || warn!) }}</pre>
-      <button class="dismiss" @click="dismissed = true">✕</button>
+      <button v-if="!props.permanent" class="dismiss" @click="dismissed = true">✕</button>
     </div>
   </Transition>
 </template>
