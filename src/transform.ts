@@ -383,7 +383,8 @@ async function doCompileTemplate(
       expressionPlugins,
     },
   })
-  let { code, errors, map } = res
+  // @ts-expect-error rootShape in 3.6
+  let { code, errors, map, multiRoot } = res
   if (errors.length) {
     return { code, map, errors }
   }
@@ -395,6 +396,10 @@ async function doCompileTemplate(
       /\nexport (function|const) (render|ssrRender)/,
       `$1 ${fnName}`,
     )}` + `\n${COMP_IDENTIFIER}.${fnName} = ${fnName}`
+
+  if(descriptor.vapor && !ssr) {
+    code += `\n${COMP_IDENTIFIER}.__multiRoot = ${multiRoot}`
+  }
 
   if (isTS) {
     code = await transformTS(code, isJSX)
