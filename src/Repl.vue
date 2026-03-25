@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import SplitPane from './SplitPane.vue'
+import EditorAndOutput from './EditorAndOutput.vue'
 import Output from './output/Output.vue'
 import { type Store, useStore } from './store'
 import { computed, provide, toRefs, useTemplateRef } from 'vue'
@@ -17,6 +17,8 @@ export interface Props {
   editor: EditorComponentType
   store?: Store
   autoResize?: boolean
+  showEditor?: boolean
+  showOutput?: boolean
   showCompileOutput?: boolean
   showOpenSourceMap?: boolean
   showImportMap?: boolean
@@ -54,6 +56,8 @@ const props = withDefaults(defineProps<Props>(), {
   previewTheme: false,
   store: () => useStore(),
   autoResize: true,
+  showEditor: true,
+  showOutput: true,
   showCompileOutput: true,
   showOpenSourceMap: false,
   showImportMap: true,
@@ -76,9 +80,6 @@ const outputRef = useTemplateRef('output')
 
 props.store.init()
 
-const editorSlotName = computed(() => (props.layoutReverse ? 'right' : 'left'))
-const outputSlotName = computed(() => (props.layoutReverse ? 'left' : 'right'))
-
 provide(injectKeyProps, {
   ...toRefs(props),
   autoSave,
@@ -100,11 +101,11 @@ defineExpose({ reload })
 
 <template>
   <div class="vue-repl">
-    <SplitPane :layout="layout">
-      <template #[editorSlotName]>
+    <EditorAndOutput :layout="layout" :layout-reverse="layoutReverse">
+      <template v-if="showEditor" #editor>
         <EditorContainer :editor-component="editor" />
       </template>
-      <template #[outputSlotName]>
+      <template v-if="showOutput" #output>
         <Output
           ref="output"
           :editor-component="editor"
@@ -114,7 +115,7 @@ defineExpose({ reload })
           :ssr="!!props.ssr"
         />
       </template>
-    </SplitPane>
+    </EditorAndOutput>
   </div>
 </template>
 
