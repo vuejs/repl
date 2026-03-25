@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import Message from './Message.vue';
-import SplitPane from './SplitPane.vue'
 import { computed } from 'vue'
+import Message from './Message.vue'
+import SplitPane from './SplitPane.vue'
 
 const props = defineProps<{
   layout?: 'horizontal' | 'vertical'
@@ -22,10 +22,14 @@ const outputSlotName = computed(() => (props.layoutReverse ? 'left' : 'right'))
       <slot name="output" />
     </template>
   </SplitPane>
-  <!-- Editor only -->
+  <!-- Editor -->
   <slot v-else-if="$slots.editor" name="editor" />
-  <!-- Output only -->
+  <!-- Output -->
   <slot v-else-if="$slots.output" name="output" />
   <!-- Warning -->
-  <Message v-else warn="Nothing to show with !showOutput and !showEditor" permanent />
+  <Message
+    v-else
+    warn="Nothing to show with !showOutput and !showEditor"
+    permanent
+  />
 </template>
