@@ -22,9 +22,9 @@ const outputSlotName = computed(() => (props.layoutReverse ? 'left' : 'right'))
       <slot name="output" />
     </template>
   </SplitPane>
-  <!-- Editor -->
+  <!-- Editor only -->
   <slot v-else-if="$slots.editor" name="editor" />
-  <!-- Output -->
+  <!-- Output only -->
   <slot v-else-if="$slots.output" name="output" />
   <!-- Warning -->
   <Message
