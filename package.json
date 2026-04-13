@@ -96,7 +96,7 @@
     "@vue/language-service": "3.0.8",
     "@vue/typescript-plugin": "3.0.8",
     "assert": "^2.1.0",
-    "bumpp": "^10.2.2",
+    "bumpp": "^11.0.1",
     "codemirror": "^5.65.18",
     "conventional-changelog-cli": "^5.0.0",
     "eslint": "^9.32.0",
