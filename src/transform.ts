@@ -397,6 +397,7 @@ async function doCompileTemplate(
       `$1 ${fnName}`,
     )}` + `\n${COMP_IDENTIFIER}.${fnName} = ${fnName}`
 
+  // @ts-expect-error multiRoot in 3.6
   if(descriptor.vapor && !ssr) {
     code += `\n${COMP_IDENTIFIER}.__multiRoot = ${multiRoot}`
   }

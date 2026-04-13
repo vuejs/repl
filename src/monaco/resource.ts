@@ -55,7 +55,7 @@ export function createNpmFileSystem(
 
   return {
     async stat(uri) {
-      const path = getCdnPath(uri)
+      const path = normalizePath(getCdnPath(uri))
       if (path === undefined) {
         return
       }
@@ -70,14 +70,14 @@ export function createNpmFileSystem(
       return await _stat(path)
     },
     async readFile(uri) {
-      const path = getCdnPath(uri)
+      const path = normalizePath(getCdnPath(uri))
       if (path === undefined) {
         return
       }
       return await _readFile(path)
     },
     readDirectory(uri) {
-      const path = getCdnPath(uri)
+      const path = normalizePath(getCdnPath(uri))
       if (path === undefined) {
         return []
       }
@@ -86,6 +86,9 @@ export function createNpmFileSystem(
   }
 
   async function _stat(path: string) {
+    if (hasNodeModulesSegment(path)) {
+      return
+    }
     if (statCache.has(path)) {
       return {
         ...statCache.get(path),
@@ -142,6 +145,9 @@ export function createNpmFileSystem(
   }
 
   async function _readDirectory(path: string): Promise<[string, FileType][]> {
+    if (hasNodeModulesSegment(path)) {
+      return []
+    }
     if (dirCache.has(path)) {
       return dirCache.get(path)!
     }
@@ -182,17 +188,7 @@ export function createNpmFileSystem(
         return []
       }
 
-      const result: [string, FileType][] = data.files.map((file) => {
-        const type =
-          file.type === 'directory'
-            ? (2 as FileType.Directory)
-            : (1 as FileType.File)
-
-        const fullPath = file.path
-        statCache.set(fullPath, { type })
-
-        return [_getNameFromPath(file.path), type]
-      })
+      const result = getDirectDirectoryEntries(path, pkgPath, data.files)
 
       dirCache.set(path, result)
       return result
@@ -201,26 +197,53 @@ export function createNpmFileSystem(
     }
   }
 
-  function _getNameFromPath(path: string): string {
-    if (!path) return ''
+  function getDirectDirectoryEntries(
+    path: string,
+    pkgPath: string,
+    files: {
+      path: string
+      type: 'file' | 'directory'
+      size?: number
+    }[],
+  ): [string, FileType][] {
+    const entries = new Map<string, FileType>()
+    const prefix = trimSlashes(pkgPath)
 
-    const trimmedPath = path.endsWith('/') ? path.slice(0, -1) : path
+    for (const file of files) {
+      const isRootedPath = file.path.startsWith('/')
+      const filePath = trimSlashes(file.path)
+      if (!filePath) continue
 
-    const lastSlashIndex = trimmedPath.lastIndexOf('/')
+      const relativePath =
+        prefix && filePath.startsWith(`${prefix}/`)
+          ? filePath.slice(prefix.length + 1)
+          : prefix && isRootedPath
+            ? undefined
+            : filePath
 
-    if (
-      lastSlashIndex === -1 ||
-      (lastSlashIndex === 0 && trimmedPath.length === 1)
-    ) {
-      return trimmedPath
+      if (!relativePath) continue
+
+      const [name, ...rest] = relativePath.split('/')
+      const type =
+        rest.length > 0 || file.type === 'directory'
+          ? (2 as FileType.Directory)
+          : (1 as FileType.File)
+
+      entries.set(name, type)
+      statCache.set(joinPath(path, name), { type })
     }
 
-    return trimmedPath.slice(lastSlashIndex + 1)
+    return [...entries]
   }
 
   async function _readFile(path: string): Promise<string | undefined> {
     const [_modName, pkgName, _version, pkgFilePath] = resolvePackageName(path)
-    if (!pkgName || !pkgFilePath || !(await isValidPackageName(pkgName))) {
+    if (
+      !pkgName ||
+      !pkgFilePath ||
+      hasNodeModulesSegment(pkgFilePath) ||
+      !(await isValidPackageName(pkgName))
+    ) {
       return
     }
 
@@ -245,9 +268,25 @@ export function createNpmFileSystem(
     return await fetchResults.get(path)!
   }
 
+  function hasNodeModulesSegment(path: string) {
+    return path.split('/').includes('node_modules')
+  }
+
+  function joinPath(base: string, path: string) {
+    return [trimSlashes(base), trimSlashes(path)].filter(Boolean).join('/')
+  }
+
+  function normalizePath(path: string | undefined) {
+    return path === undefined ? undefined : trimSlashes(path)
+  }
+
+  function trimSlashes(path: string) {
+    return path.replace(/^\/+|\/+$/g, '')
+  }
+
   async function isValidPackageName(pkgName: string) {
-    // ignore @aaa/node_modules
-    if (pkgName.endsWith('/node_modules')) {
+    // ignore nested node_modules probes like /node_modules/node_modules
+    if (pkgName === 'node_modules' || pkgName.endsWith('/node_modules')) {
       return false
     }
     // hard code to skip known invalid package
