@@ -107,6 +107,19 @@ export function useStore(
       { immediate: true },
     )
 
+    // Recompile all Vue SFC files when the compiler changes.
+    // This ensures that when switching Vue versions (e.g., from <3.6 to >=3.6),
+    // all vue sfc files are recompiled with the new compiler to correctly handle
+    // vapor components.
+    watch(compiler, (_, oldCompiler) => {
+      if (!oldCompiler) return
+      for (const file of Object.values(files.value)) {
+        if (file.filename.endsWith('.vue')) {
+          compileFile(store, file).then((errs) => errors.value.push(...errs))
+        }
+      }
+    })
+
     watch(
       sfcOptions,
       () => {
