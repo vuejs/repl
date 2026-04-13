@@ -1,3 +1,19 @@
+## [4.7.2](https://github.com/vuejs/repl/compare/v4.7.1...v4.7.2) (2026-04-13)
+
+
+### Bug Fixes
+
+* resolve CDN metadata directory entries correctly ([e5c3202](https://github.com/vuejs/repl/commit/e5c320277db488dafc8b352f5ad6849e3083ccf8))
+
+
+### Features
+
+* add multiRoot marker for template-only vapor component ([#385](https://github.com/vuejs/repl/issues/385)) ([a44a715](https://github.com/vuejs/repl/commit/a44a715d72ff7a0d293f016a906580362c616533))
+* all cdn resources can be replaced ([#325](https://github.com/vuejs/repl/issues/325)) ([82d5a98](https://github.com/vuejs/repl/commit/82d5a982dc6af634d394edbb696f0834882d7b19))
+* **repl:** `getEditorInstance`, `getMonacoEditor` (expose) ([#364](https://github.com/vuejs/repl/issues/364)) ([7ac4b95](https://github.com/vuejs/repl/commit/7ac4b9503e4cbcab6d8c36f7c8a1898cda1cb6ef))
+
+
+
 ## [4.7.1](https://github.com/vuejs/repl/compare/v4.7.0...v4.7.1) (2025-12-04)
 
 
