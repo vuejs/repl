@@ -383,7 +383,7 @@ async function doCompileTemplate(
       expressionPlugins,
     },
   })
-  // @ts-expect-error rootShape in 3.6
+  // @ts-expect-error multiRoot in 3.6
   let { code, errors, map, multiRoot } = res
   if (errors.length) {
     return { code, map, errors }
