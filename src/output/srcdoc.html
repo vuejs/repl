@@ -15,6 +15,7 @@
     <script>
       ;(() => {
         let scriptEls = []
+        let lastEvalPromise = null
 
         window.process = { env: {} }
         window.__modules__ = {}
@@ -42,7 +43,15 @@
             send_reply({ action: 'cmd_error', message, stack })
 
           if (action === 'eval') {
+            let evalDone
             try {
+              if (lastEvalPromise) {
+                await lastEvalPromise
+              }
+              lastEvalPromise = new Promise((resolve) => {
+                evalDone = resolve
+              })
+
               if (scriptEls.length) {
                 scriptEls.forEach((el) => {
                   document.head.removeChild(el)
@@ -74,6 +83,9 @@
               }
             } catch (e) {
               send_error(e.message, e.stack)
+            } finally {
+              lastEvalPromise = null
+              evalDone()
             }
           }
 
