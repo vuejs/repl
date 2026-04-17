@@ -111,7 +111,7 @@
     "simple-git-hooks": "^2.13.1",
     "source-map-js": "^1.2.1",
     "sucrase": "^3.35.0",
-    "typescript": "^5.9.2",
+    "typescript": "^6.0.3",
     "typescript-eslint": "^8.39.0",
     "vite": "^8.0.8",
     "vite-plugin-dts": "^4.5.4",
