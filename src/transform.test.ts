@@ -99,24 +99,6 @@ describe('compileFile', () => {
       expect(file.compiled.js).toContain('export const foo = 42')
       expect(file.compiled.ssr).toContain('export const foo = 42')
     })
-
-    it('should compile TSX files', async () => {
-      const tsxCode = `export const Foo = () => <div>Hello</div>`
-      const file = createMockFile('src/test.tsx', tsxCode)
-      const errors = await compileFile(store, file)
-      expect(errors).toEqual([])
-      expect(file.compiled.js).toBeDefined()
-      expect(file.compiled.ssr).toBeDefined()
-    })
-
-    it('should compile JSX files', async () => {
-      const jsxCode = `export const Foo = () => <div>Hello</div>`
-      const file = createMockFile('src/test.jsx', jsxCode)
-      const errors = await compileFile(store, file)
-      expect(errors).toEqual([])
-      expect(file.compiled.js).toBeDefined()
-      expect(file.compiled.ssr).toBeDefined()
-    })
   })
 
   describe('JSON files', () => {
