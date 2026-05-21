@@ -1,0 +1,111 @@
+{
+  "total": {
+    "lines": { "total": 909, "covered": 772, "skipped": 0, "pct": 84.92 },
+    "statements": { "total": 997, "covered": 817, "skipped": 0, "pct": 81.94 },
+    "functions": { "total": 172, "covered": 126, "skipped": 0, "pct": 73.25 },
+    "branches": { "total": 691, "covered": 490, "skipped": 0, "pct": 70.91 },
+    "branchesTrue": { "total": 0, "covered": 0, "skipped": 0, "pct": 100 }
+  },
+  "/mnt/ext2/code/prompts/github/forks/repl/jest.monaco-mock.js": {
+    "lines": { "total": 5, "covered": 5, "skipped": 0, "pct": 100 },
+    "functions": { "total": 4, "covered": 4, "skipped": 0, "pct": 100 },
+    "statements": { "total": 6, "covered": 6, "skipped": 0, "pct": 100 },
+    "branches": { "total": 0, "covered": 0, "skipped": 0, "pct": 100 }
+  },
+  "/mnt/ext2/code/prompts/github/forks/repl/jest.raw-mock.js": {
+    "lines": { "total": 1, "covered": 1, "skipped": 0, "pct": 100 },
+    "functions": { "total": 0, "covered": 0, "skipped": 0, "pct": 100 },
+    "statements": { "total": 1, "covered": 1, "skipped": 0, "pct": 100 },
+    "branches": { "total": 0, "covered": 0, "skipped": 0, "pct": 100 }
+  },
+  "/mnt/ext2/code/prompts/github/forks/repl/src/core.ts": {
+    "lines": { "total": 12, "covered": 12, "skipped": 0, "pct": 100 },
+    "functions": { "total": 6, "covered": 6, "skipped": 0, "pct": 100 },
+    "statements": { "total": 18, "covered": 18, "skipped": 0, "pct": 100 },
+    "branches": { "total": 0, "covered": 0, "skipped": 0, "pct": 100 }
+  },
+  "/mnt/ext2/code/prompts/github/forks/repl/src/import-map.ts": {
+    "lines": { "total": 22, "covered": 22, "skipped": 0, "pct": 100 },
+    "functions": { "total": 8, "covered": 8, "skipped": 0, "pct": 100 },
+    "statements": { "total": 23, "covered": 23, "skipped": 0, "pct": 100 },
+    "branches": { "total": 28, "covered": 27, "skipped": 0, "pct": 96.42 }
+  },
+  "/mnt/ext2/code/prompts/github/forks/repl/src/index.ts": {
+    "lines": { "total": 21, "covered": 18, "skipped": 0, "pct": 85.71 },
+    "functions": { "total": 8, "covered": 6, "skipped": 0, "pct": 75 },
+    "statements": { "total": 29, "covered": 24, "skipped": 0, "pct": 82.75 },
+    "branches": { "total": 31, "covered": 20, "skipped": 0, "pct": 64.51 }
+  },
+  "/mnt/ext2/code/prompts/github/forks/repl/src/sourcemap.ts": {
+    "lines": { "total": 39, "covered": 38, "skipped": 0, "pct": 97.43 },
+    "functions": { "total": 4, "covered": 4, "skipped": 0, "pct": 100 },
+    "statements": { "total": 40, "covered": 39, "skipped": 0, "pct": 97.5 },
+    "branches": { "total": 8, "covered": 7, "skipped": 0, "pct": 87.5 }
+  },
+  "/mnt/ext2/code/prompts/github/forks/repl/src/store.ts": {
+    "lines": { "total": 225, "covered": 182, "skipped": 0, "pct": 80.88 },
+    "functions": { "total": 47, "covered": 32, "skipped": 0, "pct": 68.08 },
+    "statements": { "total": 244, "covered": 187, "skipped": 0, "pct": 76.63 },
+    "branches": { "total": 169, "covered": 111, "skipped": 0, "pct": 65.68 }
+  },
+  "/mnt/ext2/code/prompts/github/forks/repl/src/transform.ts": {
+    "lines": { "total": 175, "covered": 139, "skipped": 0, "pct": 79.42 },
+    "functions": { "total": 24, "covered": 13, "skipped": 0, "pct": 54.16 },
+    "statements": { "total": 191, "covered": 141, "skipped": 0, "pct": 73.82 },
+    "branches": { "total": 153, "covered": 106, "skipped": 0, "pct": 69.28 }
+  },
+  "/mnt/ext2/code/prompts/github/forks/repl/src/utils.ts": {
+    "lines": { "total": 20, "covered": 20, "skipped": 0, "pct": 100 },
+    "functions": { "total": 5, "covered": 5, "skipped": 0, "pct": 100 },
+    "statements": { "total": 20, "covered": 20, "skipped": 0, "pct": 100 },
+    "branches": { "total": 5, "covered": 5, "skipped": 0, "pct": 100 }
+  },
+  "/mnt/ext2/code/prompts/github/forks/repl/src/vue-dev-proxy.ts": {
+    "lines": { "total": 12, "covered": 10, "skipped": 0, "pct": 83.33 },
+    "functions": { "total": 4, "covered": 3, "skipped": 0, "pct": 75 },
+    "statements": { "total": 17, "covered": 14, "skipped": 0, "pct": 82.35 },
+    "branches": { "total": 24, "covered": 16, "skipped": 0, "pct": 66.66 }
+  },
+  "/mnt/ext2/code/prompts/github/forks/repl/src/vue-server-renderer-dev-proxy.ts": {
+    "lines": { "total": 12, "covered": 10, "skipped": 0, "pct": 83.33 },
+    "functions": { "total": 4, "covered": 3, "skipped": 0, "pct": 75 },
+    "statements": { "total": 17, "covered": 14, "skipped": 0, "pct": 82.35 },
+    "branches": { "total": 24, "covered": 16, "skipped": 0, "pct": 66.66 }
+  },
+  "/mnt/ext2/code/prompts/github/forks/repl/src/codemirror/codemirror.ts": {
+    "lines": { "total": 22, "covered": 22, "skipped": 0, "pct": 100 },
+    "functions": { "total": 1, "covered": 1, "skipped": 0, "pct": 100 },
+    "statements": { "total": 22, "covered": 22, "skipped": 0, "pct": 100 },
+    "branches": { "total": 7, "covered": 6, "skipped": 0, "pct": 85.71 }
+  },
+  "/mnt/ext2/code/prompts/github/forks/repl/src/monaco/env.ts": {
+    "lines": { "total": 112, "covered": 78, "skipped": 0, "pct": 69.64 },
+    "functions": { "total": 25, "covered": 12, "skipped": 0, "pct": 48 },
+    "statements": { "total": 126, "covered": 85, "skipped": 0, "pct": 67.46 },
+    "branches": { "total": 80, "covered": 42, "skipped": 0, "pct": 52.5 }
+  },
+  "/mnt/ext2/code/prompts/github/forks/repl/src/monaco/highlight.ts": {
+    "lines": { "total": 44, "covered": 38, "skipped": 0, "pct": 86.36 },
+    "functions": { "total": 11, "covered": 8, "skipped": 0, "pct": 72.72 },
+    "statements": { "total": 55, "covered": 45, "skipped": 0, "pct": 81.81 },
+    "branches": { "total": 46, "covered": 31, "skipped": 0, "pct": 67.39 }
+  },
+  "/mnt/ext2/code/prompts/github/forks/repl/src/monaco/language-configs.ts": {
+    "lines": { "total": 7, "covered": 7, "skipped": 0, "pct": 100 },
+    "functions": { "total": 0, "covered": 0, "skipped": 0, "pct": 100 },
+    "statements": { "total": 7, "covered": 7, "skipped": 0, "pct": 100 },
+    "branches": { "total": 0, "covered": 0, "skipped": 0, "pct": 100 }
+  },
+  "/mnt/ext2/code/prompts/github/forks/repl/src/output/PreviewProxy.ts": {
+    "lines": { "total": 42, "covered": 42, "skipped": 0, "pct": 100 },
+    "functions": { "total": 9, "covered": 9, "skipped": 0, "pct": 100 },
+    "statements": { "total": 43, "covered": 43, "skipped": 0, "pct": 100 },
+    "branches": { "total": 21, "covered": 21, "skipped": 0, "pct": 100 }
+  },
+  "/mnt/ext2/code/prompts/github/forks/repl/src/output/moduleCompiler.ts": {
+    "lines": { "total": 138, "covered": 128, "skipped": 0, "pct": 92.75 },
+    "functions": { "total": 12, "covered": 12, "skipped": 0, "pct": 100 },
+    "statements": { "total": 138, "covered": 128, "skipped": 0, "pct": 92.75 },
+    "branches": { "total": 95, "covered": 82, "skipped": 0, "pct": 86.31 }
+  }
+}
