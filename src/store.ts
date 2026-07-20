@@ -64,6 +64,15 @@ export function useStore(
     setImportMap(importMap)
   }
 
+  function applyDefaultTsConfig(targetFiles: Record<string, File>) {
+    if (!targetFiles[tsconfigFile]) {
+      targetFiles[tsconfigFile] = new File(
+        tsconfigFile,
+        JSON.stringify(tsconfig, undefined, 2),
+      )
+    }
+  }
+
   function init() {
     watchEffect(() => {
       compileFile(store, activeFile.value).then((errs) => (errors.value = errs))
@@ -142,12 +151,7 @@ export function useStore(
     )
 
     // init tsconfig
-    if (!files.value[tsconfigFile]) {
-      files.value[tsconfigFile] = new File(
-        tsconfigFile,
-        JSON.stringify(tsconfig, undefined, 2),
-      )
-    }
+    applyDefaultTsConfig(files.value)
 
     // compile rest of the files
     errors.value = []
@@ -339,6 +343,7 @@ export function useStore(
     for (const [filename, file] of Object.entries(newFiles)) {
       setFile(files, filename, file)
     }
+    applyDefaultTsConfig(files)
 
     const errors = []
     for (const file of Object.values(files)) {
