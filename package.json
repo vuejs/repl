@@ -77,7 +77,7 @@
   "homepage": "https://github.com/vuejs/repl#readme",
   "devDependencies": {
     "@babel/standalone": "^7.28.2",
-    "@babel/types": "^7.28.2",
+    "@babel/types": "^8.0.6",
     "@eslint/js": "^9.32.0",
     "@jridgewell/gen-mapping": "^0.3.12",
     "@jridgewell/trace-mapping": "^0.3.29",
