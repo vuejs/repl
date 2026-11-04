@@ -8,7 +8,6 @@ import {
   walkIdentifiers,
 } from 'vue/compiler-sfc'
 import type { ExportSpecifier, Identifier, Node } from '@babel/types'
-import { createSourceRewrite, rewritePieceText } from 'muggle-string'
 
 export function compileModulesForPreview(store: Store, isSSR = false) {
   const seen = new Set<File>()
@@ -103,7 +102,12 @@ function processChildFiles(
 }
 
 function processModule(store: Store, src: string, filename: string) {
-  const s = createSourceRewrite({ content: src })
+  // edits by offsets in `src`; inserts at one offset keep their call order
+  const edits: { start: number; end: number; text: string }[] = []
+  const insert = (offset: number, text: string) =>
+    edits.push({ start: offset, end: offset, text })
+  const replace = (start: number, end: number, text: string) =>
+    edits.push({ start, end, text })
 
   const ast = babelParse(src, {
     sourceFilename: filename,
@@ -136,7 +140,7 @@ function processModule(store: Store, src: string, filename: string) {
     importedFiles.add(filename)
     const id = `__import_${importedFiles.size}__`
     importToIdMap.set(filename, id)
-    s.insertAfter(
+    insert(
       node.start!,
       `const ${id} = ${modulesKey}[${JSON.stringify(filename)}]\n`,
     )
@@ -144,14 +148,14 @@ function processModule(store: Store, src: string, filename: string) {
   }
 
   function defineExport(name: string, local = name) {
-    s.insertBefore(
+    insert(
       src.length,
       `\n${exportKey}(${moduleKey}, "${name}", () => ${local})`,
     )
   }
 
   // 0. instantiate module
-  s.insertAfter(
+  insert(
     0,
     `const ${moduleKey} = ${modulesKey}[${JSON.stringify(
       filename,
@@ -180,7 +184,7 @@ function processModule(store: Store, src: string, filename: string) {
             idToImportMap.set(spec.local.name, importId)
           }
         }
-        s.replace(node.start!, node.end!, '')
+        replace(node.start!, node.end!, '')
       }
     }
   }
@@ -204,7 +208,7 @@ function processModule(store: Store, src: string, filename: string) {
             }
           }
         }
-        s.replace(node.start!, node.declaration.start!, '')
+        replace(node.start!, node.declaration.start!, '')
       } else if (node.source && node.source.value.startsWith('./')) {
         // export { foo, bar } from './foo'
         const importId = defineImport(node, node.source.value)
@@ -214,7 +218,7 @@ function processModule(store: Store, src: string, filename: string) {
             `${importId}.${(spec as ExportSpecifier).local.name}`,
           )
         }
-        s.replace(node.start!, node.end!, '')
+        replace(node.start!, node.end!, '')
       } else {
         // export { foo, bar }
         for (const spec of node.specifiers) {
@@ -222,7 +226,7 @@ function processModule(store: Store, src: string, filename: string) {
           const binding = idToImportMap.get(local)
           defineExport((spec.exported as Identifier).name, binding || local)
         }
-        s.replace(node.start!, node.end!, '')
+        replace(node.start!, node.end!, '')
       }
     }
 
@@ -233,22 +237,22 @@ function processModule(store: Store, src: string, filename: string) {
         // export default function foo() {}
         // export default class A {}
         const { name } = node.declaration.id
-        s.replace(node.start!, node.start! + 15, '')
-        s.insertBefore(
+        replace(node.start!, node.start! + 15, '')
+        insert(
           src.length,
           `\n${exportKey}(${moduleKey}, "default", () => ${name})`,
         )
       } else {
         // anonymous default exports
-        s.replace(node.start!, node.start! + 14, `${moduleKey}.default =`)
+        replace(node.start!, node.start! + 14, `${moduleKey}.default =`)
       }
     }
 
     // export * from './foo'
     if (node.type === 'ExportAllDeclaration') {
       const importId = defineImport(node, node.source.value)
-      s.replace(node.start!, node.end!, '')
-      s.insertBefore(
+      replace(node.start!, node.end!, '')
+      insert(
         src.length,
         `\nfor (const key in ${importId}) {
         if (key !== 'default') {
@@ -261,7 +265,14 @@ function processModule(store: Store, src: string, filename: string) {
 
   // 3. convert references to import bindings
   for (const node of ast) {
-    if (node.type === 'ImportDeclaration') continue
+    if (
+      node.type === 'ImportDeclaration' ||
+      node.type === 'ExportAllDeclaration' ||
+      (node.type === 'ExportNamedDeclaration' && !node.declaration)
+    ) {
+      // handled in 1. and 2.
+      continue
+    }
     walkIdentifiers(node, (id, parent, parentStack) => {
       const binding = idToImportMap.get(id.name)
       if (!binding) {
@@ -275,7 +286,7 @@ function processModule(store: Store, src: string, filename: string) {
           !(parent as any).inPattern ||
           isInDestructureAssignment(parent, parentStack)
         ) {
-          s.insertAfter(id.end!, `: ${binding}`)
+          insert(id.end!, `: ${binding}`)
         }
       } else if (
         parent &&
@@ -286,10 +297,10 @@ function processModule(store: Store, src: string, filename: string) {
           declaredConst.add(id.name)
           // locate the top-most node containing the class declaration
           const topNode = parentStack[1]
-          s.insertBefore(topNode.start!, `const ${id.name} = ${binding};\n`)
+          insert(topNode.start!, `const ${id.name} = ${binding};\n`)
         }
       } else {
-        s.replace(id.start!, id.end!, binding)
+        replace(id.start!, id.end!, binding)
       }
     })
   }
@@ -302,8 +313,8 @@ function processModule(store: Store, src: string, filename: string) {
         const arg = parent.arguments[0]
         if (arg.type === 'StringLiteral' && arg.value.startsWith('./')) {
           hasDynamicImport = true
-          s.replace(node.start!, node.start! + 6, dynamicImportKey)
-          s.replace(
+          replace(node.start!, node.start! + 6, dynamicImportKey)
+          replace(
             arg.start!,
             arg.end!,
             JSON.stringify(arg.value.replace(/^\.\/+/, 'src/')),
@@ -313,10 +324,19 @@ function processModule(store: Store, src: string, filename: string) {
     },
   })
 
+  // stable sort: inserts come before a replacement at the same offset
+  edits.sort((a, b) => a.start - b.start || a.end - b.end)
   let code = ''
-  s.render(0, src.length, (piece) => {
-    code += rewritePieceText(piece)
-  })
+  let offset = 0
+  for (const edit of edits) {
+    if (edit.start < offset) {
+      throw new Error(`Overlapping edits at offset ${edit.start}.`)
+    }
+    code += src.slice(offset, edit.start) + edit.text
+    offset = edit.end
+  }
+  code += src.slice(offset)
+
   return {
     code,
     importedFiles,
