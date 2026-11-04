@@ -69,7 +69,7 @@ export default mergeConfig(base, {
       output: {
         chunkFileNames: 'chunks/[name]-[hash].js',
       },
-      external: ['vue', 'vue/compiler-sfc'],
+      external: ['vue', 'vue/compiler-sfc', 'muggle-string'],
     },
   },
 })
