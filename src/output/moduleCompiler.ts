@@ -1,6 +1,5 @@
 import type { File, Store } from '../store'
 import {
-  MagicString,
   babelParse,
   extractIdentifiers,
   isInDestructureAssignment,
@@ -103,7 +102,28 @@ function processChildFiles(
 }
 
 function processModule(store: Store, src: string, filename: string) {
-  const s = new MagicString(src)
+  // edits by offsets in `src`, sorted and disjoint. Each edit is applied
+  // against the edits made before it: a replaced range drops the edits inside
+  // it, whichever is made first, and inserts at one offset keep call order.
+  const edits: { start: number; end: number; text: string }[] = []
+  function replace(start: number, end: number, text: string) {
+    let i = edits.length
+    while (i && edits[i - 1].end > start) i--
+    const next = edits[i]
+    if (next && next.start <= start && end <= next.end && next.start < end) {
+      return
+    }
+    let covered = 0
+    while (
+      i + covered < edits.length &&
+      edits[i + covered].start < end &&
+      edits[i + covered].end <= end
+    ) {
+      covered++
+    }
+    edits.splice(i, covered, { start, end, text })
+  }
+  const insert = (offset: number, text: string) => replace(offset, offset, text)
 
   const ast = babelParse(src, {
     sourceFilename: filename,
@@ -136,7 +156,7 @@ function processModule(store: Store, src: string, filename: string) {
     importedFiles.add(filename)
     const id = `__import_${importedFiles.size}__`
     importToIdMap.set(filename, id)
-    s.appendLeft(
+    insert(
       node.start!,
       `const ${id} = ${modulesKey}[${JSON.stringify(filename)}]\n`,
     )
@@ -144,11 +164,15 @@ function processModule(store: Store, src: string, filename: string) {
   }
 
   function defineExport(name: string, local = name) {
-    s.append(`\n${exportKey}(${moduleKey}, "${name}", () => ${local})`)
+    insert(
+      src.length,
+      `\n${exportKey}(${moduleKey}, "${name}", () => ${local})`,
+    )
   }
 
   // 0. instantiate module
-  s.prepend(
+  insert(
+    0,
     `const ${moduleKey} = ${modulesKey}[${JSON.stringify(
       filename,
     )}] = { [Symbol.toStringTag]: "Module" }\n\n`,
@@ -176,7 +200,7 @@ function processModule(store: Store, src: string, filename: string) {
             idToImportMap.set(spec.local.name, importId)
           }
         }
-        s.remove(node.start!, node.end!)
+        replace(node.start!, node.end!, '')
       }
     }
   }
@@ -200,7 +224,7 @@ function processModule(store: Store, src: string, filename: string) {
             }
           }
         }
-        s.remove(node.start!, node.declaration.start!)
+        replace(node.start!, node.declaration.start!, '')
       } else if (node.source && node.source.value.startsWith('./')) {
         // export { foo, bar } from './foo'
         const importId = defineImport(node, node.source.value)
@@ -210,7 +234,7 @@ function processModule(store: Store, src: string, filename: string) {
             `${importId}.${(spec as ExportSpecifier).local.name}`,
           )
         }
-        s.remove(node.start!, node.end!)
+        replace(node.start!, node.end!, '')
       } else {
         // export { foo, bar }
         for (const spec of node.specifiers) {
@@ -218,7 +242,7 @@ function processModule(store: Store, src: string, filename: string) {
           const binding = idToImportMap.get(local)
           defineExport((spec.exported as Identifier).name, binding || local)
         }
-        s.remove(node.start!, node.end!)
+        replace(node.start!, node.end!, '')
       }
     }
 
@@ -229,23 +253,29 @@ function processModule(store: Store, src: string, filename: string) {
         // export default function foo() {}
         // export default class A {}
         const { name } = node.declaration.id
-        s.remove(node.start!, node.start! + 15)
-        s.append(`\n${exportKey}(${moduleKey}, "default", () => ${name})`)
+        replace(node.start!, node.start! + 15, '')
+        insert(
+          src.length,
+          `\n${exportKey}(${moduleKey}, "default", () => ${name})`,
+        )
       } else {
         // anonymous default exports
-        s.overwrite(node.start!, node.start! + 14, `${moduleKey}.default =`)
+        replace(node.start!, node.start! + 14, `${moduleKey}.default =`)
       }
     }
 
     // export * from './foo'
     if (node.type === 'ExportAllDeclaration') {
       const importId = defineImport(node, node.source.value)
-      s.remove(node.start!, node.end!)
-      s.append(`\nfor (const key in ${importId}) {
+      replace(node.start!, node.end!, '')
+      insert(
+        src.length,
+        `\nfor (const key in ${importId}) {
         if (key !== 'default') {
           ${exportKey}(${moduleKey}, key, () => ${importId}[key])
         }
-      }`)
+      }`,
+      )
     }
   }
 
@@ -265,7 +295,7 @@ function processModule(store: Store, src: string, filename: string) {
           !(parent as any).inPattern ||
           isInDestructureAssignment(parent, parentStack)
         ) {
-          s.appendLeft(id.end!, `: ${binding}`)
+          insert(id.end!, `: ${binding}`)
         }
       } else if (
         parent &&
@@ -276,10 +306,10 @@ function processModule(store: Store, src: string, filename: string) {
           declaredConst.add(id.name)
           // locate the top-most node containing the class declaration
           const topNode = parentStack[1]
-          s.prependRight(topNode.start!, `const ${id.name} = ${binding};\n`)
+          insert(topNode.start!, `const ${id.name} = ${binding};\n`)
         }
       } else {
-        s.overwrite(id.start!, id.end!, binding)
+        replace(id.start!, id.end!, binding)
       }
     })
   }
@@ -292,8 +322,8 @@ function processModule(store: Store, src: string, filename: string) {
         const arg = parent.arguments[0]
         if (arg.type === 'StringLiteral' && arg.value.startsWith('./')) {
           hasDynamicImport = true
-          s.overwrite(node.start!, node.start! + 6, dynamicImportKey)
-          s.overwrite(
+          replace(node.start!, node.start! + 6, dynamicImportKey)
+          replace(
             arg.start!,
             arg.end!,
             JSON.stringify(arg.value.replace(/^\.\/+/, 'src/')),
@@ -303,8 +333,16 @@ function processModule(store: Store, src: string, filename: string) {
     },
   })
 
+  let code = ''
+  let offset = 0
+  for (const edit of edits) {
+    code += src.slice(offset, edit.start) + edit.text
+    offset = edit.end
+  }
+  code += src.slice(offset)
+
   return {
-    code: s.toString(),
+    code,
     importedFiles,
     hasDynamicImport,
   }
