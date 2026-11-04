@@ -102,12 +102,28 @@ function processChildFiles(
 }
 
 function processModule(store: Store, src: string, filename: string) {
-  // edits by offsets in `src`; inserts at one offset keep their call order
+  // edits by offsets in `src`, sorted and disjoint. Each edit is applied
+  // against the edits made before it: a replaced range drops the edits inside
+  // it, whichever is made first, and inserts at one offset keep call order.
   const edits: { start: number; end: number; text: string }[] = []
-  const insert = (offset: number, text: string) =>
-    edits.push({ start: offset, end: offset, text })
-  const replace = (start: number, end: number, text: string) =>
-    edits.push({ start, end, text })
+  function replace(start: number, end: number, text: string) {
+    let i = edits.length
+    while (i && edits[i - 1].end > start) i--
+    const next = edits[i]
+    if (next && next.start <= start && end <= next.end && next.start < end) {
+      return
+    }
+    let covered = 0
+    while (
+      i + covered < edits.length &&
+      edits[i + covered].start < end &&
+      edits[i + covered].end <= end
+    ) {
+      covered++
+    }
+    edits.splice(i, covered, { start, end, text })
+  }
+  const insert = (offset: number, text: string) => replace(offset, offset, text)
 
   const ast = babelParse(src, {
     sourceFilename: filename,
@@ -265,14 +281,7 @@ function processModule(store: Store, src: string, filename: string) {
 
   // 3. convert references to import bindings
   for (const node of ast) {
-    if (
-      node.type === 'ImportDeclaration' ||
-      node.type === 'ExportAllDeclaration' ||
-      (node.type === 'ExportNamedDeclaration' && !node.declaration)
-    ) {
-      // handled in 1. and 2.
-      continue
-    }
+    if (node.type === 'ImportDeclaration') continue
     walkIdentifiers(node, (id, parent, parentStack) => {
       const binding = idToImportMap.get(id.name)
       if (!binding) {
@@ -324,14 +333,9 @@ function processModule(store: Store, src: string, filename: string) {
     },
   })
 
-  // stable sort: inserts come before a replacement at the same offset
-  edits.sort((a, b) => a.start - b.start || a.end - b.end)
   let code = ''
   let offset = 0
   for (const edit of edits) {
-    if (edit.start < offset) {
-      throw new Error(`Overlapping edits at offset ${edit.start}.`)
-    }
     code += src.slice(offset, edit.start) + edit.text
     offset = edit.end
   }
