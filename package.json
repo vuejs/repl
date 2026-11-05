@@ -48,6 +48,7 @@
   },
   "scripts": {
     "dev": "vite",
+    "dev:playground": "vite -c playground/vite.config.ts",
     "build": "vite build",
     "build-preview": "vite build -c vite.preview.config.ts",
     "format": "prettier --write .",
