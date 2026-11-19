@@ -141,7 +141,9 @@ function processModule(store: Store, src: string, filename: string) {
     const file =
       files[resolved] ||
       files[(resolved = raw + '.ts')] ||
-      files[(resolved = raw + '.js')]
+      files[(resolved = raw + '.js')] ||
+      files[(resolved = raw + '.tsx')] ||
+      files[(resolved = raw + '.jsx')]
     return file ? resolved : undefined
   }
 
