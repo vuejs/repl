@@ -1,5 +1,7 @@
 import { computed, version as currentVersion, ref } from 'vue'
 
+type DynamicGenPath = (version: string, productionMode: boolean) => string
+
 export function getVersions(version: string): number[] {
   return version.split('.').map((v) => parseInt(v, 10))
 }
@@ -12,15 +14,18 @@ export function isVaporSupported(version: string): boolean{
 
 export function useVueImportMap(
   defaults: {
-    runtimeDev?: string | (() => string)
-    runtimeProd?: string | (() => string)
-    serverRenderer?: string | (() => string)
+    runtimeDev?: string | DynamicGenPath
+    runtimeProd?: string | DynamicGenPath
+    serverRenderer?: string | DynamicGenPath
     vueVersion?: string | null
   } = {},
 ) {
-  function normalizeDefaults(defaults?: string | (() => string)) {
+  function normalizePath(defaults?: string | DynamicGenPath) {
     if (!defaults) return
-    return typeof defaults === 'string' ? defaults : defaults()
+
+    const version = vueVersion.value
+    const defaultIsStr = typeof defaults === 'string' 
+    return !defaultIsStr ? defaults(version || currentVersion, productionMode.value) : (!version && defaults || undefined)
   }
 
   const productionMode = ref(false)
@@ -35,14 +40,13 @@ export function useVueImportMap(
 
   const importMap = computed<ImportMap>(() => {
     const vue =
-      (!vueVersion.value &&
-        normalizeDefaults(
-          productionMode.value ? defaults.runtimeProd : defaults.runtimeDev,
-        )) ||
+      normalizePath(
+        productionMode.value ? defaults.runtimeProd : defaults.runtimeDev,
+      ) ||
       getVueURL()
 
     const serverRenderer =
-      (!vueVersion.value && normalizeDefaults(defaults.serverRenderer)) ||
+      normalizePath(defaults.serverRenderer) ||
       `https://cdn.jsdelivr.net/npm/@vue/server-renderer@${
         vueVersion.value || currentVersion
       }/dist/server-renderer.esm-browser.js`
