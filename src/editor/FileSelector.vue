@@ -122,7 +122,10 @@ function horizontalScroll(e: WheelEvent) {
       <div
         v-if="pending !== file"
         class="file"
-        :class="{ active: store.activeFile.filename === file }"
+        :class="{
+          active: store.activeFile.filename === file,
+          error: store.files[file]?.compiled.errors?.length,
+        }"
         @click="store.setActive(file)"
         @dblclick="i > 0 && editFileName(file)"
       >
@@ -156,7 +159,10 @@ function horizontalScroll(e: WheelEvent) {
       <div
         v-if="showTsConfig && store.files[tsconfigFile]"
         class="file"
-        :class="{ active: store.activeFile.filename === tsconfigFile }"
+        :class="{
+          active: store.activeFile.filename === tsconfigFile,
+          error: store.files[tsconfigFile]?.compiled.errors?.length,
+        }"
         @click="store.setActive(tsconfigFile)"
       >
         <span class="label">tsconfig.json</span>
@@ -164,7 +170,10 @@ function horizontalScroll(e: WheelEvent) {
       <div
         v-if="showImportMap"
         class="file"
-        :class="{ active: store.activeFile.filename === importMapFile }"
+        :class="{
+          active: store.activeFile.filename === importMapFile,
+          error: store.files[importMapFile]?.compiled.errors?.length,
+        }"
         @click="store.setActive(importMapFile)"
       >
         <span class="label">Import Map</span>
@@ -222,6 +231,10 @@ function horizontalScroll(e: WheelEvent) {
   color: var(--color-branding);
   border-bottom: 3px solid var(--color-branding);
   cursor: text;
+}
+.file.error .label {
+  text-decoration: underline wavy #f56c6c;
+  text-underline-offset: 4px;
 }
 .file span {
   display: inline-block;

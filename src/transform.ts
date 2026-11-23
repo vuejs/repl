@@ -25,7 +25,7 @@ function transformTS(src: string, isJSX?: boolean) {
   }).code
 }
 
-export async function compileFile(
+async function doCompileFile(
   store: Store,
   { filename, code, compiled }: File,
 ): Promise<(string | Error)[]> {
@@ -406,4 +406,13 @@ async function doCompileTemplate(
     code = await transformTS(code, isJSX)
   }
   return { code, map, errors: [] }
+}
+
+export async function compileFile(
+  store: Store,
+  file: File,
+): Promise<(string | Error)[]> {
+  const errors = await doCompileFile(store, file)
+  file.compiled.errors = errors
+  return errors
 }
