@@ -540,6 +540,7 @@ export class File {
     ssr: '',
     clientMap: '',
     ssrMap: '',
+    errors: [] as (string | Error)[],
   }
   editorViewState: editor.ICodeEditorViewState | null = null
 
